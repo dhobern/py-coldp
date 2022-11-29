@@ -62,7 +62,7 @@ reference_id = None
 show_help = False
 
 numeric = re.compile("^[0-9]+$")
-iso2 = re.compile("^[A-Z][A-Z](-[A-Z0-9]+)$")
+iso2 = re.compile("^[A-Z][A-Z](-[A-Z0-9]+)?$")
 
 # Be tolerant of arguments in any order - one should be a country code, one should be a reference ID, one should be a 
 # COLDP folder and one should be a CSV file
