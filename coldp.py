@@ -119,16 +119,16 @@ class NameBundle:
                         self.coldp.issue(
                             "Uppercase initial letter for epithet: " + name[k])
                         name[k] = name[k][0].lower() + name[k][1:]
-        if self.coldp.is_species_group(name):
-            name["scientificName"], name["rank"] = \
-                self.coldp.construct_species_rank_name(
-                        name["genus"],
-                        name["infragenericEpithet"],
-                        name["specificEpithet"],
-                        name["infraspecificEpithet"],
-                        name["rank"])
-        else:
-            name["scientificName"] = name["uninomial"]
+            if self.coldp.is_species_group(name):
+                name["scientificName"], name["rank"] = \
+                    self.coldp.construct_species_rank_name(
+                            name["genus"],
+                            name["infragenericEpithet"],
+                            name["specificEpithet"],
+                            name["infraspecificEpithet"],
+                            name["rank"])
+            else:
+                name["scientificName"] = name["uninomial"]
         return name
 
     def derive_name(self, name, values):
