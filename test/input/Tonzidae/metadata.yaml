@@ -1,0 +1,150 @@
+---
+title: Global Lepidoptera Index
+alias: Global Lepidoptera Index
+description: "Global Lepidoptera Index is a revised dataset based on the Global Lepidoptera\
+  \ Names Index (LepIndex), a digitised and updated version of the unique index card\
+  \ archive to the scientific names of the living and fossil butterflies and moths\
+  \ of the world at the Natural History Museum (London). This card index was produced\
+  \ by the museum’s lepidopterists over many decades and contained 15,578 genus and\
+  \ 157,474 species names for Lepidoptera (moths and butterflies), together with synonyms,\
+  \ misspellings and misidentifications. Updates to LepIndex, the digitised version\
+  \ of this dataset, ended in 2012. Large sections of the dataset are outdated and\
+  \ contain errors or inaccuracies (particularly relating to changes in higher classification\
+  \ and incomplete data on historical combinations for each epithet), but the size\
+  \ of the Lepidoptera makes it challenging to find and correct all these issues.\n\
+  \nLepIndex has now been imported into TaxonWorks and is maintained there as an online\
+  \ curated resource. Significant updates have been made to some families, and work\
+  \ will continue to improve all aspects of this important dataset. \n\nTaxonomists\
+  \ working with any Lepidoptera groups are encouraged to make contributions to improve\
+  \ the quality and completeness of the dataset. Please contact Donald Hobern (donald.hobern@sp2000.org)\
+  \ for more information."
+issued: 2022-10-19
+version: 2022-10-19
+contact:
+  orcid: 0000-0001-6492-4016
+  given: Donald
+  family: Hobern
+  rorid: 04m098c22
+  city: Aranda
+  state: ACT
+  email: donald.hobern@sp2000.org
+  url: https://sp2000.org/
+  address: Aranda, ACT
+  organisation: Species 2000
+creator:
+ -
+  orcid: 0000-0003-0323-8535
+  given: George
+  family: Beccaloni
+  rorid: 039zvsn29
+  city: London
+  country: GB
+  url: https://www.nhm.ac.uk/
+  address: London, United Kingdom
+  organisation: Natural History Museum
+ -
+  given: Malcolm
+  family: Scoble
+  rorid: 039zvsn29
+  city: London
+  country: GB
+  url: https://www.nhm.ac.uk/
+  address: London, United Kingdom
+  organisation: Natural History Museum
+ -
+  orcid: 0000-0003-4738-5967
+  given: Ian
+  family: Kitching
+  rorid: 039zvsn29
+  city: London
+  country: GB
+  url: https://www.nhm.ac.uk/
+  address: London, United Kingdom
+  organisation: Natural History Museum
+ -
+  orcid: 0000-0001-9857-9564
+  given: Thomas
+  family: Simonsen
+  rorid: 039zvsn29
+  city: London
+  country: GB
+  url: https://www.nhm.ac.uk/
+  address: London, United Kingdom
+  organisation: Natural History Museum
+ -
+  given: Gaden
+  family: Robinson
+  rorid: 039zvsn29
+  city: London
+  country: GB
+  url: https://www.nhm.ac.uk/
+  address: London, United Kingdom
+  organisation: Natural History Museum
+ -
+  given: Brian
+  family: Pitkin
+  rorid: 039zvsn29
+  city: London
+  country: GB
+  url: https://www.nhm.ac.uk/
+  address: London, United Kingdom
+  organisation: Natural History Museum
+ -
+  given: Adrian
+  family: Hine
+  rorid: 039zvsn29
+  city: London
+  country: GB
+  url: http://www.nhm.ac.uk/
+  address: London, United Kingdom
+  organisation: Natural History Museum
+ -
+  orcid: 0000-0003-3647-6222
+  given: Christopher
+  family: Lyal
+  rorid: 039zvsn29
+  city: London
+  country: GB
+  url: https://www.nhm.ac.uk/
+  address: London, United Kingdom
+  organisation: Natural History Museum
+ -
+  given: Justin
+  family: Ollerenshaw
+  rorid: 039zvsn29
+  city: London
+  country: GB
+  url: http://www.nhm.ac.uk/
+  address: London, United Kingdom
+  organisation: Natural History Museum
+ -
+  orcid: 0000-0002-8634-8790
+  given: Peter
+  family: Wing
+  rorid: 039zvsn29
+  city: London
+  country: GB
+  url: https://www.nhm.ac.uk/
+  address: London, United Kingdom
+  organisation: Natural History Museum
+editor:
+ -
+  orcid: 0000-0001-6492-4016
+  given: Donald
+  family: Hobern
+  rorid: 04m098c22
+  city: Aranda
+  state: ACT
+  email: donald.hobern@sp2000.org
+  url: https://sp2000.org/
+  address: Aranda, ACT
+  organisation: Species 2000
+keyword: []
+geographicScope: Global
+taxonomicScope: Moths and Butterflies
+temporalScope: Modern
+confidence: 2
+completeness: 70
+license: cc by
+logo: https://api.checklistbank.org/dataset/55434/logo%3Fsize=ORIGINAL
+source: []

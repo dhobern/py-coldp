@@ -17,29 +17,72 @@ checklist datasets. See: https://github.com/CatalogueOfLife/coldp
 # ---------------------------------------------------------------------------
 # Imports
 # ---------------------------------------------------------------------------
-import pandas
+import pandas as pd
+import numpy as np  
 import logging
 import os
 import re
+import shutil
+
+name_from_nameusage = { 
+    "status": "nameStatus",
+    "genus": "genericName",
+    "referenceID": "nameReferenceID",
+    "remarks": "nameRemarks"
+}
+
+taxon_from_nameusage = { 
+    "nameID": "ID",
+    "provisional": "status"
+}
+
+synonym_from_nameusage = {
+    "taxonID": "parentID",
+    "nameID": "ID"
+}
+
+nameusage_headings = [ 
+    "ID", "sourceID", "parentID", "basionymID", "status", "scientificName", 
+    "authorship", "rank", "notho", "uninomial", "genericName", 
+    "infragenericEpithet", "specificEpithet", "infraspecificEpithet", 
+    "cultivarEpithet", "namePhrase", "nameReferenceID", "publishedInYear", 
+    "publishedInPage", "publishedInPageLink", "code", "nameStatus", 
+    "accordingToID", "accordingToPage", "accordingToPageLink", "referenceID", 
+    "scrutinizer", "scrutinizerID", "scrutinizerDate", "extinct", 
+    "temporalRangeStart", "temporalRangeEnd", "environment", "species", 
+    "section", "subgenus", "genus", "subtribe", "tribe", "subfamily", "family", 
+    "superfamily", "suborder", "order", "subclass", "class", "subphylum", 
+    "phylum", "kingdom", "sequenceIndex", "branchLength", "link", "nameRemarks", 
+    "remarks" ]
+
+name_headings = [ 
+    "ID", "sourceID", "basionymID", "scientificName", 
+    "authorship", "rank", "uninomial", "genus", 
+    "infragenericEpithet", "specificEpithet", "infraspecificEpithet", 
+    "cultivarEpithet", "code", "status", "referenceID", "publishedInYear", 
+    "publishedInPage", "publishedInPageLink", "link", "remarks" ]
+
+taxon_headings = [
+    "ID", "sourceID", "parentID", "nameID", "namePhrase", "nameReferenceID", 
+    "publishedInYear", "publishedInPage", "publishedInPageLink", "code", 
+    "nameStatus", "accordingToID", "scrutinizer", "scrutinizerID", 
+    "scrutinizerDate", "referenceID", "extinct", "temporalRangeStart", 
+    "temporalRangeEnd", "environment", "species", "section", "subgenus", 
+    "genus", "subtribe", "tribe", "subfamily", "family", 
+    "superfamily", "suborder", "order", "subclass", "class", "subphylum", 
+    "phylum", "kingdom", "link", "remarks" ]
+
+rank_headings = [ "kingdom", "phylum", "subphylum", "class", "subclass", 
+    "order", "suborder", "superfamily", "family", "subfamily", "tribe", 
+    "subtribe", "genus", "subgenus", "section", "species" ]
+
+synonym_headings = [
+    "ID", "sourceID", "taxonID", "nameID", "namePhrase", "accordingToID", 
+    "status", "referenceID",  "link", "remarks" ]
 
 reference_headings = [ 
     "ID", "author", "title", "issued", "containerTitle", "volume", "issue", 
     "page", "link", "citation" ]
-
-name_headings = [ 
-    "ID", "basionymID", "scientificName", "authorship", "rank", "uninomial", 
-    "genus", "infragenericEpithet", "specificEpithet", "infraspecificEpithet", 
-    "referenceID", "publishedInPage", "publishedInYear", "code", "status", 
-    "remarks", "link" ]
-
-taxon_headings = [ 
-    "ID", "parentID", "nameID", "scrutinizer", "scrutinizerDate", "provisional",
-     "referenceID", "extinct", "temporalRangeEnd", "lifezone", "kingdom", 
-     "phylum", "class", "order", "superfamily", "family", "subfamily", "tribe", 
-     "genus", "uninomial", "species", "remarks" ]
-
-synonym_headings = [ 
-    "taxonID", "nameID", "accordingToID", "status", "referenceID", "remarks" ]
 
 type_material_headings = [ 
     "nameID", "citation", "status", "referenceID", "locality", "country", 
@@ -57,6 +100,8 @@ species_interaction_headings = [
     "referenceID", "remarks" ]
 
 issues_headings = [ "context", "issue" ]
+
+csv_extensions = { "csv" : ",", "tsv": "\t", "txt": "\t" }
 
 uninomial_pattern = re.compile('^[A-Z][a-z]+$')
 epithet_pattern = re.compile('^[a-z]-?[a-z]+$')
@@ -97,7 +142,8 @@ class NameBundle:
     def normalise_name(self, name, sic=True):
         for k in [
                 "uninomial", "genus", "infragenericEpithet", "specificEpithet", 
-                "infraspecificEpithet", "authorship", "rank", "basionymID" ]:
+                "infraspecificEpithet", "authorship", "rank", "basionymID",
+                "scientificName" ]:
             if k not in name:
                 name[k] = ""
         if not sic:
@@ -168,19 +214,39 @@ class COLDP:
         self.species_from_trinomials = False
         self.subspecies_from_trinomials = False
         self.subgenus_free_synonyms = False
+        self.basionyms_from_synonyms = False
+        self.classification_from_parents = False
         self.issues_to_stdout = False
+
         if kwargs:
             self.set_options(kwargs)
         self.folder = folder
         self.name = name
-        self.names = pandas.DataFrame(columns=name_headings)
-        self.taxa = pandas.DataFrame(columns=taxon_headings)
-        self.synonyms = pandas.DataFrame(columns=synonym_headings)
-        self.references = pandas.DataFrame(columns=reference_headings)
-        self.type_materials = None
-        self.distributions = None
-        self.name_relations = None
-        self.species_interactions = None
+        source_folder = os.path.join(folder, name)
+        self.name_usages = None
+        self.names = self.initialise_dataframe(
+                source_folder, "name", name_headings)
+        self.taxa = self.initialise_dataframe(
+                source_folder, "taxon", taxon_headings)
+        self.synonyms = self.initialise_dataframe(
+                source_folder, "synonym", synonym_headings)
+        self.references = self.initialise_dataframe(
+                source_folder, "reference", reference_headings)
+        self.distributions = self.initialise_dataframe(
+                source_folder, "distribution", distribution_headings)
+        self.species_interactions = self.initialise_dataframe(
+                source_folder, "speciesinteration", 
+                species_interaction_headings)
+        self.name_relations = self.initialise_dataframe(
+                source_folder, "namerelation", name_relation_headings)
+        self.type_materials = self.initialise_dataframe(
+                source_folder, "typematerial", type_material_headings)
+        ranks = self.names.loc[:, ["ID", "rank", "scientificName"]]
+        ranks.columns = [ "nameID", "rank", "scientificName" ]
+        if self.classification_from_parents:
+            self.fix_classification(self.taxa, ranks, None)
+        if self.basionyms_from_synonyms:
+            self.fix_basionyms(self.names, self.synonyms)
         self.issues = None
         self.context = None
 
@@ -201,11 +267,129 @@ class COLDP:
                 self.context = value
             elif key == "issues_to_stdout":
                 self.issues_to_stdout = value
+            elif key == "basionyms_from_synonyms":
+                self.basionyms_from_synonyms = value
+            elif key == "classification_from_parents":
+                self.classification_from_parents = value
             elif key == "code" and value in ["ICZN", "ICBN"]:
                 self.code = value
 
     def set_context(self, context):
         self.context = context
+
+    def initialise_dataframe(self, foldername, name, default_headings):
+        df = None
+        nameusage_filename = None
+        if os.path.isdir(foldername):
+            if os.path.isdir(os.path.join(foldername, "data")):
+                foldername = os.path.join(foldername, "data")
+            for filename in os.listdir(foldername):
+                parts = filename.lower().split(".")
+                if parts[0] == "nameusage":
+                    nameusage_filename = filename
+                if len(parts) == 2 and parts[0] == name \
+                    and parts[1] in csv_extensions.keys():
+                    df = pd.read_csv(os.path.join(foldername, filename), 
+                            dtype=str, keep_default_na=False, 
+                            sep=csv_extensions[parts[1]])
+                    columns = df.columns.tolist()
+                    for i in range(len(columns)):
+                        if ":" in columns[i]:
+                            columns[i] = columns[i].split(":")[1]
+                    df.columns = columns
+                    break
+        if df is None and nameusage_filename is not None and \
+                name in [ "name", "taxon", "synonym" ]:
+            if self.name_usages is None:
+                self.name_usages = self.initialise_dataframe(
+                        foldername, "nameusage", nameusage_headings)
+            if self.name_usages is not None:
+                synonym_statuses = [ 
+                        "synonym", "ambiguous synonym", "misapplied" ]
+                if name == "name":
+                    df = self.extract_table(
+                            self.name_usages, name_headings, name_from_nameusage)
+                elif name == "synonym":
+                    df = self.extract_table(
+                        self.name_usages[
+                                self.name_usages.status.isin(synonym_statuses)], 
+                        synonym_headings, synonym_from_nameusage)
+                else:
+                    df = self.extract_table(self.name_usages[
+                            ~self.name_usages.status.isin(synonym_statuses)], 
+                        taxon_headings, taxon_from_nameusage)
+
+        if df is None and default_headings is not None:
+            df = pd.DataFrame(columns=default_headings)
+
+        return df
+
+    def extract_table(self, df, headings, mappings):
+        table = None
+
+        headings_out = []
+        headings_in = []
+
+        for h in headings:
+            m = mappings[h] if h in mappings else h
+            if m in df.columns:
+                headings_out.append(h)
+                headings_in.append(m)
+
+        if len(headings_in) > 0:
+            table = df.loc[:, headings_in]
+            table.columns = headings_out
+        
+        return table
+
+    def fix_basionyms(self, names, synonyms):
+        for index, row in names.iterrows():
+            if row["authorship"].startswith("("):
+                authorship = row["authorship"][1:len(row["authorship"])-1]
+                if row["infraspecificEpithet"]:
+                    epithet = row["infraspecificEpithet"]
+                else:
+                    epithet = row["specificEpithet"]
+                match = names[(names["authorship"] == authorship) & 
+                        ((names["infraspecificEpithet"] == epithet) | 
+                            ((names["infraspecificEpithet"] == "") & 
+                                (names["specificEpithet"] == epithet)))]
+                if len(match) > 1:
+                    synonym_match = pd.merge( \
+                        synonyms[synonyms["taxonID"] == row["ID"]] \
+                                [["nameID", "taxonID"]], 
+                        names, left_on="nameID", right_on="ID", 
+                        how="left")[["ID"]]
+                    match = pd.merge(match, synonym_match, on="ID", how="inner")
+                if len(match) == 0:
+                    print(f"Cannot find basionym for {row['ID']}: " + \
+                            f"{row['scientificName']} {row['authorship']}")
+                elif len(match) == 1:
+                    names.loc[names["ID"] == row["ID"], "basionymID"] = \
+                            match.iloc[0]["ID"]
+            else:
+                names.loc[names["ID"] == row["ID"], "basionymID"] = row["ID"]
+
+    def fix_classification(self, taxa, ranks, parent):
+        if parent is None:
+            for p in range(len(rank_headings)):
+                parents = pd.merge(
+                        taxa, ranks[ranks["rank"] == rank_headings[p]], 
+                        on="nameID", how="right")
+                if parents is not None and len(parents) > 0:
+                    break
+        else:
+            classification = parent[rank_headings]
+            if parent["rank"] in rank_headings:
+                classification[rank_headings.index(parent["rank"])] = \
+                    parent["scientificName"]
+
+            taxa.loc[taxa["parentID"] == parent["ID"], rank_headings] \
+                    = classification.to_numpy()
+            parents = pd.merge(taxa.loc[taxa["parentID"] == parent["ID"]],
+                    ranks, on="nameID", how="left")
+        for i in range(len(parents)):
+            self.fix_classification(taxa, ranks, parents.iloc[i])
 
     #
     # Ensure one or more references are included in references dataframe
@@ -226,8 +410,8 @@ class COLDP:
     def add_references(self, reference_list):
         for i in range(len(reference_list)):
             r = reference_list[i]
-            for k in ["author", "title", "issued", "containerTitle", "volume", 
-                    "issue", "page", "citation"]:
+            for k in ["ID", "author", "title", "issued", "containerTitle", 
+                    "volume", "issue", "page", "citation"]:
                 if k not in r:
                     r[k] = ""
 
@@ -250,7 +434,7 @@ class COLDP:
             else:
                 if not r["ID"]:
                     r["ID"] = str(len(self.references) + 1)
-                self.references = pandas.concat((self.references, pandas.DataFrame.from_records([r])), ignore_index=True)
+                self.references = pd.concat((self.references, pd.DataFrame.from_records([r])), ignore_index=True)
                 logging.debug("Added reference " + str(r))
         return reference_list
 
@@ -343,7 +527,7 @@ class COLDP:
     def add_type_material(self, type_material):
         if self.type_materials is None:
             logging.info("Adding type_material table")
-            self.type_materials = pandas.DataFrame(
+            self.type_materials = pd.DataFrame(
                     columns=type_material_headings)
         
         if "nameID" not in type_material or \
@@ -352,14 +536,14 @@ class COLDP:
             return None
 
         self.type_materials = \
-                pandas.concat((self.type_materials, 
-                    pandas.DataFrame.from_records([type_material])), ignore_index=True)
+                pd.concat((self.type_materials, 
+                    pd.DataFrame.from_records([type_material])), ignore_index=True)
         return type_material
 
     def add_distribution(self, distribution):
         if self.distributions is None:
             logging.info("Adding distribution table")
-            self.distributions = pandas.DataFrame(
+            self.distributions = pd.DataFrame(
                     columns=distribution_headings)
         
         if "taxonID" not in distribution or \
@@ -368,8 +552,8 @@ class COLDP:
             return None
 
         self.distributions = \
-                pandas.concat((self.distributions, 
-                    pandas.DataFrame.from_records(
+                pd.concat((self.distributions, 
+                    pd.DataFrame.from_records(
                             [distribution])), ignore_index=True)
         return distribution
 
@@ -436,7 +620,7 @@ class COLDP:
             return match.iloc[0]
         synonym_row = { 
             "taxonID": taxon_id, "nameID": name_id, "status": "synonym" }
-        self.synonyms = pandas.concat((self.synonyms, pandas.DataFrame.from_records([synonym_row])), ignore_index = True)
+        self.synonyms = pd.concat((self.synonyms, pd.DataFrame.from_records([synonym_row])), ignore_index = True)
         return
 
     def add_taxon(self, name, parent, incertae_sedis=False):
@@ -505,7 +689,7 @@ class COLDP:
                 else:
                     taxon_row["remarks"] = taxon_row["remarks"]
                 taxon_row["remarks"] = "Incertae sedis"
-            self.taxa = pandas.concat((self.taxa, pandas.DataFrame.from_records([taxon_row])), ignore_index=True)
+            self.taxa = pd.concat((self.taxa, pd.DataFrame.from_records([taxon_row])), ignore_index=True)
 
             return taxon_row
 
@@ -521,7 +705,7 @@ class COLDP:
         else:
             if "ID" not in name or not name["ID"]:
                 name["ID"] = str(len(self.names) + 1)
-            self.names = pandas.concat((self.names, pandas.DataFrame.from_records([name])), ignore_index = True)
+            self.names = pd.concat((self.names, pd.DataFrame.from_records([name])), ignore_index = True)
         return name
 
     def same_basionym(self, a, b):
@@ -679,13 +863,15 @@ class COLDP:
     # Behaviour:
     #   Ensure that <folder>/<name>/ exists and write all dataframes as CSV.
     #
-    def save(self):
-        if not os.path.exists(self.folder):
+    def save(self, destination = None):
+        if destination is None:
+            destination = self.folder
+        if not os.path.exists(destination):
             logging.critical(
-                "Can't save package. Folder does not exist: " + self.folder)
+                f"Can't save package. Folder does not exist: {destination}")
             return
         logging.debug("Saving COLDP")    
-        coldp_folder = os.path.join(self.folder, self.name)
+        coldp_folder = os.path.join(destination, self.name)
         if not os.path.exists(coldp_folder):
             os.mkdir(coldp_folder)
         for item, value in { 
@@ -699,7 +885,10 @@ class COLDP:
                 "speciesinteraction": self.species_interactions,
                 "issue": self.issues 
                 }.items():
-            if value is not None:
+            if value is not None and len(value) > 0:
+                value.replace('', np.nan, inplace=True)
+                value.dropna(how='all', axis=1, inplace=True)
+                value.replace(np.nan, '', inplace=True)
                 file_name = os.path.join(coldp_folder, item + ".csv")
                 value.to_csv(file_name, index=False)
         logging.info("COLDP saved to " + coldp_folder)
@@ -707,7 +896,7 @@ class COLDP:
 
     def issue(self, message, **record):
         if self.issues is None:
-            self.issues = pandas.DataFrame(columns=issues_headings)
+            self.issues = pd.DataFrame(columns=issues_headings)
 
         context = self.context if self.context else ""
         record = {"issue": message, "context": context }
@@ -715,7 +904,7 @@ class COLDP:
         if self.issues_to_stdout:
             logging.error(context + ": " + message)
         
-        self.issues = pandas.concat((self.issues, pandas.DataFrame.from_records([record])), ignore_index=True)
+        self.issues = pd.concat((self.issues, pd.DataFrame.from_records([record])), ignore_index=True)
             
 
         
@@ -735,11 +924,15 @@ if __name__ == "__main__":
         "temporalRangeEnd": "Holocene"
     }
 
-    coldp = COLDP("./", "coldp", 
+    for f in os.listdir("./test/output/"):
+        shutil.rmtree(os.path.join("./test/output/", f))
+
+    coldp = COLDP("./test/output/", "fake", 
                     default_taxon_record=default_taxon,
                     insert_species_for_trinomials=True,
                     create_subspecies_for_infrasubspecifics=True,
-                    create_synonyms_without_subgenus=True)
+                    create_synonyms_without_subgenus=True,
+                    issues_to_stdout=True)
 
     coldp.add_references([
         {"author": "White, T.H.", "issued": "1950", "title": "The Once and Future King", "containerTitle": "Penguin Classics", "volume": "34", "page": "1-756"},
@@ -790,3 +983,17 @@ if __name__ == "__main__":
     coldp.modify_taxon(nb.accepted_taxon_id, {"extinct": "true", "lifezone": "marine"})
 
     coldp.save()
+
+    coldp = COLDP("./test/input", "Tonzidae", 
+                basionyms_from_synonyms=True,
+                classification_from_parents=True,
+                issues_to_stdout=True)
+
+    coldp.save("./test/output")
+
+    coldp = COLDP("../../Dropbox/NetBeans Projects/Tineidae", "NHM_Tineidae_2011-11-21", 
+                basionyms_from_synonyms=True,
+                classification_from_parents=True,
+                issues_to_stdout=True)
+
+    coldp.save("./test/output")
