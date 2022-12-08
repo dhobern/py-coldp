@@ -1,2 +1,5 @@
 
 *.pyc
+COLDP.log
+coldp_reshape_2.py
+test/output/
