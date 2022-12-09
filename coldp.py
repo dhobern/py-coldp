@@ -8,8 +8,8 @@
 """ 
 COLDP.py
 
-COLDP is a Python class for creating and serialising Catalogue of Life
-Data Package (COLDP) files.
+COLDP is a Python class for creating or loading, manipulating and serialising 
+Catalogue of Life Data Package (COLDP) files.
 
 COLDP is the preferred format within Catalogue of Life for organising taxonomic 
 checklist datasets. See: https://github.com/CatalogueOfLife/coldp 
@@ -24,23 +24,9 @@ import os
 import re
 import shutil
 
-name_from_nameusage = { 
-    "status": "nameStatus",
-    "genus": "genericName",
-    "referenceID": "nameReferenceID",
-    "remarks": "nameRemarks"
-}
-
-taxon_from_nameusage = { 
-    "nameID": "ID",
-    "provisional": "status"
-}
-
-synonym_from_nameusage = {
-    "taxonID": "parentID",
-    "nameID": "ID"
-}
-
+# ---------------------------------------------------------------------------
+# Column headings for each data class within COLDP packages
+# ---------------------------------------------------------------------------
 nameusage_headings = [ 
     "ID", "sourceID", "parentID", "basionymID", "status", "scientificName", 
     "authorship", "rank", "notho", "uninomial", "genericName", 
@@ -99,34 +85,86 @@ species_interaction_headings = [
     "taxonID", "relatedTaxonID", "relatedTaxonScientificName", "type", 
     "referenceID", "remarks" ]
 
+# ---------------------------------------------------------------------------
+# Column headings for the issues log
+# ---------------------------------------------------------------------------
 issues_headings = [ "context", "issue" ]
 
-csv_extensions = { "csv" : ",", "tsv": "\t", "txt": "\t" }
+# ---------------------------------------------------------------------------
+# Dictionaries for mapping columns from nameusage format into separate
+# name, taxon and synonym dataframes. 
+# 
+# Keys indicate the column name in the target table and values represent the
+# column name in the nameusage table 
+# ---------------------------------------------------------------------------
+name_from_nameusage = { 
+    "status": "nameStatus",
+    "genus": "genericName",
+    "referenceID": "nameReferenceID",
+    "remarks": "nameRemarks"
+}
 
+taxon_from_nameusage = { 
+    "nameID": "ID",
+    "provisional": "status"
+}
+
+synonym_from_nameusage = {
+    "taxonID": "parentID",
+    "nameID": "ID"
+}
+
+# ---------------------------------------------------------------------------
+# Recognised file extensions and their associated separator characters
+# ---------------------------------------------------------------------------
+csv_extensions = { 
+    "csv" : ",", 
+    "tsv": "\t", 
+    "txt": "\t" 
+}
+
+# ---------------------------------------------------------------------------
+# Regular expression patterns for uninomial and species-rank epithets and a
+# superset expression including both
+# ---------------------------------------------------------------------------
 uninomial_pattern = re.compile('^[A-Z][a-z]+$')
 epithet_pattern = re.compile('^[a-z]-?[a-z]+$')
 name_pattern = re.compile('^[A-Za-z]-?[a-z]+$')
 
-#
+# ---------------------------------------------------------------------------
+# 
 # CLASS: NameBundle
 #
-# Wrapper to manage set of associated names, normally an original and an
-# accepted name. The bundle handles the logic of associate name variations.
+# Wrapper class to manage set of associated names, normally an accepted name
+# and one or more synonyms. The bundle handles the logic of associated name 
+# variations.
 # 
 # Usage:
 #   The minimal usage is to create a new bundle with an accepted name. One 
 #   or more synonyms can also be supplied using the add_synonym() method.
-#   The prepare() method augments the bundle with other associated names to
-#   support intelligent handling by the COLDP package. 
-#   (variant) 
+#   The bundle is then submitted to the COLDP add_names method for 
+#   processing.
 #
+# ---------------------------------------------------------------------------
 class NameBundle:
 
-    def __init__(self, coldp, accepted, incertae_sedis=False):
+    #------------------------------------------------------------------------
+    # __init__ - Initialise NameBundle
+    #
+    #   coldp: COLDP object to handle logging of any issues and normalise 
+    #       name records
+    #   accepted: Dictionary mapping COLDP name elements to values for the 
+    #       accepted name - a name record and a taxon record will be added to 
+    #       the COLDP package for the accepted name
+    #   incertae_sedis: Flag to indicate if the resulting taxon record should
+    #       be marked "incertae sedis" 
+    #------------------------------------------------------------------------
+    def __init__(self, coldp:type["COLDP"], accepted:dict, 
+                incertae_sedis:bool=False) -> None:
         self.coldp = coldp
         if "rank" not in accepted:
-            self.coldp.issue(
-                "Accepted name missing rank, assume species: " + str(accepted))
+            self.coldp.issue("Accepted name missing rank, assume species: " \
+                    + str(accepted))
             accepted["rank"] = "species"
         self.accepted = self.normalise_name(accepted)
         self.incertae_sedis = incertae_sedis
@@ -136,35 +174,69 @@ class NameBundle:
         self.species_synonym = None
         self.accepted_species_id = None
 
-    def add_synonym(self, synonym, sic=False):
+    #------------------------------------------------------------------------
+    # add_synonym - Register an additional name as a synonym for the accepted
+    #       name
+    #
+    #   synonym: Dictionary mapping COLDP name elements to values for the 
+    #       synonymous name - a name record and a synonym record will be 
+    #       added to the COLDP package for the synonym
+    #   sic: Flag to indicate that the name does not follow expected 
+    #       formatting rules for a code-compliant name and that no issues
+    #       should be logged for this 
+    #------------------------------------------------------------------------
+    def add_synonym(self, synonym:dict, sic:bool=False) -> None:
         self.synonyms.append(self.normalise_name(synonym, sic))
 
-    def normalise_name(self, name, sic=True):
+    #------------------------------------------------------------------------
+    # normalise_name - Ensure that a name record dictionary contains all 
+    #       necessary/appropriate elements
+    #
+    #   name: Dictionary containing name to be normalised
+    #   sic: Flag to indicate that the name does not follow expected 
+    #       formatting rules for a code-compliant name and that no issues
+    #       should be logged for this 
+    #
+    #   Returns name dictionary updated with extra values 
+    #------------------------------------------------------------------------
+    def normalise_name(self, name:dict, sic:bool=True) -> dict:
+
+        # Ensure main elements are present in dictionary
         for k in [
-                "uninomial", "genus", "infragenericEpithet", "specificEpithet", 
-                "infraspecificEpithet", "authorship", "rank", "basionymID",
-                "scientificName" ]:
+                "uninomial", "genus", "infragenericEpithet", 
+                "specificEpithet", "infraspecificEpithet", "authorship", 
+                "rank", "basionymID", "scientificName" ]:
             if k not in name:
                 name[k] = ""
+
+        # Skip processing if sic
         if not sic:
+
+            # Check uninomials for formatting - log issues and fix case
             for k in [ "uninomial", "genus", "infragenericEpithet" ]:
                 if len(name[k]) > 0:
                     if not name_pattern.match(name[k]):
                         self.coldp.issue(
-                            "Invalid pattern for supraspecific name: \"" + name[k] + "\"")
+                            "Invalid pattern for supraspecific name: \"" + \
+                                name[k] + "\"")
                     elif name[k][0].islower():
-                        self.coldp.issue(
-                            "Lowercase initial letter for supraspecific name: " 
-                                + name[k])
+                        self.coldp.issue("Lowercase initial letter " +\
+                            "for supraspecific name: " + name[k])
                         name[k] = name[k][0].upper() + name[k][1:]
+
+            # Check epithets for formatting - log issues and fix case
             for k in [ "specificEpithet", "infraspecificEpithet" ]:
                 if len(name[k]) > 0:
                     if not name_pattern.match(name[k]):
-                        self.coldp.issue("Invalid pattern for epithet: " + name[k])
+                        self.coldp.issue(
+                                "Invalid pattern for epithet: " + name[k])
                     elif name[k][0].isupper():
                         self.coldp.issue(
-                            "Uppercase initial letter for epithet: " + name[k])
+                            "Uppercase initial letter for epithet: " + \
+                                name[k])
                         name[k] = name[k][0].lower() + name[k][1:]
+
+            # Generate properly formatted scientific name
             if self.coldp.is_species_group(name):
                 name["scientificName"], name["rank"] = \
                     self.coldp.construct_species_rank_name(
@@ -175,9 +247,20 @@ class NameBundle:
                             name["rank"])
             else:
                 name["scientificName"] = name["uninomial"]
+
+        # Return normalised version of name
         return name
 
-    def derive_name(self, name, values):
+    #------------------------------------------------------------------------
+    # derive_name - Use supplied values to create new name dictionary with
+    #       missing elements copied from an existing name dictionary
+    #
+    #   name: Dictionary containing name on which new name is to be based
+    #   values: Dictionary of values to override values in name 
+    #
+    #   Returns name dictionary with supplied values supplemented from name
+    #------------------------------------------------------------------------
+    def derive_name(self, name:dict, values:dict) -> dict:
         if "authorship" not in values and "authorship" in name and \
                     not name["authorship"].startswith("("):
             if "genus" in values or "specificEpithet" in values:
@@ -191,17 +274,27 @@ class NameBundle:
                 values[k] = name[k]
         return self.normalise_name(values)
 
+# ---------------------------------------------------------------------------
 #
 # CLASS: COLDP
 #
-#   Wrapper for set of Pandas dataframes for CSV tables in Catalogue of Life
-#   Data Package.
-#
-#   Constructor:
-#       folder - name of folder in which to save COLDP package
-#       name - name for COLDP package (files will be saved as 
-#           <folder>/<name>/*.csv)
-#
+#   Class to manage a set of Pandas dataframes for CSV tables in Catalogue 
+#   of Life Data Package.
+# 
+# Usage:
+#   Initialise the COLDP object with folder, COLDP package name and other 
+#   options. If the package exists in the folder, the COLDP package is 
+#   initialised as a set of dataframes based on its data. Otherwise empty
+#   dataframes are created.
+# 
+#   Data is added using the add_references, add_names, add_typematerial,
+#   add_distribution and modify_taxon methods. The start_name_bundle is
+#   used to produce a NameBundle object for preparing an accepted name
+#   and associated synonyms to pass to add_names.
+# 
+#   The save method writes the data back to the same or another folder. 
+# 
+# ---------------------------------------------------------------------------
 class COLDP:
 
     def __init__(self, folder, name, **kwargs):
