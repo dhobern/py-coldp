@@ -114,6 +114,31 @@ synonym_from_nameusage = {
     "nameID": "ID"
 }
 
+#----------------------------------------------------------------------------
+# Dictionary for mappings between id columns in tables
+#
+# The keys to the outer dictionary are table names (for use with 
+# table_by_name()) which contain an "ID" column. Each key is associated with
+# an inner dictionary that maps the name of another (or sometimes the same
+# table) to a list of columns that contain ID values from the first table. 
+#----------------------------------------------------------------------------
+id_mappings = { "name": { "name": ["basionymID"],
+                       "taxon": ["nameID"],
+                       "name_relation": ["nameID", "relatedNameID"],
+                       "synonym": ["nameID"] },
+                "taxon": { "taxon": ["parentID"],
+                       "distribution": ["taxonID"],
+                       "species_interaction": ["taxonID", "relatedTaxonID"],
+                       "synonym": ["taxonID"] },
+                "reference": { "name": ["sourceID", "referenceID"],
+                       "taxon": ["sourceID", "referenceID", "nameReferenceID"],
+                       "synonym": ["sourceID", "referenceID"],
+                       "type_material": ["referenceID"],
+                       "distribution": ["referenceID"],
+                       "species_interaction": ["referenceID"],
+                       "name_relation": ["referenceID"] },
+                "synonym": {} }
+
 # ---------------------------------------------------------------------------
 # Recognised file extensions and their associated separator characters
 # ---------------------------------------------------------------------------
@@ -159,7 +184,7 @@ class NameBundle:
     #   incertae_sedis: Flag to indicate if the resulting taxon record should
     #       be marked "incertae sedis" 
     #------------------------------------------------------------------------
-    def __init__(self, coldp:type["COLDP"], accepted:dict, 
+    def __init__(self, coldp, accepted:dict, 
                 incertae_sedis:bool=False) -> None:
         self.coldp = coldp
         if "rank" not in accepted:
@@ -315,7 +340,10 @@ class COLDP:
             self.set_options(kwargs)
         self.folder = folder
         self.name = name
-        source_folder = os.path.join(folder, name)
+        if folder is not None:
+            source_folder = os.path.join(folder, name)
+        else:
+            source_folder = None
         self.name_usages = None
         self.names = self.initialise_dataframe(
                 source_folder, "name", name_headings)
@@ -334,10 +362,8 @@ class COLDP:
                 source_folder, "namerelation", name_relation_headings)
         self.type_materials = self.initialise_dataframe(
                 source_folder, "typematerial", type_material_headings)
-        ranks = self.names.loc[:, ["ID", "rank", "scientificName"]]
-        ranks.columns = [ "nameID", "rank", "scientificName" ]
         if self.classification_from_parents:
-            self.fix_classification(self.taxa, ranks, None)
+            self.fix_classification()
         if self.basionyms_from_synonyms:
             self.fix_basionyms(self.names, self.synonyms)
         self.issues = None
@@ -373,7 +399,7 @@ class COLDP:
     def initialise_dataframe(self, foldername, name, default_headings):
         df = None
         nameusage_filename = None
-        if os.path.isdir(foldername):
+        if foldername is not None and os.path.isdir(foldername):
             if os.path.isdir(os.path.join(foldername, "data")):
                 foldername = os.path.join(foldername, "data")
             for filename in os.listdir(foldername):
@@ -432,13 +458,13 @@ class COLDP:
         if len(headings_in) > 0:
             table = df.loc[:, headings_in]
             table.columns = headings_out
-        
+
         return table
 
     def fix_basionyms(self, names, synonyms):
         for index, row in names.iterrows():
             if row["authorship"].startswith("("):
-                authorship = row["authorship"][1:len(row["authorship"])-1]
+                authorship = get_original_authorship(row["authorship"])
                 if row["infraspecificEpithet"]:
                     epithet = row["infraspecificEpithet"]
                 else:
@@ -463,7 +489,12 @@ class COLDP:
             else:
                 names.loc[names["ID"] == row["ID"], "basionymID"] = row["ID"]
 
-    def fix_classification(self, taxa, ranks, parent):
+    def fix_classification(self):
+        ranks = self.names.loc[:, ["ID", "rank", "scientificName"]]
+        ranks.columns = [ "nameID", "rank", "scientificName" ]
+        self.fix_classification_recursive(self.taxa, ranks, None)
+
+    def fix_classification_recursive(self, taxa, ranks, parent):
         if parent is None:
             for p in range(len(rank_headings)):
                 parents = pd.merge(
@@ -482,7 +513,76 @@ class COLDP:
             parents = pd.merge(taxa.loc[taxa["parentID"] == parent["ID"]],
                     ranks, on="nameID", how="left")
         for i in range(len(parents)):
-            self.fix_classification(taxa, ranks, parents.iloc[i])
+            self.fix_classification_recursive(taxa, ranks, parents.iloc[i])
+
+    def sort_taxa(self):
+        df = pd.merge(self.taxa, self.names, left_on="nameID", right_on="ID", 
+                how="left", suffixes=["", "_name"]) \
+                    [["ID", "parentID", "rank", "scientificName"]] \
+                        .sort_values(["scientificName"])
+
+        ids = []
+        for index, row in df[(df["parentID"] == "") | \
+                    (df["parentID"].isnull())].iterrows():
+            ids = self.sort_taxa_recursive(df, ids, row["ID"])
+        ids = ids + df[~df["ID"].isin(np.array(ids))]["ID"].tolist()
+
+        sort_index = dict(zip(ids, range(len(ids))))
+        self.taxa["sequence"] = self.taxa["ID"].map(sort_index)
+        self.taxa = self.taxa.sort_values(["sequence"])
+        self.taxa.drop("sequence", axis=1, inplace=True)
+        self.taxa = self.taxa.reset_index(drop=True)
+
+    def sort_taxa_recursive(self, df, ids, id):
+        #ids.append(str(len(ids) + 1))
+        ids.append(id)
+        for index, row in df[df["parentID"] == id].iterrows():
+            ids = self.sort_taxa_recursive(df, ids, row["ID"])
+        return ids
+
+    def sort_names(self):
+        taxon_subset = self.taxa[["ID", "nameID"]]
+        taxon_subset["idx"] = self.taxa.index
+        sort_table = pd.merge(self.names[["ID"]], taxon_subset, 
+            left_on="ID", right_on="nameID", how="left", 
+            suffixes=["", "_taxon"])
+        sort_table = pd.merge(sort_table, self.synonyms[["taxonID", "nameID"]], 
+            left_on="ID", right_on="nameID", how="left", 
+            suffixes=["", "_synonym"])
+        sort_table.loc[sort_table["idx"].isnull(), ["idx"]] = \
+            pd.merge(sort_table.loc[sort_table["idx"].isnull()], 
+            taxon_subset, left_on="taxonID", right_on="ID", how="left")["idx_y"]
+        self.names[["idx"]] = sort_table[["idx"]]
+        self.names = self.names.sort_values(["idx", "scientificName"])
+        self.names.drop(["idx"], axis=1, inplace=True)
+        self.names = self.names.reset_index(drop=True)
+
+    def table_by_name(self, name):
+        tables = {
+            "name": self.names, "taxon": self.taxa, "synonym": self.synonyms,
+            "reference": self.references, "type_material": self.type_materials,
+            "distribution": self.distributions, 
+            "species_interaction": self.species_interactions,
+            "name_relation": self.name_relations }
+        return tables[name] if name in tables.keys() else None
+
+    def reset_ids(self, name=None, prefix=""):
+        for table_name in [ "name", "taxon", "reference", "synonym" ]:
+            if name is None or table_name == name:
+                table = self.table_by_name(table_name)
+                if prefix is None:
+                    prefix = ""
+                table["newID"] = prefix + (table.index + 1).astype(str)
+                by_ids = table.set_index("ID")
+                joins = id_mappings[table_name]
+                for key in joins.keys():
+                    other_table = self.table_by_name(key)
+                    for value in joins[key]:
+                        if value in other_table.columns:
+                            other_table[value] = \
+                                other_table[value].map(by_ids["newID"])
+                table["ID"] = table["newID"]
+                table.drop("newID", axis=1, inplace=True)
 
     #
     # Ensure one or more references are included in references dataframe
@@ -502,34 +602,49 @@ class COLDP:
     #
     def add_references(self, reference_list):
         for i in range(len(reference_list)):
-            r = reference_list[i]
-            for k in ["ID", "author", "title", "issued", "containerTitle", 
-                    "volume", "issue", "page", "citation"]:
-                if k not in r:
-                    r[k] = ""
-
-            match = self.references[
-                (self.references["author"] == r["author"]) &
-                (self.references["title"] == r["title"]) &
-                (self.references["issued"] == r["issued"]) &
-                (self.references["containerTitle"] == r["containerTitle"]) &
-                (self.references["volume"] == r["volume"]) &
-                (self.references["issue"] == r["issue"]) &
-                (self.references["page"] == r["page"]) &
-                (self.references["citation"] == r["citation"])]
-            if len(match) > 1:
-                logging.critical(
-                    "Multiple reference records exist for " + str(r))
-            elif len(match) == 1:
-                reference_list[i] = match.iloc[0]
-                logging.debug(
-                    "Matched reference ID " + reference_list[i]["ID"])
+            has_content = False
+            for k in reference_list[i].keys():
+                if reference_list[i][k]:
+                    has_content = True
+                    break
+            if has_content:
+                r = reference_list[i]
+                reference = self.find_reference(reference_list[i])
+                if reference is not None:
+                    reference_list[i] = reference
+                    logging.debug(
+                        "Matched reference ID " + reference_list[i]["ID"])
+                else:
+                    if not r["ID"]:
+                        r["ID"] = "r_" + str(len(self.references) + 1)
+                    self.references = pd.concat(
+                            (self.references, pd.DataFrame.from_records([r])), 
+                            ignore_index=True)
+                    logging.debug("Added reference " + str(r))
             else:
-                if not r["ID"]:
-                    r["ID"] = str(len(self.references) + 1)
-                self.references = pd.concat((self.references, pd.DataFrame.from_records([r])), ignore_index=True)
-                logging.debug("Added reference " + str(r))
+                reference_list[i]["ID"] = ""
         return reference_list
+
+    def find_reference(self, reference):
+        for k in ["ID", "author", "title", "issued", "containerTitle", 
+                "volume", "issue", "page", "citation"]:
+            if k not in reference:
+                reference[k] = ""
+
+        match = self.references[
+            (self.references["author"] == reference["author"]) &
+            (self.references["title"] == reference["title"]) &
+            (self.references["issued"] == reference["issued"]) &
+            (self.references["containerTitle"] == reference["containerTitle"]) &
+            (self.references["volume"] == reference["volume"]) &
+            (self.references["issue"] == reference["issue"]) &
+            (self.references["page"] == reference["page"]) &
+            (self.references["citation"] == reference["citation"])]
+
+        if len(match) == 0:
+            return None
+        return match.iloc[0]
+
 
     def start_name_bundle(self, accepted, incertae_sedis=False):
         return NameBundle(self, accepted)
@@ -571,8 +686,8 @@ class COLDP:
                     bundle.synonyms[i] = self.set_basionymid( 
                             bundle.synonyms[i],
                             bundle.synonyms[i]["ID"])
-                    for j in range(i+1, len(bundle.synonyms)):
-                        if not bundle.synonyms[j]["basionymID"] and \
+                    for j in range(len(bundle.synonyms)):
+                        if i != j and not bundle.synonyms[j]["basionymID"] and \
                                 self.same_basionym(
                                     bundle.synonyms[i], bundle.synonyms[j]):
                             bundle.synonyms[j] = self.set_basionymid( 
@@ -802,23 +917,32 @@ class COLDP:
         return name
 
     def same_basionym(self, a, b):
-        authorship_a = a["authorship"]
-        if authorship_a.startswith("("):
-            authorship_a = authorship_a[1: len(authorship_a) - 1]
-        authorship_b = b["authorship"]
-        if authorship_b.startswith("("):
-            authorship_b = authorship_b[1: len(authorship_b) - 1]
+        authorship_a = self.get_original_authorship(a["authorship"])
+        authorship_b = self.get_original_authorship(b["authorship"])
         epithet_a = a["infraspecificEpithet"] if a["infraspecificEpithet"] \
                 else a["specificEpithet"]
         epithet_b = b["infraspecificEpithet"] if b["infraspecificEpithet"] \
                 else b["specificEpithet"]
-        return authorship_a == authorship_b and epithet_a == epithet_b
+        return authorship_a == authorship_b and \
+                self.remove_gender(epithet_a) == self.remove_gender(epithet_b)
+
+    def remove_gender(self, epithet):
+        for suffix in [ "a", "us", "um", "is", "e", "os", "on" ]:
+            if epithet.endswith(suffix):
+                return epithet[0:len(epithet) - len(suffix)]
+        return epithet
+
+    def get_original_authorship(self, authorship):
+        if authorship.startswith("(") and ")" in authorship:
+            return authorship[1:authorship.index(")")]
+        return authorship
 
     def epithet_and_authorship_match(self, name, epithet, authorship):
+        epithet = self.remove_gender(epithet)
         return name["authorship"] == authorship and \
-                (name["infraspecificEpithet"] == epithet or \
-                    (name["specificEpithet"] == epithet and \
-                        not name["infraspecificEpithet"]))
+                (self.remove_gender(name["infraspecificEpithet"]) == epithet \
+                    or (self.remove_gender(name["specificEpithet"]) == epithet \
+                        and not name["infraspecificEpithet"]))
 
     def set_basionymid(self, name, basionymid):
         self.names.loc[self.names["ID"] == name["ID"], ["basionymID"]] = basionymid
@@ -826,16 +950,17 @@ class COLDP:
         return name
 
     def fix_basionymid(self, name, synonyms):
-        if name["authorship"].startswith("("):
-            bare_authorship = name["authorship"] \
-                    [1:len(name["authorship"]) - 1]
+        original_authorship = self.get_original_authorship(name["authorship"])
+        if name["authorship"] != original_authorship:
             epithet = name["infraspecificEpithet"] \
-                    if name["infraspecificEpithet"] else name["specificEpithet"]
+                    if name["infraspecificEpithet"] \
+                    else name["specificEpithet"]
             for i in range(len(synonyms)):
                 if self.epithet_and_authorship_match(
-                        synonyms[i], epithet, bare_authorship):
-                    name = self.set_basionymid(
-                            name, synonyms[i]["basionymID"])
+                        synonyms[i], epithet, original_authorship):
+                    name = self.set_basionymid(name, 
+                            synonyms[i]["basionymID"])
+                    break
         else:
             name = self.set_basionymid(name, name["ID"])
         return name
@@ -956,15 +1081,17 @@ class COLDP:
     # Behaviour:
     #   Ensure that <folder>/<name>/ exists and write all dataframes as CSV.
     #
-    def save(self, destination = None):
+    def save(self, destination = None, name = None):
         if destination is None:
             destination = self.folder
-        if not os.path.exists(destination):
+        if destination is None or not os.path.exists(destination):
             logging.critical(
                 f"Can't save package. Folder does not exist: {destination}")
             return
         logging.debug("Saving COLDP")    
-        coldp_folder = os.path.join(destination, self.name)
+        if name is None:
+            name = self.name
+        coldp_folder = os.path.join(destination, name)
         if not os.path.exists(coldp_folder):
             os.mkdir(coldp_folder)
         for item, value in { 
