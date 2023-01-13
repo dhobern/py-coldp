@@ -21,7 +21,7 @@ def get_taxon_id(supplied_name, search_name, taxa, names, synonyms):
     if len(taxon) == 1:
         taxon_id = taxon.iloc[0]["ID"]
         taxon_name = names[names["ID"] == taxon.iloc[0]["nameID"]] \
-                ["scientificName"]
+                .iloc[0]["scientificName"]
     else:
         # Search name may be considered a synonym within the COLDP package
         name = names[names["scientificName"] == search_name]
@@ -32,7 +32,7 @@ def get_taxon_id(supplied_name, search_name, taxa, names, synonyms):
                 if len(taxon) == 1:
                     taxon_id = taxon.iloc[0]["ID"]
                     taxon_name = names[names["ID"] == taxon.iloc[0]["nameID"]] \
-                            ["scientificName"]
+                            .iloc[0]["scientificName"]
             else:
                 # One remaining possibility is that there was more than 1 matching taxon because one or more
                 # was for a subspecies - this solves these.
@@ -40,7 +40,7 @@ def get_taxon_id(supplied_name, search_name, taxa, names, synonyms):
                 if len(taxon) == 1:
                     taxon_id = taxon.iloc[0]["ID"]
                     taxon_name = names[names["ID"] == taxon.iloc[0]["nameID"]] \
-                            ["scientificName"]
+                            .iloc[0]["scientificName"]
     
     # If the taxon_id has not been found and we are not already testing a gender-flipped name, try one
     if taxon_id is None and supplied_name == search_name:
@@ -160,6 +160,7 @@ list_headings = ["SuppliedName", "Remarks", "RegionList"]
 species_list.columns = list_headings[0:len(species_list.columns)]
 species_list["SearchName"] = species_list.iloc[:,0]
 species_list["TaxonID"] = numpy.nan
+species_list["TaxonName"] = numpy.nan
 
 for s in range(len(species_list)):
     region_ids.update(validate_listitem(species_list, s, taxa, names, synonyms))

@@ -224,7 +224,7 @@ class NameBundle:
     #
     #   Returns name dictionary updated with extra values 
     #------------------------------------------------------------------------
-    def normalise_name(self, name:dict, sic:bool=True) -> dict:
+    def normalise_name(self, name:dict, sic:bool=False) -> dict:
 
         # Ensure main elements are present in dictionary
         for k in [
@@ -272,7 +272,7 @@ class NameBundle:
                             name["rank"])
             else:
                 name["scientificName"] = name["uninomial"]
-
+            
         # Return normalised version of name
         return name
 
@@ -566,12 +566,14 @@ class COLDP:
             "name_relation": self.name_relations }
         return tables[name] if name in tables.keys() else None
 
-    def reset_ids(self, name=None, prefix=""):
+    def reset_ids(self, name=None, prefix=None):
         for table_name in [ "name", "taxon", "reference", "synonym" ]:
             if name is None or table_name == name:
                 table = self.table_by_name(table_name)
                 if prefix is None:
                     prefix = ""
+                if prefix == "" and table_name == "synonym":
+                    prefix = "s_"
                 table["newID"] = prefix + (table.index + 1).astype(str)
                 by_ids = table.set_index("ID")
                 joins = id_mappings[table_name]
@@ -658,13 +660,8 @@ class COLDP:
     #       values keyed by terms from name_headings 
     #
     # Behaviour:
-    #   Find existing ID values for each supplied reference, based on identity
-    #   of: author, title, issued, containerTitle, volume, issue and page. Add 
-    #   ID to the appropriate reference dictionary in references. If none 
-    #   found, set ID to next index and add to references  
-    # 
-    # Returns:
-    #   Updated copy of reference_list 
+    #   Add names, taxon and synonyms to package and update bundle records
+    #   with id values    
     #
     def add_names(self, bundle, parent):
         # Tag any names that are already known with the appropriate id
@@ -731,6 +728,29 @@ class COLDP:
             self.add_synonym(bundle.accepted_taxon_id, bundle.synonyms[i]["ID"])
 
         return
+
+    def add_name_relation(self, name_relation):
+        if self.name_relations is None:
+            logging.info("Adding name_relation table")
+            self.name_relations = pd.DataFrame(
+                    columns=name_relation_headings)
+        
+        if "nameID" not in name_relation or \
+                name_relation["nameID"] not in self.names["ID"].values:
+            self.issue("Type material must be associated with a valid name ID")
+            return None
+        
+        if "relatedNameID" not in name_relation or \
+                name_relation["relatedNameID"] not in self.names["ID"].values:
+            self.issue(
+                "Type material must be associated with a valid related name ID")
+            return None
+
+        self.name_relations = \
+                pd.concat((self.name_relations, 
+                    pd.DataFrame.from_records([name_relation])), 
+                            ignore_index=True)
+        return name_relation
 
     def add_type_material(self, type_material):
         if self.type_materials is None:
@@ -980,8 +1000,8 @@ class COLDP:
                     (self.names["authorship"] == authorship) &
                     (self.names["rank"] == rank)]
         if len(match) > 1:
-            self.issue("Multiple name records for " + rank + " " + \
-                    scientificName + " " + authorship)
+            self.issue("Multiple name records for " + \
+                            f"{rank} {scientificName} {str(authorship)}")
         if len(match) == 1:
             return match.iloc[0]
         return None
@@ -1030,6 +1050,9 @@ class COLDP:
                 elif marker in ["aberratio", "aberration", "ab."]:
                     marker = "ab."
                     rank = "aberration"
+                elif marker in [ "infrasubspecific name" ]:
+                    marker = ""
+                    rank = "infrasubspecific name"
                 else:
                     self.issue("Unknown rank marker " + marker)
                     rank = marker
