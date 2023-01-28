@@ -191,6 +191,7 @@ class NameBundle:
             self.coldp.issue("Accepted name missing rank, assume species: " \
                     + str(accepted))
             accepted["rank"] = "species"
+        self.accepted_sic = sic
         self.accepted = self.normalise_name(accepted, sic)
         self.incertae_sedis = incertae_sedis
         self.accepted_taxon_id = None
@@ -285,7 +286,7 @@ class NameBundle:
     #
     #   Returns name dictionary with supplied values supplemented from name
     #------------------------------------------------------------------------
-    def derive_name(self, name:dict, values:dict) -> dict:
+    def derive_name(self, name:dict, values:dict, sic:bool=False) -> dict:
         if "authorship" not in values and "authorship" in name and \
                     not name["authorship"].startswith("("):
             if "genus" in values or "specificEpithet" in values:
@@ -297,7 +298,7 @@ class NameBundle:
                 "infraspecificEpithet", "code", "status" ]:
             if k in name and k not in values:
                 values[k] = name[k]
-        return self.normalise_name(values)
+        return self.normalise_name(values, sic)
 
 # ---------------------------------------------------------------------------
 #
@@ -796,7 +797,8 @@ class COLDP:
                 bundle.species = \
                         bundle.derive_name(bundle.accepted, 
                             {"rank": "species",
-                                "infraspecificEpithet": ""})
+                                "infraspecificEpithet": ""}, 
+                            bundle.accepted_sic)
                 # If this is a nominate subspecies, we can retain the 
                 # authorship. Otherwise, check if we already know it.
                 if bundle.accepted["infraspecificEpithet"] != \
@@ -828,7 +830,8 @@ class COLDP:
             if bundle.accepted["infragenericEpithet"]:
                 bundle.add_synonym(
                         bundle.derive_name(bundle.accepted, 
-                            {"infragenericEpithet": ""}))
+                            {"infragenericEpithet": ""}, 
+                            bundle.accepted_sic))
 
             for i in range(len(bundle.synonyms)):
                 if bundle.synonyms[i]["infragenericEpithet"]:
@@ -913,7 +916,8 @@ class COLDP:
             if incertae_sedis:
                 taxon_row["provisional"] = True
                 if taxon_row["remarks"]:
-                    taxon_row["remarks"] = "Incertae sedis - " + taxon_row["remarks"]
+                    taxon_row["remarks"] = \
+                        f"Incertae sedis - {taxon_row['remarks']}"
                 else:
                     taxon_row["remarks"] = taxon_row["remarks"]
                 taxon_row["remarks"] = "Incertae sedis"
