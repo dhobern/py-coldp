@@ -185,13 +185,13 @@ class NameBundle:
     #       be marked "incertae sedis" 
     #------------------------------------------------------------------------
     def __init__(self, coldp, accepted:dict, 
-                incertae_sedis:bool=False) -> None:
+                incertae_sedis:bool=False, sic:bool=False) -> None:
         self.coldp = coldp
         if "rank" not in accepted:
             self.coldp.issue("Accepted name missing rank, assume species: " \
                     + str(accepted))
             accepted["rank"] = "species"
-        self.accepted = self.normalise_name(accepted)
+        self.accepted = self.normalise_name(accepted, sic)
         self.incertae_sedis = incertae_sedis
         self.accepted_taxon_id = None
         self.synonyms = []
@@ -648,8 +648,8 @@ class COLDP:
         return match.iloc[0]
 
 
-    def start_name_bundle(self, accepted, incertae_sedis=False):
-        return NameBundle(self, accepted)
+    def start_name_bundle(self, accepted, incertae_sedis=False, sic=False):
+        return NameBundle(self, accepted, incertae_sedis, sic)
 
     #
     # Ensure one or more names are included in names dataframe and update
