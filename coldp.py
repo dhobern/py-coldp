@@ -262,6 +262,7 @@ class NameBundle:
                                 name[k])
                         name[k] = name[k][0].lower() + name[k][1:]
 
+        if not sic or not name["scientificName"]:
             # Generate properly formatted scientific name
             if self.coldp.is_species_group(name):
                 name["scientificName"], name["rank"] = \
@@ -335,6 +336,7 @@ class COLDP:
         self.subgenus_free_synonyms = False
         self.basionyms_from_synonyms = False
         self.classification_from_parents = False
+        self.allow_repeated_binomials = False
         self.issues_to_stdout = False
 
         if kwargs:
@@ -391,6 +393,8 @@ class COLDP:
                 self.basionyms_from_synonyms = value
             elif key == "classification_from_parents":
                 self.classification_from_parents = value
+            elif key == "allow_repeated_binomials":
+                self.allow_repeated_binomials = value
             elif key == "code" and value in ["ICZN", "ICBN"]:
                 self.code = value
 
@@ -930,7 +934,9 @@ class COLDP:
                 = list(properties.values())
 
     def identify_name(self, name):
-        match = self.find_name_record(name)
+        match = None
+        if name["rank"] != "species" or not self.allow_repeated_binomials:
+            match = self.find_name_record(name)
         if match is not None:
             name["ID"] = match["ID"]
             name["basionymID"] = match["basionymID"]
