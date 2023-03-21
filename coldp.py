@@ -632,6 +632,14 @@ class COLDP:
                 reference_list[i]["ID"] = ""
         return reference_list
 
+    def get_reference(self, id):
+        match = self.references[self.references["ID"] == id]
+        if len(match) == 0:
+            return None
+        if len(match) > 1:
+            logging.warn(f"Multiple matches for reference ID: {id}")
+        return match.to_dict('records')[0]
+
     def find_reference(self, reference):
         for k in ["ID", "author", "title", "issued", "containerTitle", 
                 "volume", "issue", "page", "citation"]:
@@ -868,7 +876,7 @@ class COLDP:
                 self.issue("Uninomial mismatch (" + match["uninomial"] + \
                         " vs " + name["uninomial"] + ") for taxon id "
                         + match["ID"])
-            if match["species"] and \
+            if "species" in match and match["species"] and \
                     not name["scientificName"].startswith(match["species"]):
                 self.issue("Species mismatch (" + match["species"] + \
                         " vs " + name["scientificName"] + ") for taxon id " 
@@ -999,6 +1007,14 @@ class COLDP:
         return self.find_name( 
             name["scientificName"], name["authorship"], name["rank"])
 
+    def get_name(self, id):
+        match = self.names[self.names["ID"] == id]
+        if len(match) == 0:
+            return None
+        if len(match) > 1:
+            logging.warn(f"Multiple matches for name ID: {id}")
+        return match.to_dict('records')[0]
+
     def find_name(self, scientificName, authorship, rank):
         if authorship is None:
             match = self.names[
@@ -1025,6 +1041,79 @@ class COLDP:
             if len(match) > 0:
                 return match.iloc[0]
         return None
+    
+    def find_names(self, properties, to_dict=False):
+        for k in properties.keys():
+            if k not in self.names.columns:
+                self.issue(f"Unknown name property: {k}")
+                return None
+            
+        names = self.names
+        for k in properties.keys():
+            names = names[names[k] == properties[k]]
+            if len(names) == 0:
+                return None
+            
+        if to_dict:
+            return names.to_dict('records')
+        return names
+
+    def get_taxon(self, id):
+        match = self.taxa[self.taxa["ID"] == id]
+        if match.empty:
+            return None
+        if len(match.index  ) > 1:
+            logging.warn(f"Multiple matches for taxon ID: {id}")
+        return match.to_dict('records')[0]
+    
+    def get_synonyms(self, taxonID, to_dict=False):
+        match = self.synonyms[self.synonyms["taxonID"] == taxonID]
+        if match.empty:
+            return None
+        if to_dict:
+            return match.to_dict('records')
+        return match
+
+    def get_synonymy(self, nameID, to_dict=False):
+        match = self.taxa[self.taxa["nameID"] == nameID]
+        if match.empty:
+            match = self.synonyms[self.synonyms["nameID"] == nameID]
+            if match.empty:
+                return None, None
+            if len(match.index) > 1:
+                logging.warn(f"Multiple synonyms for name {nameID}")
+            taxonID = match.iloc[0]["taxonID"]
+            match = self.taxa[self.taxa["ID"] == taxonID]
+            if match.empty:
+                logging.error(f"Taxon not found for taxonID {taxonID}")
+                return None, None
+            if len(match.index) > 1:
+                logging.warn(f"Multiple taxa found for taxonID {taxonID}")
+            taxon = match.iloc[0]
+        else:
+            if len(match.index) > 1:
+                logging.warn(f"Multiple taxa for name {nameID}")
+            taxon = match.iloc[0]
+        match = self.names[self.names["ID"] == taxon["nameID"]]
+        if match.empty:
+            logging.error(f"Name not found for nameID {taxon['nameID']}")
+            accepted = None
+        else:
+            if len(match.index) > 1:
+                logging.warn(f"Multiple matches for name ID: {id}")
+            if to_dict:
+                accepted = match.to_dict('records')[0]
+            else:
+                accepted = match.iloc[0]
+        synonyms = self.get_synonyms(taxon['ID'])
+        if synonyms.empty:
+            synonymy = None
+        else:
+            synonymy = self.names[self.names["ID"].isin(synonyms["nameID"])]
+            if to_dict:
+                synonymy = synonymy.to_dict('records')
+
+        return accepted, synonymy
 
     def construct_species_rank_name(self, g, sg, s, ss, marker):
         if not g:
