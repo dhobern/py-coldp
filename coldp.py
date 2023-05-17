@@ -469,7 +469,7 @@ class COLDP:
     def fix_basionyms(self, names, synonyms):
         for index, row in names.iterrows():
             if row["authorship"].startswith("("):
-                authorship = get_original_authorship(row["authorship"])
+                authorship = self.get_original_authorship(row["authorship"])
                 if row["infraspecificEpithet"]:
                     epithet = row["infraspecificEpithet"]
                 else:
@@ -493,6 +493,15 @@ class COLDP:
                             match.iloc[0]["ID"]
             else:
                 names.loc[names["ID"] == row["ID"], "basionymID"] = row["ID"]
+        for index, row in names[(names["infraspecificEpithet"] != "") &
+                            (names["specificEpithet"] 
+                                == names["infraspecificEpithet"])].iterrows():
+            species = names[(names["genus"] == row["genus"]) &
+                                (names["authorship"] == row["authorship"]) &
+                                (names["rank"] == "species")]
+            if len(species) == 1:
+                names.loc[names["ID"] == row["ID"], "basionymID"] = \
+                        species.iloc[0]["basionymID"]
 
     def fix_classification(self):
         ranks = self.names.loc[:, ["ID", "rank", "scientificName"]]
@@ -927,18 +936,21 @@ class COLDP:
                 taxon_row["species"] = ""
             if incertae_sedis:
                 taxon_row["provisional"] = True
-                if taxon_row["remarks"]:
+                if "remarks" in taxon_row and taxon_row["remarks"]:
                     taxon_row["remarks"] = \
                         f"Incertae sedis - {taxon_row['remarks']}"
                 else:
-                    taxon_row["remarks"] = taxon_row["remarks"]
-                taxon_row["remarks"] = "Incertae sedis"
+                    taxon_row["remarks"] = "Incertae sedis"
             self.taxa = pd.concat((self.taxa, pd.DataFrame.from_records([taxon_row])), ignore_index=True)
 
             return taxon_row
 
     def modify_taxon(self, taxon_id, properties):
         self.taxa.loc[self.taxa["ID"] == taxon_id, list(properties.keys())] \
+                = list(properties.values())
+
+    def modify_name(self, name_id, properties):
+        self.names.loc[self.names["ID"] == name_id, list(properties.keys())] \
                 = list(properties.values())
 
     def identify_name(self, name):
