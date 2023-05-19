@@ -212,7 +212,15 @@ class NameBundle:
     #       should be logged for this 
     #------------------------------------------------------------------------
     def add_synonym(self, synonym:dict, sic:bool=False) -> None:
-        self.synonyms.append(self.normalise_name(synonym, sic))
+        normalised = self.normalise_name(synonym, sic)
+        present = (normalised["scientificName"] == self.accepted["scientificName"])
+        if not present:
+            for s in self.synonyms:
+                if normalised["scientificName"] == s["scientificName"]:
+                    present = True
+                    break
+        if not present:
+            self.synonyms.append(self.normalise_name(synonym, sic))
 
     #------------------------------------------------------------------------
     # normalise_name - Ensure that a name record dictionary contains all 
