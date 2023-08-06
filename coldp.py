@@ -1134,6 +1134,14 @@ class COLDP:
                 synonymy = synonymy.to_dict('records')
 
         return accepted, synonymy
+    
+    def get_children(self, taxonID, to_dict=False):
+        match = self.taxa[self.taxa["parentID"] == taxonID]
+        if match.empty:
+            return None
+        if to_dict:
+            return match.to_dict('records')
+        return match
 
     def construct_species_rank_name(self, g, sg, s, ss, marker):
         if not g:
