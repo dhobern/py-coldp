@@ -20,20 +20,23 @@ ranks = {
 }
 
 
-def rank_position(rank):
+def get_rank_position(rank):
     if rank in ranks:
         return ranks[rank]
     return "99"
 
 
-def report_taxon(coldp, taxon, extras=[], list=None):
+def report_taxon(coldp, taxon, extras=[], log_level=None, list=None):
     if list is None:
         list = []
 
     name = coldp.get_name(taxon["nameID"])
+    rank_position = get_rank_position(name["rank"])
+    if log_level is not None and log_level >= rank_position:
+        print(f"{' ' * (int(rank_position) - 1)}{name['scientificName']} ({name['rank']})")
     row = [
         name["rank"],
-        rank_position(name["rank"]),
+        rank_position,
         "accepted",
         name["scientificName"],
         name["authorship"],
@@ -54,7 +57,7 @@ def report_taxon(coldp, taxon, extras=[], list=None):
         for other_name in names:
             row = [
                 other_name["rank"],
-                rank_position(other_name["rank"]),
+                get_rank_position(other_name["rank"]),
                 "synonym",
                 other_name["scientificName"],
                 other_name["authorship"],
@@ -64,13 +67,12 @@ def report_taxon(coldp, taxon, extras=[], list=None):
 
     children = coldp.get_children(taxon["ID"], True)
     if children is not None:
-        print(f"{name['scientificName']} ({name['rank']})")
         for child in children:
             name = coldp.get_name(child["nameID"])
-            child["position"] = rank_position(name["rank"]) + name["scientificName"]
+            child["position"] = get_rank_position(name["rank"]) + name["scientificName"]
         children = sorted(children, key=lambda x: x["position"])
         for child in sorted(children, key=lambda x: x["position"]):
-            report_taxon(coldp, child, extras, list)
+            report_taxon(coldp, child, extras=extras, log_level=log_level, list=list)
 
     return list
 
@@ -86,7 +88,7 @@ if __name__ == "__main__":
             for e in ["modified", "modifiedBy", "referenceID"]:
                 if e in coldp.names.columns:
                     extras.append(e)
-            hierarchy = report_taxon(coldp, taxon, extras)
+            hierarchy = report_taxon(coldp, taxon, extras=extras, log_level="07")
             headings = [
                 "rank",
                 "rankLevel",
