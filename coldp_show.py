@@ -1,4 +1,5 @@
 from coldp import COLDP
+import sys
 
 ranks = {
     "kingdom": "01",
@@ -60,12 +61,15 @@ def show_taxon(f, coldp, taxon, indent, extras=["rank"], separator=", "):
             show_taxon(f, coldp, child, indent + "  ", extras, separator)
 
 
-with open("show.txt", "w", encoding="utf8") as f:
-    coldp = COLDP("D:/stang/Downloads", "latest", issues_to_stdout=True)
-    taxon = coldp.find_taxon("Lepidoptera", None, "order")
-    indent = ""
-    extras = []
-    for e in ["rank", "modified", "modifiedBy", "referenceID"]:
-        if e in coldp.names.columns:
-            extras.append(e)
-    show_taxon(f, coldp, taxon, indent, extras, separator=",")
+if len(sys.argv) > 2:
+    with open("show.txt", "w", encoding="utf8") as f:
+        coldp = COLDP(sys.argv[1], sys.argv[2], issues_to_stdout=True)
+        taxon = coldp.find_taxon("Lepidoptera", None, "order")
+        indent = ""
+        extras = []
+        for e in ["rank", "modified", "modifiedBy", "referenceID"]:
+            if e in coldp.names.columns:
+                extras.append(e)
+        show_taxon(f, coldp, taxon, indent, extras, separator=",")
+else:
+    print("Usage: python coldp_show.py folder coldp_name")
