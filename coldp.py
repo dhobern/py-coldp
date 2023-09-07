@@ -347,7 +347,7 @@ class NameBundle:
             )
             accepted["rank"] = "species"
         self.accepted_sic = sic
-        self.accepted = self.normalise_name(accepted, sic)
+        self.accepted = self.normalise_name(accepted.copy(), sic)
         self.incertae_sedis = incertae_sedis
         self.accepted_taxon_id = None
         self.synonyms = []
@@ -526,6 +526,7 @@ class COLDP:
         self.basionyms_from_synonyms = False
         self.classification_from_parents = False
         self.allow_repeated_binomials = False
+        self.create_taxa_for_not_established = False
         self.issues_to_stdout = False
 
         if kwargs:
@@ -587,6 +588,8 @@ class COLDP:
                 self.classification_from_parents = value
             elif key == "allow_repeated_binomials":
                 self.allow_repeated_binomials = value
+            elif key == "create_taxa_for_not_established":
+                self.create_taxa_for_not_established = value
             elif key == "code" and value in ["ICZN", "ICBN"]:
                 self.code = value
 
@@ -1008,17 +1011,21 @@ class COLDP:
                 self.names["basionymID"] == bundle.accepted["ID"], ["basionymID"]
             ] = bundle.accepted["basionymID"]
 
-        if bundle.species:
-            taxon = self.add_taxon(bundle.species, parent)
-            parent = taxon["ID"]
-            bundle.species_taxon_id = parent
-            if bundle.species_synonym:
-                self.add_synonym(parent, bundle.species_synonym["ID"])
+        if (
+            bundle.accepted["status"] == "established"
+            or self.create_taxa_for_not_established
+        ):
+            if bundle.species:
+                taxon = self.add_taxon(bundle.species, parent)
+                parent = taxon["ID"]
+                bundle.species_taxon_id = parent
+                if bundle.species_synonym:
+                    self.add_synonym(parent, bundle.species_synonym["ID"])
 
-        taxon = self.add_taxon(bundle.accepted, parent, bundle.incertae_sedis)
-        bundle.accepted_taxon_id = taxon["ID"]
-        for i in range(len(bundle.synonyms)):
-            self.add_synonym(bundle.accepted_taxon_id, bundle.synonyms[i]["ID"])
+            taxon = self.add_taxon(bundle.accepted, parent, bundle.incertae_sedis)
+            bundle.accepted_taxon_id = taxon["ID"]
+            for i in range(len(bundle.synonyms)):
+                self.add_synonym(bundle.accepted_taxon_id, bundle.synonyms[i]["ID"])
 
         return
 
@@ -1082,6 +1089,26 @@ class COLDP:
             ignore_index=True,
         )
         return distribution
+
+    def add_species_interaction(self, interaction):
+        if self.species_interactions is None:
+            logging.info("Adding species interaction table")
+            self.species_interactions = pd.DataFrame(
+                columns=species_interaction_headings
+            )
+
+        if (
+            "taxonID" not in interaction
+            or interaction["taxonID"] not in self.taxa["ID"].values
+        ):
+            self.issue("Species interaction must be associated with a valid taxon ID")
+            return None
+
+        self.species_interactions = pd.concat(
+            (self.species_interactions, pd.DataFrame.from_records([interaction])),
+            ignore_index=True,
+        )
+        return interaction
 
     #
     # Add extra names

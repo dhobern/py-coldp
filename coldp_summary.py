@@ -33,7 +33,9 @@ def report_taxon(coldp, taxon, extras=[], log_level=None, list=None):
     name = coldp.get_name(taxon["nameID"])
     rank_position = get_rank_position(name["rank"])
     if log_level is not None and log_level >= rank_position:
-        print(f"{' ' * (int(rank_position) - 1)}{name['scientificName']} ({name['rank']})")
+        print(
+            f"{' ' * (int(rank_position) - 1)}{name['scientificName']} ({name['rank']})"
+        )
     row = [
         name["rank"],
         rank_position,
@@ -79,11 +81,17 @@ def report_taxon(coldp, taxon, extras=[], log_level=None, list=None):
 
 if __name__ == "__main__":
     if len(sys.argv) > 2:
+        if len(sys.argv) > 4:
+            name = sys.argv[3]
+            rank = sys.argv[4]
+        else:
+            name = "Lepidoptera"
+            rank = "order"
         with open("show.csv", "w", encoding="utf8", newline="") as f:
             writer = csv.writer(f, delimiter=",")
 
             coldp = COLDP(sys.argv[1], sys.argv[2], issues_to_stdout=True)
-            taxon = coldp.find_taxon("Tischeriidae", None, "family")
+            taxon = coldp.find_taxon(name, None, rank)
             extras = []
             for e in ["modified", "modifiedBy", "referenceID"]:
                 if e in coldp.names.columns:
@@ -100,4 +108,4 @@ if __name__ == "__main__":
             for row in hierarchy:
                 writer.writerow(row)
     else:
-        print(f"Usage: python {sys.argv[0]} folder coldp_name")
+        print(f"Usage: python {sys.argv[0]} folder coldp_name taxon rank")
