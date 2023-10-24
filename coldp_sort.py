@@ -1,15 +1,17 @@
-from coldp import COLDP
-import sys
 import csv
 import re
-import pandas as pd
+import sys
+
 import numpy as np
+import pandas as pd
+
+from coldp import COLDP
 
 pd.options.mode.chained_assignment = None  # default='warn'
 
 
 def add_rank(names, rank):
-    names[rank] = np.nan
+    names[rank] = ""
     names.loc[names["rank"] == rank, rank] = names["scientificName"]
     loop = True
     while loop:
