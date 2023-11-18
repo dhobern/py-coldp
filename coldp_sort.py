@@ -24,11 +24,11 @@ def add_rank(names, rank):
             suffixes=("", "_p"),
         )
         parent_rank = f"{rank}_p"
-        count = len(names[(names[rank].isnull()) & (~names[parent_rank].isnull())])
+        count = len(names[(names[rank] == "") & (names[parent_rank] != "")])
         if count > 0:
-            names.loc[
-                (names[rank].isnull()) & (~names[parent_rank].isnull()), rank
-            ] = names[parent_rank]
+            names.loc[(names[rank] == "") & (names[parent_rank] != ""), rank] = names[
+                parent_rank
+            ]
         else:
             loop = False
         names.drop(columns=["ID_t_p", parent_rank], inplace=True)
