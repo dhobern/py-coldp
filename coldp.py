@@ -417,7 +417,7 @@ class NameBundle:
                 if len(name[k]) > 0:
                     if not name_pattern.match(name[k]):
                         self.coldp.issue(
-                            'Invalid pattern for supraspecific name: "' + name[k] + '"'
+                            f'Invalid pattern for supraspecific name: "{name[k]}"'
                         )
                     elif name[k][0].islower():
                         self.coldp.issue(
@@ -756,9 +756,9 @@ class COLDP:
                     "scientificName"
                 ]
 
-            taxa.loc[
-                taxa["parentID"] == parent["ID"], rank_headings
-            ] = classification.to_numpy()
+            taxa.loc[taxa["parentID"] == parent["ID"], rank_headings] = (
+                classification.to_numpy()
+            )
             parents = pd.merge(
                 taxa.loc[taxa["parentID"] == parent["ID"]],
                 ranks,
@@ -1013,7 +1013,8 @@ class COLDP:
             ] = bundle.accepted["basionymID"]
 
         if (
-            bundle.accepted["status"] == "established"
+            "status" not in bundle.accepted
+            or bundle.accepted["status"] == "established"
             or self.create_taxa_for_not_established
         ):
             if bundle.species:
@@ -1506,6 +1507,28 @@ class COLDP:
             return match.to_dict("records")
         return match
 
+    def get_text_tree(self, taxonID, indent=""):
+        taxon = self.get_taxon(taxonID)
+        if taxon is None:
+            return ""
+        name = self.get_name(taxon["nameID"])
+        if name is None:
+            logging.error(f"No name for taxon {taxonID}")
+        tree = f"{indent}{name['scientificName']} {name['authorship']} [{name['rank']}]"
+        synonyms = self.get_synonyms(taxonID)
+        if synonyms is not None:
+            for synonym in synonyms["nameID"]:
+                junior = self.get_name(synonym)
+                if junior is None:
+                    logging.error(f"Could not find name {synonym} for synonym")
+                else:
+                    tree += f"\n {indent}* {junior['scientificName']} {junior['authorship']} [{junior['rank']}]"
+        children = self.get_children(taxonID)
+        if children is not None:
+            for child in children["ID"]:
+                tree += "\n" + self.get_text_tree(child, indent + "  ")
+        return tree
+
     def construct_species_rank_name(self, g, sg, s, ss, marker):
         if not g:
             self.issue(
@@ -1622,7 +1645,7 @@ class COLDP:
             "issue": self.issues,
         }.items():
             if value is not None and len(value) > 0:
-                value.replace("", np.nan, inplace=True)
+                value = value.replace("", None)
                 value.dropna(how="all", axis=1, inplace=True)
                 value.replace(np.nan, "", inplace=True)
                 file_name = os.path.join(coldp_folder, item + ".csv")
