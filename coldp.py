@@ -1083,7 +1083,7 @@ class COLDP:
             "taxonID" not in distribution
             or distribution["taxonID"] not in self.taxa["ID"].values
         ):
-            self.issue("Distribution must be associated with a valid taxon ID")
+            self.issue(f"Distribution must be associated with a valid taxon ID ({distribution['taxonID'] if 'taxonID' in distribution else 'None'}) supplied")
             return None
 
         self.distributions = pd.concat(
@@ -1588,10 +1588,10 @@ class COLDP:
     def construct_authorship(self, a, y, is_basionym):
         if not a:
             self.issue("No author supplied")
-            a = "?"
+            a = ""
         if not y:
             self.issue("No year supplied")
-            y = "?"
+            y = ""
 
         year_parts = y.split()
         if len(year_parts) > 0:
@@ -1600,11 +1600,20 @@ class COLDP:
         else:
             year_publication = y
 
-        if is_basionym:
-            return a + ", " + y, y, year_publication
+        if a and y:
+            combined = a + ", " + y
+        elif a:
+            combined = a
+        elif y:
+            combined = y
         else:
-            return "(" + a + ", " + y + ")", y, year_publication
-
+            combined = ""
+        
+        if not is_basionym and combined:
+            combined = "(" + combined + ")"
+        
+        return combined, y, year_publication
+        
     def is_species_group(self, name):
         if name["specificEpithet"]:
             return True
