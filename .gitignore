@@ -5,3 +5,7 @@
 *.csv
 coldp_reshape_2.py
 test/output/
+/legacy
+/.idea
+/venv
+/dist

@@ -1,0 +1,32 @@
+[build-system]
+requires = ["hatchling"]
+build-backend = "hatchling.build"
+
+[project]
+name = "coldp"
+version = "2024.0.2"
+authors = [
+  { name="Donald Hobern", email="dhobern@gmail.com" },
+]
+description = "Python tools for working with taxonomic checklists organised as Catalogue of Life Data Package (COLDP) format"
+keywords = ["Catalogue of Life", "COLDP", "taxonomic checklist"]
+readme = "README.md"
+requires-python = ">=3.8"
+dependencies = [
+  "pandas",
+  "numpy"
+]
+classifiers = [
+    "Programming Language :: Python :: 3",
+    "License :: OSI Approved :: MIT License",
+    "Operating System :: OS Independent",
+    "Development Status :: 4 - Beta",
+]
+license = {file = "LICENSE"}
+
+[project.urls]
+Homepage = "https://github.com/dhobern/py-coldp"
+Issues = "https://github.com/dhobern/py-coldp/issues"
+
+[tool.hatch.build.targets.wheel]
+packages = ["src/coldp"]
