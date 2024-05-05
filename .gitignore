@@ -9,3 +9,5 @@ test/output/
 /.idea
 /venv
 /dist
+/docs/build/doctrees
+docs/build/html/.buildinfo

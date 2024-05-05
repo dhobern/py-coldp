@@ -28,5 +28,10 @@ license = {file = "LICENSE"}
 Homepage = "https://github.com/dhobern/py-coldp"
 Issues = "https://github.com/dhobern/py-coldp/issues"
 
+[project.optional-dependencies]
+doc = [
+    "sphinx",
+]
+
 [tool.hatch.build.targets.wheel]
 packages = ["src/coldp"]
