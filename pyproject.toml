@@ -30,7 +30,7 @@ Issues = "https://github.com/dhobern/py-coldp/issues"
 
 [project.optional-dependencies]
 doc = [
-    "sphinx",
+    "sphinx", "sphinx-paramlinks"
 ]
 
 [tool.hatch.build.targets.wheel]

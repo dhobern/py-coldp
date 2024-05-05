@@ -514,16 +514,16 @@ class COLDP:
     Pandas dataframes are created as required for the COLDP data types as
     data are inserted into the instance.
 
-    The start_name_bundle method produces a NameBundle object for preparing an
+    The :py:func:`~coldp.COLDP.start_name_bundle` method produces a :py:class:`~coldp.COLDP.NameBundle` object for preparing an
     accepted name and associated synonyms to pass to the :py:func:`~coldp.COLDP.add_names` method
     which creates name, taxon and synonym records as a set of cross-referenced
     objects.
 
-    Other data is added using the add_references, add_names, add_name_relation,
-    add_typematerial, add_distribution, add_species_intreaction and
-    modify_taxon methods.
+    Other data is added using the :py:func:`~coldp.COLDP.add_references, :py:func:`~coldp.COLDP.add_names`, :py:func:`~coldp.COLDP.add_name_relation`,
+    :py:func:`~coldp.COLDP.add_typematerial`, :py:func:`~coldp.COLDP.add_distribution`, :py:func:`~coldp.COLDP.add_species_interaction` and
+    :py:func:`~coldp.COLDP.modify_taxon` methods.
 
-    The save method writes the data back to the same or another folder.
+    The :py:func:`~coldp.COLDP.save` method writes the data back to the same or another folder.
     """
 
     def __init__(self, folder: str, name: str, **kwargs: dict):
@@ -673,6 +673,7 @@ class COLDP:
         :param foldername: Path string for COLDP folder potentially containing serialised dataframe
         :param name: Base name for COLDP class (name, taxon, etc.) for which the dataframe is requested
         :param default_headings: Column headings to use if returning a new empty dataframe
+        :return: Dataframe for requested COLDP data class
 
         Checks for a file in the COLDP folder with a supported extension (.csv, .tsv, .txt)
         and a name matching one of the COLDP record types (name, taxon, synonym,
@@ -767,6 +768,11 @@ class COLDP:
         Extract a set of columns from a dataframe using a dictionary that maps
         source columns names to target column names
 
+        :param df: Dataframe from which columns are to be extracted/mapped
+        :param headings: Dist of column headings for destinaton dataframe
+        :param mappings: Dictionary mappimg desination column names to source column names
+        :return: New Dataframe based on supplied mappings
+
         This method is used to extract and rename a subset of columns from a
         COLDP NameUsage table.
         """
@@ -788,18 +794,24 @@ class COLDP:
 
         return table
 
-    def fix_basionyms(self, names: pd.DataFrame, synonyms: pd.DataFrame):
+    def fix_basionyms(self, names: pd.DataFrame, synonyms: pd.DataFrame) -> None:
         """
-        Update subsequent combination names to refer to the basionym
+        Update dataframe of name records so that subsequent combination names refer to the original basionym record where present
 
-        For any name record dictionary in the list passed using the names
-        parameter, if the name is a subsequent zoological combination (with
-        parentheses around authorship), find any other record in the names list
+        :param names: Dataframe containing COLDP name records to be updated
+        :param synonyms: Dataframe containing COLDP synonym records corresponding to the name records in names
+
+        For any name record in :paramref:`~coldp.COLDP.fix_basionyms.names`
+        if the name is a subsequent zoological combination (with
+        parentheses around authorship), find any other record in
+        :paramref:`~coldp.COLDP.fix_basionyms.names`
         that matches the authorship, year and epithet but lacks parentheses and
         update the basionymID property of the name to refer to this second
-        record's ID.
+        record's ID. :paramref:`~coldp.COLDP.fix_basionyms.synonyms` is used to
+        assist with selection of the correct match in cases where more than one
+        possible record is found.
 
-        The parameters are the two relevant DataFrames in the COLDP instance.
+        The parameters are the two relevant DataFrames from the same COLDP instance.
         """
 
         for index, row in names.iterrows():
@@ -864,25 +876,44 @@ class COLDP:
                     "basionymID"
                 ]
 
-    def fix_classification(self):
+    def fix_classification(self) -> None:
         """
-        Internal method to tidy and fill in higher classification for taxon
-        records
+        Tidy and fill in higher classification for taxon records based on hierarchy
+
+        Recursively fixes classification elements for whole taxa dataframe
         """
 
         ranks = self.names.loc[:, ["ID", "rank", "scientificName"]]
         ranks.columns = ["nameID", "rank", "scientificName"]
-        self.fix_classification_recursive(self.taxa, ranks, None)
+        self.fix_classification_recursive(self.taxa, ranks)
 
-    def fix_classification_recursive(self, taxa, ranks, parent):
+    def fix_classification_recursive(
+        self, taxa: pd.DataFrame, ranks: pd.DataFrame, parent: dict[str:str] = None
+    ) -> None:
         """
         Recursively complete classification elements (higher taxon IDs) in
         taxon records descended from a given parent or for all taxon records
-        in the COLDP instance
+        in the COLDP instance at the highest included rank
+
+        :param taxa: Dataframe containing COLDP taxa records
+        :param ranks: DataFrame with nameID, rank and scientificName for all names in COLDP instance
+        :param parent: Taxon record for which children should be updated, or None if all top-level taxa should be updated
+
+        If :paramref:`~coldp.COLDP.fix_classification_recursive.taxa` is None, select all top-level taxa from the dataframe (i.e. all without a parentID) and process these recursively.
+
+        If a parent is supplied, copy classification properties (kingdom, phylum,
+        subphylum, class, subclass, order, suborder, superfamily, family, subfamily,
+        tribe, subtribe, genus, subgenus, section, species) from the parent
+        record, set any rank-specific column matching the rank of the parent
+        to the name of the parent taxon, and then copy these rank values into
+        all taxon records that are immediate descendents of the parent.
+        This will ensure that the higher classification for all children matches
+        this parent. Then call this method recursively for all children.
         """
 
-        # If no parent provided, get list of root taxa - these will be passed
-        # for the first recursion
+        # If no parent provided, get list of taxa at the highest included rank,
+        # expanded to include values from the name record, including rank and
+        # scientificName - these will be passed for the first recursion
         if parent is None:
             for p in range(len(rank_headings)):
                 parents = pd.merge(
@@ -894,12 +925,12 @@ class COLDP:
                 if parents is not None and len(parents) > 0:
                     break
 
-        # Otherwise, update the parent so the column with a name matching the
-        # parent's rank contains the parent's name. This will enable it to
-        # propagate down on recursion. Then get the parent's children as the
-        # parents for the next recursion and set all their higher taxon
-        # columns to match the parent. Lower ranks will be completed on
-        # recursion.
+        # Otherwise, get the classification columns from the parent and set
+        # any column with a name matching the parent's rank to contain the
+        # parent's name. This will enable it to propagate down on recursion.
+        # Then get the parent's children as the parents for the next recursion
+        # and set all their higher taxon columns to match the parent. Use these
+        # as parents for the next recursion.
         else:
             classification = parent[rank_headings]
             if parent["rank"] in rank_headings:
@@ -921,7 +952,25 @@ class COLDP:
         for i in range(len(parents)):
             self.fix_classification_recursive(taxa, ranks, parents.iloc[i])
 
-    def sort_taxa(self):
+    def sort_taxa(self) -> None:
+        """
+        Sort taxa dataframe so that all taxon records are sequenced
+        hierarchically and alphabetically.
+
+        Following this method, the taxon table is sorted so that any taxa
+        without parents are sorted alphabetically by scientific nameand each is
+        followed immediately by its children and their descendents also sorted
+        alphabetically. The result is a tree with siblings ordered
+        alphabetically.
+
+        Existing ID values for all records are unchanged.
+
+        This is a convenience method to simplify review of the data in a
+        spreadsheet or editor tool. It also simplifies import of the data into
+        a database since there are no forward references to parent taxa.
+        """
+
+        # Get list of all IDs, parentIDs and ranks sorted by scientificName
         df = pd.merge(
             self.taxa,
             self.names,
@@ -931,29 +980,63 @@ class COLDP:
             suffixes=["", "_name"],
         )[["ID", "parentID", "rank", "scientificName"]].sort_values(["scientificName"])
 
+        # Get recursively generated list of alternating taxon IDs and the
+        # preferred sequence positions (as strings) for each top-level taxon
+        # and its descendents. At each level, siblings will be sorted
+        # alphabetically and will be followed by their children.
         ids = []
         for index, row in df[
             (df["parentID"] == "") | (df["parentID"].isnull())
         ].iterrows():
             ids = self.sort_taxa_recursive(df, ids, row["ID"])
-        ids = ids + df[~df["ID"].isin(np.array(ids))]["ID"].tolist()
 
+        # Convert alternating list into dictionary
         sort_index = dict(zip(ids, range(len(ids))))
+
+        # Join the preferred sequence positions as a new column, sort on
+        # that column and then drop the sequence values.
         self.taxa["sequence"] = self.taxa["ID"].map(sort_index)
         self.taxa = self.taxa.sort_values(["sequence"])
         self.taxa.drop("sequence", axis=1, inplace=True)
         self.taxa = self.taxa.reset_index(drop=True)
 
-    def sort_taxa_recursive(self, df, ids, id):
-        ids.append(str(len(ids) + 1))
+    def sort_taxa_recursive(
+        self, df: pd.DataFrame, ids: list[str], id: str
+    ) -> list[str]:
+        """
+        Internal method for recursive sorting of taxon records by parent and
+        name
+
+        :param df: Taxa dataframe to be sorted
+        :param ids: Alternative list of IDs and preferred positions (as strings)
+        :param id: Taxon ID for current taxon
+        :return: :paramref:`~coldp.COLDP.sort_taxa_recursive.ids` with additional values for current taxon and its descendents
+
+        Appends next taxon ID to the list along with a value guaranteed to be
+        higher than the one added on the previous execution of this method.
+        Recursively add IDs for children.
+        """
+
         ids.append(id)
+        ids.append(str(len(ids) + 1))
         for index, row in df[df["parentID"] == id].iterrows():
             ids = self.sort_taxa_recursive(df, ids, row["ID"])
         return ids
 
-    def sort_names(self):
+    def sort_names(self) -> None:
+        """
+        Sort name records to match order of records in taxa dataframe and with
+        accepted names and synonyms sorted alphabetically
+
+        Records are sorted first in the current order of the taxon table and
+        then alphabetically within the set of names for each taxon.
+
+        Existing ID values for all records are unchanged.
+
+        This method is most useful following a call to :py:func:`~coldp.COLDP.sort_taxa`.
+        """
         taxon_subset = self.taxa[["ID", "nameID"]]
-        taxon_subset["idx"] = self.taxa.index
+        taxon_subset.loc[:, ["idx"]] = self.taxa.index
         sort_table = pd.merge(
             self.names[["ID"]],
             taxon_subset,
@@ -970,19 +1053,31 @@ class COLDP:
             how="left",
             suffixes=["", "_synonym"],
         )
-        sort_table.loc[sort_table["idx"].isnull(), ["idx"]] = pd.merge(
-            sort_table.loc[sort_table["idx"].isnull()],
+        sort_table = pd.merge(
+            sort_table,
             taxon_subset,
             left_on="taxonID",
             right_on="ID",
             how="left",
-        )["idx_y"]
-        self.names[["idx"]] = sort_table[["idx"]]
-        self.names = self.names.sort_values(["idx", "scientificName"])
-        self.names.drop(["idx"], axis=1, inplace=True)
+            suffixes=["", "_y"],
+        )
+        sort_table.loc[sort_table["idx"].isnull(), ["idx"]] = sort_table["idx_y"]
+        sort_table["junior"] = True
+        sort_table.loc[sort_table["ID"] == sort_table["nameID"], ["junior"]] = False
+        self.names[["idx", "junior"]] = sort_table[["idx", "junior"]]
+        self.names = self.names.sort_values(["idx", "junior", "scientificName"])
+        self.names.drop(["idx", "junior"], axis=1, inplace=True)
         self.names = self.names.reset_index(drop=True)
 
-    def table_by_name(self, name):
+    def table_by_name(self, name: str) -> pd.DataFrame:
+        """
+        Return dataframe for named COLDP data class
+
+        :param name: Name of data frame to return (one of: name, taxon, synonym, reference, type_material, distribution, species_interaction, name_relation)
+        :return: Requested dataframe or None if no such table exists
+
+        Returns dataframe if one exists for supplied name
+        """
         tables = {
             "name": self.names,
             "taxon": self.taxa,
@@ -995,7 +1090,22 @@ class COLDP:
         }
         return tables[name] if name in tables.keys() else None
 
-    def reset_ids(self, name=None, prefix=None):
+    def reset_ids(self, name: str = None, prefix: str = None) -> None:
+        """
+        Reset all IDs for one or more COLDP data tables to consecutive values in the order of the table records
+
+        :param name: Table to be modified. One of name, taxon, reference or synonym. If name is None, all four are processed
+        :param prefix: Optional prefix string to be prepended before consecutive integer record ids
+
+        Resets all ids for one or all of the four supported classes to consecutive
+        id values, with an optional string prefix which defaults to "s" and an underscore in the
+        case of synonym records and is otherwise empty.
+
+        Also modifies corresponding foreign ID references in other tables so they
+        continue to resolve correctly.
+
+        If no table name is specified, all four are processed.
+        """
         for table_name in ["name", "taxon", "reference", "synonym"]:
             if name is None or table_name == name:
                 table = self.table_by_name(table_name)
@@ -1005,30 +1115,34 @@ class COLDP:
                     prefix = "s_"
                 table["newID"] = prefix + (table.index + 1).astype(str)
                 by_ids = table.set_index("ID")
+
+                # The id_mappings dictionary identifies references to the
+                # current table in other tables. These will be corrected here.
                 joins = id_mappings[table_name]
                 for key in joins.keys():
                     other_table = self.table_by_name(key)
                     for value in joins[key]:
                         if value in other_table.columns:
                             other_table[value] = other_table[value].map(by_ids["newID"])
+
                 table["ID"] = table["newID"]
                 table.drop("newID", axis=1, inplace=True)
 
-    def add_references(self, reference_list):
+    def add_references(
+        self, reference_list: list[dict[str:str]]
+    ) -> list[dict[str:str]]:
         """
         Ensure one or more references are included in references dataframe
 
-        Parameters:
-        reference_list - list of dictionaries - each dictionary contains values keyed by terms from reference_headings
+        :param reference_list: List of dictionaries - each dictionary contains values keyed by terms from reference_headings
+        :return: Updated :paramref:`~coldp.COLDP.add_references.reference_list` with IDs for references in this COLDP instance
 
-        Behaviour:
         Find existing ID values for each supplied reference, based on identity
         of: author, title, issued, containerTitle, volume, issue and page. Add
         ID to the appropriate reference dictionary in references. If none
-        found, set ID to next index and add to references
+        found, set ID to next unused index and add to references.
 
-        Returns:
-        Updated copy of reference_list
+        The list is returned updated with current ID values so these can be used for referenceID values in other classes.
         """
 
         for i in range(len(reference_list)):

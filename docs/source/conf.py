@@ -25,6 +25,7 @@ extensions = [
     "sphinx.ext.doctest",
     "sphinx.ext.intersphinx",
     "sphinx.ext.autosummary",
+    "sphinx_paramlinks",
 ]
 
 
