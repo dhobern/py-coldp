@@ -13,8 +13,8 @@ COLDP
    coldp
    name-bundle
 
-Indices and tables
-==================
+Index and search 
+~~~~~~~~~~~~~~~~
 
 * :ref:`genindex`
 * :ref:`search`

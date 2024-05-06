@@ -3,19 +3,21 @@
 
 .. currentmodule:: coldp
 
+Class
+~~~~~
+
 .. autoclass:: NameBundle
+    :no-index:
 
-    .. rubric:: Constructor
-   
-   .. automethod:: __init__
-   
-   .. rubric:: Methods
-  
-   .. automethod:: add_synonym
-   .. automethod:: normalise_name
-   .. automethod:: derive_name
+Methods
+~~~~~~~
 
-.. rubric:: Indices and tables
+.. automethod:: coldp.NameBundle.add_synonym
+.. automethod:: coldp.NameBundle.normalise_name
+.. automethod:: coldp.NameBundle.derive_name
+
+Index and search 
+~~~~~~~~~~~~~~~~
 
 * :ref:`genindex`
 * :ref:`search`

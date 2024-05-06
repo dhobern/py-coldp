@@ -257,10 +257,13 @@ name_from_nameusage = {
     "referenceID": "nameReferenceID",
     "remarks": "nameRemarks",
 }
+""" Dictionary mapping names of columns in COLDP Name records to the corresponding column names in COLDP NameUsage records """
 
 taxon_from_nameusage = {"nameID": "ID", "provisional": "status"}
+""" Dictionary mapping names of columns in COLDP Taxon records to the corresponding column names in COLDP NameUsage records """
 
 synonym_from_nameusage = {"taxonID": "parentID", "nameID": "ID"}
+""" Dictionary mapping names of columns in COLDP Synonym records to the corresponding column names in COLDP NameUsage records """
 
 # ----------------------------------------------------------------------------
 # Dictionary for mappings between id columns in tables
@@ -274,31 +277,48 @@ id_mappings = {
     "name": {
         "name": ["basionymID"],
         "taxon": ["nameID"],
-        "name_relation": ["nameID", "relatedNameID"],
+        "namerelation": ["nameID", "relatedNameID"],
         "synonym": ["nameID"],
     },
     "taxon": {
         "taxon": ["parentID"],
         "distribution": ["taxonID"],
-        "species_interaction": ["taxonID", "relatedTaxonID"],
+        "speciesinteraction": ["taxonID", "relatedTaxonID"],
         "synonym": ["taxonID"],
     },
     "reference": {
         "name": ["sourceID", "referenceID"],
         "taxon": ["sourceID", "referenceID", "nameReferenceID"],
         "synonym": ["sourceID", "referenceID"],
-        "type_material": ["referenceID"],
+        "typematerial": ["referenceID"],
         "distribution": ["referenceID"],
-        "species_interaction": ["referenceID"],
-        "name_relation": ["referenceID"],
+        "speciesinteraction": ["referenceID"],
+        "namerelation": ["referenceID"],
     },
     "synonym": {},
 }
+"""
+Dictionary mapping table names (name, taxon, reference or synonym) to a
+dictionary that maps another table name to the properties in the second table
+that reference ID values from the first table.
+
+For example, :py:data:`~coldp.COLDP.id_mappings` maps the key "name" to a 
+dictionary that includes the key "namerelation" with a list containing 
+"nameID" and "relatedNameID" as its value.
+
+This is a map of the foreign-key relationships that need to be validated 
+and preserved between the COLDP data tables.
+"""
 
 # ---------------------------------------------------------------------------
 # Recognised file extensions and their associated separator characters
 # ---------------------------------------------------------------------------
 csv_extensions = {"csv": ",", "tsv": "\t", "txt": "\t"}
+"""
+Dictionary mapping supported CSV/TSV file extensions to the expected delimiter.
+
+Supported extensions are .csv for comma-separated data files and .tsv or .txt for tab-delimited data files.
+"""
 
 # ---------------------------------------------------------------------------
 # Regular expression patterns for uninomial and species-rank epithets and a
@@ -315,6 +335,11 @@ class NameBundle:
     and one or more synonyms. The bundle handles the logic of associated name
     variations.
 
+    :param coldp: :py:class:`~coldp.COLDP` object to handle logging of any issues and normalise name records
+    :param accepted: Dictionary mapping COLDP name elements to values for the accepted name - a name record and a taxon record will be added to the COLDP package for the accepted name
+    :param incertae_sedis: Flag to indicate if the resulting taxon record should be marked "incertae sedis"
+    :param sic: Flag to indicate if the accepted name should be processed without reporting issues for invalid format
+
     The minimal usage is to create a new bundle with an accepted name. One
     or more synonyms can also be supplied using the :py:func:`~coldp.NameBundle.add_synonym` method.
     The bundle is then submitted to the :py:func:`coldp.COLDP.add_names` method for
@@ -323,11 +348,6 @@ class NameBundle:
     NameBundle objects should not be created directly. Use the :py:punc`coldp.COLDP.start_name_bundle` method instead.
 
     accepted should contain a dictionary with keys that match property names from the `COLDP Name class <https://github.com/CatalogueOfLife/coldp?tab=readme-ov-file#name>`_
-
-    :param coldp: :py:class:`~coldp.COLDP` object to handle logging of any issues and normalise name records
-    :param accepted: Dictionary mapping COLDP name elements to values for the accepted name - a name record and a taxon record will be added to the COLDP package for the accepted name
-    :param incertae_sedis: Flag to indicate if the resulting taxon record should be marked "incertae sedis"
-
     """
 
     def __init__(
@@ -491,24 +511,35 @@ class COLDP:
     Class to manage a set of Pandas dataframes for CSV tables in Catalogue
     of Life Data Package.
 
-    Usage
-    -----
-    Initialise the COLDP object with folder, COLDP package name and other
-    options. If the package exists in the folder, the COLDP package is
-    initialised as a set of dataframes based on its data. Otherwise empty
-    dataframes are created.
+    :param folder: Name of folder that may contain the named COLDP source folder from which source files should be read (name specified via the name parameter) and that is the default folder in which a COLDP folder will be written when the COLDP instance is saved. This is not the folder in which the CSV files are written. It is the folder which will contain the subfolder holding CSV files.
+    :param name: The name for the COLDP package. If a folder of this name exists inside the folder specied by the folder parameter, this COLDP instance will be initialised with the contents of any COLDP-compliant CSV or TSV files in the named folder.
+    :param kwargs: Options for controlling the behaviour of the COLDP package - see set_options().
+    :param default_taxon_record: Any values in the dictionary are automatically used as default values in taxon records added to the COLDP instance. In other words, the dictionary becomes the base into which other taxon record properties are then inserted.
+    :param code: ICZN or ICBN to indicate the nomenclatural code for name formatting. ICZN is the default.
+    :param insert_species_for_trinomials: If true, insert species (taxon and name) if trinomials are provided without the associated species. This can be convenient when mapping source data that only lists infraspecific taxa for species with subspecies, varieties or forms.
+    :param create_subspecies_for_infrasubspecifics: If true, automatically add a trinomial at subspecific rank as a synonym whenever an infrasubspecific name is added. This may be useful if the resulting dataset is intended to provide easy mapping of strings to taxon concepts, since versions of the trinomial lacking the rank marker will often be found in source data.
+    :param create_synonyms_without_subgenus: If true, automatically add a binomial or trinomial without an included subgenus name as a synonym whenever a name including a subgenus is added. This may be useful if the resulting dataset is intended to provide easy mapping of strings to taxon concepts, since versions of lacking the subgeneric component will often be found in source data.
+    :param basionyms_from_synonyms: If true, basionym associations are automatically created from synonyms within a loaded COLDP dataset. If an accepted name includes parentheses around the authorship, and if a name with the same epithet and authorship but no parentheses is included in the synonyms, the ID value for the synonym will be used for the basionymID element in the accepted name. This is normally a housekeeping step when first loading a new COLDP dataset. This option is only used when the dataset is first loaded. Addition of basionym relationships is automatic for names added as part of the same NameBundle.
+    :param classification_from_parents: If true, insert names for higher ranks into relevant elements in each taxon record based on the parent and higher ancestry for the taxon.
+    :param allow_repeated_binomials: If true, omit checks rejecting the addition of the same binomial more than once to the COLDP name dataframe.
+    :param create_taxa_for_not_established: If true, generate taxon records even if the associated name is flagged as not established (i.e. not satisfying the relevant nomenclatural code)
+    :param issues_to_stdout: If true, print any issue messages (see :py:func:`~coldp.COLDP.issue`) to stdout as well as inserting then in the issue dataframe.
+    :param context: Value to be used in labeling issue records (see :py:func:`~coldp.COLDP.issue`). This value is more normally set using :py:func:`~coldp.COLDP.set_context`.
 
-    If a folder exists with the supplied name in the supplied folder, it
+    A COLDP object is initalised with a source/destination folder, COLDP package
+    name and other options.
+
+    If a subfolder exists with the supplied name in the supplied folder, it
     will be initialised with data from any CSV/TSV files it contains with any
     of the following base names: name, taxon, synonym, reference,
     distribution, speciesinteraction, namerelation, typematerial or nameusage,
-    and with any of the following extensions: .csv, .tsv, .txt. File names
-    are case insensitive.
+    and with a file extension recognised via :py:data:`~coldp.COLDP.csv_extensions`.
+    File names are case insensitive.
 
     Files with the base name nameusage are loaded only if the name, taxon or
     synonym file is absent, in which case the contents of the nameusage file
-    are mapped internally to the more normalised name + taxon + synonym
-    format.
+    are mapped internally to the more normalised COLDP format with separate
+    name + taxon + synonym tables.
 
     If no folder exists with the supplied name, an empty instance is created.
     Pandas dataframes are created as required for the COLDP data types as
@@ -526,32 +557,40 @@ class COLDP:
     The :py:func:`~coldp.COLDP.save` method writes the data back to the same or another folder.
     """
 
-    def __init__(self, folder: str, name: str, **kwargs: dict):
-        """
-        Load or initialise a COLDP instance
-
-        :param folder: Name of folder that may contain the named COLDP source folder from which source files should be read (name specified via the name parameter) and that is the default folder in which a COLDP folder will be written when the COLDP instance is saved. This is not the folder in which the CSV files are written. It is the folder which will contain the subfolder holding CSV files.
-        :param name: The name for the COLDP package. If a folder of this name exists inside the folder specied by the folder parameter, this COLDP instance will be initialised with the contents of any COLDP-compliant CSV or TSV files in the named folder.
-        :param kwargs: Options for controlling the behaviour of the COLDP package - see set_options().
-        """
+    def __init__(
+        self,
+        name: str,
+        folder: str = ".",
+        code: str = "ICZN",
+        default_taxon_record: dict[str:str] = None,
+        insert_species_for_trinomials: bool = False,
+        create_subspecies_for_infrasubspecifics: bool = False,
+        create_synonyms_without_subgenus: bool = False,
+        basionyms_from_synonyms: bool = False,
+        classification_from_parents: bool = False,
+        allow_repeated_binomials: bool = False,
+        create_taxa_for_not_established: bool = False,
+        issues_to_stdout: bool = False,
+        context: str = None,
+    ) -> None:
 
         self.default_taxon = {
             "provisional": "false",
             "extinct": "false",
             "temporalRangeEnd": "Holocene",
         }
+        self.default_taxon_record = default_taxon_record
         self.code = "ICZN"
-        self.species_from_trinomials = False
-        self.subspecies_from_trinomials = False
-        self.subgenus_free_synonyms = False
-        self.basionyms_from_synonyms = False
-        self.classification_from_parents = False
-        self.allow_repeated_binomials = False
-        self.create_taxa_for_not_established = False
-        self.issues_to_stdout = False
+        self.species_from_trinomials = insert_species_for_trinomials
+        self.subspecies_from_trinomials = create_subspecies_for_infrasubspecifics
+        self.subgenus_free_synonyms = create_synonyms_without_subgenus
+        self.basionyms_from_synonyms = basionyms_from_synonyms
+        self.classification_from_parents = classification_from_parents
+        self.allow_repeated_binomials = allow_repeated_binomials
+        self.create_taxa_for_not_established = create_taxa_for_not_established
+        self.issues_to_stdout = issues_to_stdout
+        self.context = context
 
-        if kwargs:
-            self.set_options(kwargs)
         self.folder = folder
         self.name = name
         if folder is not None:
@@ -584,43 +623,15 @@ class COLDP:
         if self.basionyms_from_synonyms:
             self.fix_basionyms(self.names, self.synonyms)
         self.issues = None
-        self.context = None
 
-    def set(self, **kwargs):
+    def set_options(self, **options: bool):
         """
         Set options controlling COLDP instance from keyword arguments
 
-        :param kwargs: Set of options for controlling the behaviour of the COLDP package - see set_options().
+        :param options: Set of boolean options for controlling the behaviour of the COLDP package - see :py:class:`~coldp.COLDP` for boolean options that can be set.
 
         Convenience method for setting options via keyword arguments after the COLDP instance has been created.
         """
-
-        self.set_options(kwargs)
-
-    def set_options(self, options: dict) -> None:
-        """
-        Set options controlling COLDP instance from a dictionary
-
-        :param options: Dictionary containing options to control the behaviour of the COLDP instance. Any combination of the supported options may be specified.
-
-        Option values may be dictionaries, booleans or string values. All boolean options default to False.
-
-        * Dictionary options
-           * **default_taxon_record**: Any values in the dictionary are automatically used as default values in taxon records added to the COLDP instance. In other words, the dictionary becomes the base into which other taxon record properties are then inserted.
-        * Boolean options
-           * **insert_species_for_trinomials**:  If true, insert species (taxon and name) if trinomials are provided without the associated species. This can be convenient when mapping source data that only lists infraspecific taxa for species with subspecies, varieties or forms.
-           * **create_subspecies_for_infrasubspecifics**:  If true, automatically add a trinomial at subspecific rank as a synonym whenever an infrasubspecific name is added. This may be useful if the resulting dataset is intended to provide easy mapping of strings to taxon concepts, since versions of the trinomial lacking the rank marker will often be found in source data.
-           * **create_synonyms_without_subgenus**:  If true, automatically add a binomial or trinomial without an included subgenus name as a synonym whenever a name including a subgenus is added. This may be useful if the resulting dataset is intended to provide easy mapping of strings to taxon concepts, since versions of lacking the subgeneric component will often be found in source data.
-           * **basionyms_from_synonyms**:  If true, basionym associations are automatically created from synonyms within a loaded COLDP dataset. If an accepted name includes parentheses around the authorship, and if a name with the same epithet and authorship but no parentheses is included in the synonyms, the ID value for the synonym will be used for the basionymID element in the accepted name. This is normally a housekeeping step when first loading a new COLDP dataset. This option is only used when the dataset is first loaded. Addition of basionym relationships is automatic for names added as part of the same NameBundle.
-           * **classification_from_parents**:  If true, insert names for higher ranks into relevant elements in each taxon record based on the parent and higher ancestry for the taxon.
-           * **allow_repeated_binomials**:  If true, omit checks rejecting the addition of the same binomial more than once to the COLDP name dataframe.
-           * **create_taxa_for_not_established**:  If true, generate taxon records even if the associated name is flagged as not established (i.e. not satisfying the relevant nomenclatural code)
-           * **issues_to_stdout**:  If true, print any issue messages (see issue()) to stdout as well as inserting then in the issue dataframe.
-        * String options
-           * **code**:  ICZN or ICBN to indicate the nomenclatural code for name formatting. ICZN is the default.
-           * **context**:  Value to be used in labeling issue records (see issue()). This value is more normally set using set_context().
-        """
-
         for key, value in options.items():
             if key == "insert_species_for_trinomials":
                 self.species_from_trinomials = value
@@ -630,8 +641,6 @@ class COLDP:
                 self.subgenus_free_synonyms = value
             elif key == "default_taxon_record":
                 self.default_taxon = value
-            elif key == "context":
-                self.context = value
             elif key == "issues_to_stdout":
                 self.issues_to_stdout = value
             elif key == "basionyms_from_synonyms":
@@ -642,8 +651,16 @@ class COLDP:
                 self.allow_repeated_binomials = value
             elif key == "create_taxa_for_not_established":
                 self.create_taxa_for_not_established = value
-            elif key == "code" and value in ["ICZN", "ICBN"]:
-                self.code = value
+
+    def set_default_taxon_record(self, default_taxon_record: dict[str:str]) -> None:
+        """
+        Set default values for properties in taxon records created by this COLDP instance
+
+        :param default_taxon_record: Any values in the dictionary are automatically used as default values in taxon records added to the COLDP instance. In other words, the dictionary becomes the base into which other taxon record properties are then inserted.
+
+        Convenience method for setting default taxon record after the COLDP instance has been created.
+        """
+        self.default_taxon_record = default_taxon_record
 
     def set_context(self, context: str) -> None:
         """
@@ -769,8 +786,8 @@ class COLDP:
         source columns names to target column names
 
         :param df: Dataframe from which columns are to be extracted/mapped
-        :param headings: Dist of column headings for destinaton dataframe
-        :param mappings: Dictionary mappimg desination column names to source column names
+        :param headings: List of column headings for destination dataframe
+        :param mappings: Dictionary mapping destination column names to source column names
         :return: New Dataframe based on supplied mappings
 
         This method is used to extract and rename a subset of columns from a
@@ -895,8 +912,8 @@ class COLDP:
         taxon records descended from a given parent or for all taxon records
         in the COLDP instance at the highest included rank
 
-        :param taxa: Dataframe containing COLDP taxa records
-        :param ranks: DataFrame with nameID, rank and scientificName for all names in COLDP instance
+        :param taxa: Dataframe containing COLDP taxon records
+        :param ranks: DataFrame containing at least nameID, rank and scientificName for all names in COLDP instance (can be the complete table of COLDP names)
         :param parent: Taxon record for which children should be updated, or None if all top-level taxa should be updated
 
         If :paramref:`~coldp.COLDP.fix_classification_recursive.taxa` is None, select all top-level taxa from the dataframe (i.e. all without a parentID) and process these recursively.
@@ -1076,17 +1093,17 @@ class COLDP:
         :param name: Name of data frame to return (one of: name, taxon, synonym, reference, type_material, distribution, species_interaction, name_relation)
         :return: Requested dataframe or None if no such table exists
 
-        Returns dataframe if one exists for supplied name
+        Returns dataframe if one exists for supplied name.
         """
         tables = {
             "name": self.names,
             "taxon": self.taxa,
             "synonym": self.synonyms,
             "reference": self.references,
-            "type_material": self.type_materials,
+            "typematerial": self.type_materials,
             "distribution": self.distributions,
-            "species_interaction": self.species_interactions,
-            "name_relation": self.name_relations,
+            "speciesinteraction": self.species_interactions,
+            "namerelation": self.name_relations,
         }
         return tables[name] if name in tables.keys() else None
 
@@ -1098,11 +1115,12 @@ class COLDP:
         :param prefix: Optional prefix string to be prepended before consecutive integer record ids
 
         Resets all ids for one or all of the four supported classes to consecutive
-        id values, with an optional string prefix which defaults to "s" and an underscore in the
+        id values, with an optional string prefix which defaults to ``"s_"`` in the
         case of synonym records and is otherwise empty.
 
         Also modifies corresponding foreign ID references in other tables so they
-        continue to resolve correctly.
+        continue to resolve correctly using the :py:data:`~coldp.COLDP.id_mappings`
+        dictionary.
 
         If no table name is specified, all four are processed.
         """
@@ -1138,7 +1156,7 @@ class COLDP:
         :return: Updated :paramref:`~coldp.COLDP.add_references.reference_list` with IDs for references in this COLDP instance
 
         Find existing ID values for each supplied reference, based on identity
-        of: author, title, issued, containerTitle, volume, issue and page. Add
+        of: author, title, issued, containerTitle, volume, issue, page and citation. Add
         ID to the appropriate reference dictionary in references. If none
         found, set ID to next unused index and add to references.
 
@@ -1169,7 +1187,16 @@ class COLDP:
                 reference_list[i]["ID"] = ""
         return reference_list
 
-    def get_reference(self, id):
+    def get_reference(self, id: str) -> dict[str:str]:
+        """
+        Get reference record as dictionary from ID string
+
+        :param id: ID string for requested COLDP reference record
+        :return: Dictionary of COLDP reference properties for requested ID
+
+        Returns None if no matching reference. If multiple records exist with
+        the given id, a warning is logged and the first match is returned.
+        """
         match = self.references[self.references["ID"] == id]
         if len(match) == 0:
             return None
@@ -1177,7 +1204,19 @@ class COLDP:
             logging.warn(f"Multiple matches for reference ID: {id}")
         return match.to_dict("records")[0]
 
-    def find_reference(self, reference):
+    def find_reference(self, reference: dict[str:str]) -> pd.DataFrame:
+        """
+        Locate existing COLDP reference record exactly matching all major
+        fields in :py:paramref:`~coldp.COLDP.find_reference.reference`
+
+        :param reference: Dictionary of COLDP reference properties representing a record to be found
+        :return: DataFrame with one COLDP reference record if found, else None
+
+        Only returns a record that exactly matches the values supplied in
+        :py:paramref:`~coldp.COLDP.find_reference.reference` for all of
+        author, title, issued, containerTitle, volume, issue, page and citation.
+        """
+
         for k in [
             "ID",
             "author",
@@ -1210,7 +1249,7 @@ class COLDP:
     def start_name_bundle(self, accepted, incertae_sedis=False, sic=False):
         return NameBundle(self, accepted, incertae_sedis, sic)
 
-    def add_names(self, bundle: NameBundle, parent: str) -> None:
+    def add_names(self, bundle: NameBundle, parent: str = None) -> None:
         """
         Ensure one or more names are included in names dataframe and update
         taxa and synonyms dataframes as necessary
@@ -1218,10 +1257,43 @@ class COLDP:
         :param bundle: :py:class:`~coldp.NameBundle` object with set of associated taxon names
         :param parent: ID for taxon record for which the accepted taxon in this bundle is to be added as a child
 
-        Add names, taxon and synonyms to package and update bundle records with id values
+        The supplied :py:class:`~coldp.NameBundle` object includes an accepted
+        name record (as a dictionary of COLDP name properties) and a list, which
+        may be empty, of synonym name records in the same format. :py:func:`~coldp.COLDP.add_names`
+        ensures that name records exist for all these names in the names dataframe,
+        that a taxon record exists for the accepted taxon name, and that synonym
+        records exist for this taxon record for all supplied synonyms.
+
+        Depending on the options supplied for the :py:class:`~coldp.COLDP` object,
+        additional synonyms may be created to represent subspecies-rank versions
+        of infrasubspecific trinomials and subgenus-free versions of combinations
+        including a subgenus name.
+
+        If a matching name already exists in the COLDP instance, no new name will
+        normally be added. Instead, the name record in the bundle will be updated
+        with the ID (and basionymID where applicable) from the existing name. This
+        allows for additional synonyms to be added to an existing taxon. The
+        behaviour can be over-ridden with the :paramref:`~coldp.COLDP.allow_repeated_binomials`
+        option, in which case any number of matching names can be added.
+
+        If the :paramref:`~coldp.COLDP.insert_species_for_trinomials` option is
+        set, a new species will be created if required before adding the
+        trinomial as its child. In this case the bundle will contain the id
+        for the species taxon as a species_taxon_id property.
+
+        Name records in the bundle are all updated with existing or new IDs and
+        basionymIDs, which are inferred automatically for zoological names by
+        associating combinations with and without parentheses around the
+        authorship.
+
+        Upon completion, the bundle also contains an accepted_taxon_id property
+        which includes the string ID for the taxon.
+
+        If :paramref:`~coldp.COLDP.add_names.parent` is None, the new taxon record
+        is created without a parent, i.e. becomes a root node in the classification.
         """
 
-        # Tag any names that are already known with the appropriate id
+        # Handle any options and get species if exists already.
         self.prepare_bundle(bundle)
 
         # Ensure all names have IDs
@@ -1458,6 +1530,8 @@ class COLDP:
         return
 
     def add_taxon(self, name, parent, incertae_sedis=False):
+
+        print(f"Name: {name}\nParent: {parent}")
         match = self.taxa[self.taxa["nameID"] == name["ID"]]
         if len(match) > 0:
             if len(match) > 1:
@@ -1485,7 +1559,12 @@ class COLDP:
                     + ") for taxon id "
                     + match["ID"]
                 )
-            if match["parentID"] and parent and match["parentID"] != parent:
+            if (
+                "parentID" in match
+                and match["parentID"]
+                and parent
+                and match["parentID"] != parent
+            ):
                 match = self.taxa[self.taxa["ID"] == match["parentID"]].iloc[0]
                 parentA = self.names[self.names["ID"] == match["nameID"]].iloc[0]
                 match = self.taxa[self.taxa["ID"] == parent].iloc[0]
@@ -1770,14 +1849,34 @@ class COLDP:
             return match.to_dict("records")
         return match
 
-    def get_text_tree(self, taxonID, indent=""):
+    def get_text_tree(
+        self,
+        taxonID: str,
+        indent: str = "  ",
+        initial_prefix: str = "",
+        synonym_prefix=" = ",
+    ) -> str:
+        """
+        Generate formatted text tree for specified taxon and its descendents
+
+        :param taxonID: String ID for taxon to be formatted
+        :param indent: Indent string to be added one or more times before each nested row, defaults to two spaces
+        :param initial_prefix: Optional prefix string for all rows (preceeds indentation), defaults to empty string
+        :param synonym_prefix: Prefix to appear before synonymised names, defaults to an equal sign with spaces on either side
+        :return: Multiline string representation of taxonomic hierarchy
+
+        The tree view shows the name, authorship and rank for the selected taxon.
+        Synonyms follow, one to a row at the same indent level but preceded by a
+        space and an asterisk. Then each child follows, indented two more spaces per level,
+        with its own synonyms and children following.
+        """
         taxon = self.get_taxon(taxonID)
         if taxon is None:
             return ""
         name = self.get_name(taxon["nameID"])
         if name is None:
             logging.error(f"No name for taxon {taxonID}")
-        tree = f"{indent}{name['scientificName']} {name['authorship']} [{name['rank']}]"
+        tree = f"{initial_prefix}{name['scientificName']} {name['authorship']} [{name['rank']}]"
         synonyms = self.get_synonyms(taxonID)
         if synonyms is not None:
             for synonym in synonyms["nameID"]:
@@ -1785,11 +1884,13 @@ class COLDP:
                 if junior is None:
                     logging.error(f"Could not find name {synonym} for synonym")
                 else:
-                    tree += f"\n {indent}* {junior['scientificName']} {junior['authorship']} [{junior['rank']}]"
+                    tree += f"\n{initial_prefix} = {junior['scientificName']} {junior['authorship']} [{junior['rank']}]"
         children = self.get_children(taxonID)
         if children is not None:
             for child in children["ID"]:
-                tree += "\n" + self.get_text_tree(child, indent + "  ")
+                tree += "\n" + self.get_text_tree(
+                    child, indent, initial_prefix + indent
+                )
         return tree
 
     def construct_species_rank_name(self, g, sg, s, ss, marker):

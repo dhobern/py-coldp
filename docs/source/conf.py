@@ -30,6 +30,7 @@ extensions = [
 
 
 autosummary_generate = True
+autodoc_typehints = "none"
 
 templates_path = ["_templates"]
 exclude_patterns = []

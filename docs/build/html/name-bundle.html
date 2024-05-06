@@ -34,38 +34,38 @@
             
   <section id="coldp-namebundle">
 <h1>coldp.NameBundle<a class="headerlink" href="#coldp-namebundle" title="Link to this heading">¶</a></h1>
+<section id="class">
+<h2>Class<a class="headerlink" href="#class" title="Link to this heading">¶</a></h2>
 <dl class="py class">
-<dt class="sig sig-object py" id="coldp.NameBundle">
-<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">coldp.</span></span><span class="sig-name descname"><span class="pre">NameBundle</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="pre">coldp,</span> <span class="pre">accepted:</span> <span class="pre">dict[slice(&lt;class</span> <span class="pre">'str'&gt;,</span> <span class="pre">&lt;class</span> <span class="pre">'str'&gt;,</span> <span class="pre">None)],</span> <span class="pre">incertae_sedis:</span> <span class="pre">bool</span> <span class="pre">=</span> <span class="pre">False,</span> <span class="pre">sic:</span> <span class="pre">bool</span> <span class="pre">=</span> <span class="pre">False</span></em><span class="sig-paren">)</span><a class="headerlink" href="#coldp.NameBundle" title="Link to this definition">¶</a></dt>
+<dt class="sig sig-object py">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">coldp.</span></span><span class="sig-name descname"><span class="pre">NameBundle</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">coldp</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">accepted</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">incertae_sedis</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">sic</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em><span class="sig-paren">)</span></dt>
 <dd><p>Wrapper class to manage set of associated names, normally an accepted name
 and one or more synonyms. The bundle handles the logic of associated name
 variations.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><span class="target" id="coldp.NameBundle.params.coldp"></span><strong>coldp</strong><a class="paramlink headerlink reference internal" href="#coldp.NameBundle.params.coldp">¶</a> – <code class="xref py py-class docutils literal notranslate"><span class="pre">COLDP</span></code> object to handle logging of any issues and normalise name records</p></li>
+<li><p><span class="target" id="coldp.NameBundle.params.accepted"></span><strong>accepted</strong><a class="paramlink headerlink reference internal" href="#coldp.NameBundle.params.accepted">¶</a> – Dictionary mapping COLDP name elements to values for the accepted name - a name record and a taxon record will be added to the COLDP package for the accepted name</p></li>
+<li><p><span class="target" id="coldp.NameBundle.params.incertae_sedis"></span><strong>incertae_sedis</strong><a class="paramlink headerlink reference internal" href="#coldp.NameBundle.params.incertae_sedis">¶</a> – Flag to indicate if the resulting taxon record should be marked “incertae sedis”</p></li>
+<li><p><span class="target" id="coldp.NameBundle.params.sic"></span><strong>sic</strong><a class="paramlink headerlink reference internal" href="#coldp.NameBundle.params.sic">¶</a> – Flag to indicate if the accepted name should be processed without reporting issues for invalid format</p></li>
+</ul>
+</dd>
+</dl>
 <p>The minimal usage is to create a new bundle with an accepted name. One
 or more synonyms can also be supplied using the <a class="reference internal" href="#coldp.NameBundle.add_synonym" title="coldp.NameBundle.add_synonym"><code class="xref py py-func docutils literal notranslate"><span class="pre">add_synonym()</span></code></a> method.
 The bundle is then submitted to the <a class="reference internal" href="coldp.html#coldp.COLDP.add_names" title="coldp.COLDP.add_names"><code class="xref py py-func docutils literal notranslate"><span class="pre">coldp.COLDP.add_names()</span></code></a> method for
 processing.</p>
 <p>NameBundle objects should not be created directly. Use the :py:punc`coldp.COLDP.start_name_bundle` method instead.</p>
 <p>accepted should contain a dictionary with keys that match property names from the <a class="reference external" href="https://github.com/CatalogueOfLife/coldp?tab=readme-ov-file#name">COLDP Name class</a></p>
-<dl class="field-list simple">
-<dt class="field-odd">Parameters<span class="colon">:</span></dt>
-<dd class="field-odd"><ul class="simple">
-<li><p><span class="target" id="coldp.NameBundle.params.coldp"></span><strong>coldp</strong><a class="paramlink headerlink reference internal" href="#coldp.NameBundle.params.coldp">¶</a> – <a class="reference internal" href="coldp.html#coldp.COLDP" title="coldp.COLDP"><code class="xref py py-class docutils literal notranslate"><span class="pre">COLDP</span></code></a> object to handle logging of any issues and normalise name records</p></li>
-<li><p><span class="target" id="coldp.NameBundle.params.accepted"></span><strong>accepted</strong><a class="paramlink headerlink reference internal" href="#coldp.NameBundle.params.accepted">¶</a> – Dictionary mapping COLDP name elements to values for the accepted name - a name record and a taxon record will be added to the COLDP package for the accepted name</p></li>
-<li><p><span class="target" id="coldp.NameBundle.params.incertae_sedis"></span><strong>incertae_sedis</strong><a class="paramlink headerlink reference internal" href="#coldp.NameBundle.params.incertae_sedis">¶</a> – <p>Flag to indicate if the resulting taxon record should be marked “incertae sedis”</p>
-<p class="rubric">Constructor</p>
-</p></li>
-</ul>
-</dd>
-</dl>
-<dl class="py method">
-<dt class="sig sig-object py" id="coldp.NameBundle.__init__">
-<span class="sig-name descname"><span class="pre">__init__</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="pre">coldp,</span> <span class="pre">accepted:</span> <span class="pre">dict[slice(&lt;class</span> <span class="pre">'str'&gt;,</span> <span class="pre">&lt;class</span> <span class="pre">'str'&gt;,</span> <span class="pre">None)],</span> <span class="pre">incertae_sedis:</span> <span class="pre">bool</span> <span class="pre">=</span> <span class="pre">False,</span> <span class="pre">sic:</span> <span class="pre">bool</span> <span class="pre">=</span> <span class="pre">False</span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">None</span></span></span><a class="headerlink" href="#coldp.NameBundle.__init__" title="Link to this definition">¶</a></dt>
-<dd></dd></dl>
+</dd></dl>
 
-<p class="rubric">Methods</p>
+</section>
+<section id="methods">
+<h2>Methods<a class="headerlink" href="#methods" title="Link to this heading">¶</a></h2>
 <dl class="py method">
 <dt class="sig sig-object py" id="coldp.NameBundle.add_synonym">
-<span class="sig-name descname"><span class="pre">add_synonym</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="pre">synonym:</span> <span class="pre">dict[slice(&lt;class</span> <span class="pre">'str'&gt;,</span> <span class="pre">&lt;class</span> <span class="pre">'str'&gt;,</span> <span class="pre">None)],</span> <span class="pre">sic:</span> <span class="pre">bool</span> <span class="pre">=</span> <span class="pre">False</span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">None</span></span></span><a class="headerlink" href="#coldp.NameBundle.add_synonym" title="Link to this definition">¶</a></dt>
+<span class="sig-prename descclassname"><span class="pre">NameBundle.</span></span><span class="sig-name descname"><span class="pre">add_synonym</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">synonym</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">sic</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#coldp.NameBundle.add_synonym" title="Link to this definition">¶</a></dt>
 <dd><p>Register an additional name as a synonym for the accepted name</p>
 <p>synonym should contain a dictionary with keys that match property names from the <a class="reference external" href="https://github.com/CatalogueOfLife/coldp?tab=readme-ov-file#name">COLDP Name class</a></p>
 <dl class="field-list simple">
@@ -80,7 +80,7 @@ processing.</p>
 
 <dl class="py method">
 <dt class="sig sig-object py" id="coldp.NameBundle.normalise_name">
-<span class="sig-name descname"><span class="pre">normalise_name</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="pre">name:</span> <span class="pre">dict[slice(&lt;class</span> <span class="pre">'str'&gt;,</span> <span class="pre">&lt;class</span> <span class="pre">'str'&gt;,</span> <span class="pre">None)],</span> <span class="pre">sic:</span> <span class="pre">bool</span> <span class="pre">=</span> <span class="pre">False</span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">dict</span></span></span><a class="headerlink" href="#coldp.NameBundle.normalise_name" title="Link to this definition">¶</a></dt>
+<span class="sig-prename descclassname"><span class="pre">NameBundle.</span></span><span class="sig-name descname"><span class="pre">normalise_name</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">name</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">sic</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#coldp.NameBundle.normalise_name" title="Link to this definition">¶</a></dt>
 <dd><p>Ensure that a name record dictionary contains all necessary/appropriate elements</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
@@ -97,7 +97,7 @@ processing.</p>
 
 <dl class="py method">
 <dt class="sig sig-object py" id="coldp.NameBundle.derive_name">
-<span class="sig-name descname"><span class="pre">derive_name</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="pre">name:</span> <span class="pre">dict[slice(&lt;class</span> <span class="pre">'str'&gt;,</span> <span class="pre">&lt;class</span> <span class="pre">'str'&gt;,</span> <span class="pre">None)],</span> <span class="pre">values:</span> <span class="pre">dict[slice(&lt;class</span> <span class="pre">'str'&gt;,</span> <span class="pre">&lt;class</span> <span class="pre">'str'&gt;,</span> <span class="pre">None)],</span> <span class="pre">sic:</span> <span class="pre">bool</span> <span class="pre">=</span> <span class="pre">False</span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">dict</span></span></span><a class="headerlink" href="#coldp.NameBundle.derive_name" title="Link to this definition">¶</a></dt>
+<span class="sig-prename descclassname"><span class="pre">NameBundle.</span></span><span class="sig-name descname"><span class="pre">derive_name</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">name</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">values</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">sic</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#coldp.NameBundle.derive_name" title="Link to this definition">¶</a></dt>
 <dd><p>Use supplied values to create new name dictionary with missing elements copied from an existing name dictionary</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
@@ -112,13 +112,14 @@ processing.</p>
 </dl>
 </dd></dl>
 
-</dd></dl>
-
-<p class="rubric">Indices and tables</p>
+</section>
+<section id="index-and-search">
+<h2>Index and search<a class="headerlink" href="#index-and-search" title="Link to this heading">¶</a></h2>
 <ul class="simple">
 <li><p><a class="reference internal" href="genindex.html"><span class="std std-ref">Index</span></a></p></li>
 <li><p><a class="reference internal" href="search.html"><span class="std std-ref">Search Page</span></a></p></li>
 </ul>
+</section>
 </section>
 
 
@@ -142,7 +143,9 @@ processing.</p>
 <ul class="current">
 <li class="toctree-l1"><a class="reference internal" href="coldp.html">coldp.COLDP</a></li>
 <li class="toctree-l1 current"><a class="current reference internal" href="#">coldp.NameBundle</a><ul>
-<li class="toctree-l2"><a class="reference internal" href="#coldp.NameBundle"><code class="docutils literal notranslate"><span class="pre">NameBundle</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="#class">Class</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#methods">Methods</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#index-and-search">Index and search</a></li>
 </ul>
 </li>
 </ul>

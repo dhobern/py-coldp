@@ -35,27 +35,45 @@
             
   <section id="coldp-coldp">
 <h1>coldp.COLDP<a class="headerlink" href="#coldp-coldp" title="Link to this heading">¶</a></h1>
+<section id="class">
+<h2>Class<a class="headerlink" href="#class" title="Link to this heading">¶</a></h2>
 <dl class="py class">
-<dt class="sig sig-object py" id="coldp.COLDP">
-<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">coldp.</span></span><span class="sig-name descname"><span class="pre">COLDP</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">folder</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">name</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">dict</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#coldp.COLDP" title="Link to this definition">¶</a></dt>
+<dt class="sig sig-object py">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">coldp.</span></span><span class="sig-name descname"><span class="pre">COLDP</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">name</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">folder</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'.'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">code</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'ICZN'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">default_taxon_record</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">insert_species_for_trinomials</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">create_subspecies_for_infrasubspecifics</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">create_synonyms_without_subgenus</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">basionyms_from_synonyms</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">classification_from_parents</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">allow_repeated_binomials</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">create_taxa_for_not_established</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">issues_to_stdout</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">context</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span></dt>
 <dd><p>Class to manage a set of Pandas dataframes for CSV tables in Catalogue
 of Life Data Package.</p>
-<section id="usage">
-<h2>Usage<a class="headerlink" href="#usage" title="Link to this heading">¶</a></h2>
-<p>Initialise the COLDP object with folder, COLDP package name and other
-options. If the package exists in the folder, the COLDP package is
-initialised as a set of dataframes based on its data. Otherwise empty
-dataframes are created.</p>
-<p>If a folder exists with the supplied name in the supplied folder, it
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><span class="target" id="coldp.COLDP.params.folder"></span><strong>folder</strong><a class="paramlink headerlink reference internal" href="#coldp.COLDP.params.folder">¶</a> – Name of folder that may contain the named COLDP source folder from which source files should be read (name specified via the name parameter) and that is the default folder in which a COLDP folder will be written when the COLDP instance is saved. This is not the folder in which the CSV files are written. It is the folder which will contain the subfolder holding CSV files.</p></li>
+<li><p><span class="target" id="coldp.COLDP.params.name"></span><strong>name</strong><a class="paramlink headerlink reference internal" href="#coldp.COLDP.params.name">¶</a> – The name for the COLDP package. If a folder of this name exists inside the folder specied by the folder parameter, this COLDP instance will be initialised with the contents of any COLDP-compliant CSV or TSV files in the named folder.</p></li>
+<li><p><span class="target" id="coldp.COLDP.params.kwargs"></span><strong>kwargs</strong><a class="paramlink headerlink reference internal" href="#coldp.COLDP.params.kwargs">¶</a> – Options for controlling the behaviour of the COLDP package - see set_options().</p></li>
+<li><p><span class="target" id="coldp.COLDP.params.default_taxon_record"></span><strong>default_taxon_record</strong><a class="paramlink headerlink reference internal" href="#coldp.COLDP.params.default_taxon_record">¶</a> – Any values in the dictionary are automatically used as default values in taxon records added to the COLDP instance. In other words, the dictionary becomes the base into which other taxon record properties are then inserted.</p></li>
+<li><p><span class="target" id="coldp.COLDP.params.code"></span><strong>code</strong><a class="paramlink headerlink reference internal" href="#coldp.COLDP.params.code">¶</a> – ICZN or ICBN to indicate the nomenclatural code for name formatting. ICZN is the default.</p></li>
+<li><p><span class="target" id="coldp.COLDP.params.insert_species_for_trinomials"></span><strong>insert_species_for_trinomials</strong><a class="paramlink headerlink reference internal" href="#coldp.COLDP.params.insert_species_for_trinomials">¶</a> – If true, insert species (taxon and name) if trinomials are provided without the associated species. This can be convenient when mapping source data that only lists infraspecific taxa for species with subspecies, varieties or forms.</p></li>
+<li><p><span class="target" id="coldp.COLDP.params.create_subspecies_for_infrasubspecifics"></span><strong>create_subspecies_for_infrasubspecifics</strong><a class="paramlink headerlink reference internal" href="#coldp.COLDP.params.create_subspecies_for_infrasubspecifics">¶</a> – If true, automatically add a trinomial at subspecific rank as a synonym whenever an infrasubspecific name is added. This may be useful if the resulting dataset is intended to provide easy mapping of strings to taxon concepts, since versions of the trinomial lacking the rank marker will often be found in source data.</p></li>
+<li><p><span class="target" id="coldp.COLDP.params.create_synonyms_without_subgenus"></span><strong>create_synonyms_without_subgenus</strong><a class="paramlink headerlink reference internal" href="#coldp.COLDP.params.create_synonyms_without_subgenus">¶</a> – If true, automatically add a binomial or trinomial without an included subgenus name as a synonym whenever a name including a subgenus is added. This may be useful if the resulting dataset is intended to provide easy mapping of strings to taxon concepts, since versions of lacking the subgeneric component will often be found in source data.</p></li>
+<li><p><span class="target" id="coldp.COLDP.params.basionyms_from_synonyms"></span><strong>basionyms_from_synonyms</strong><a class="paramlink headerlink reference internal" href="#coldp.COLDP.params.basionyms_from_synonyms">¶</a> – If true, basionym associations are automatically created from synonyms within a loaded COLDP dataset. If an accepted name includes parentheses around the authorship, and if a name with the same epithet and authorship but no parentheses is included in the synonyms, the ID value for the synonym will be used for the basionymID element in the accepted name. This is normally a housekeeping step when first loading a new COLDP dataset. This option is only used when the dataset is first loaded. Addition of basionym relationships is automatic for names added as part of the same NameBundle.</p></li>
+<li><p><span class="target" id="coldp.COLDP.params.classification_from_parents"></span><strong>classification_from_parents</strong><a class="paramlink headerlink reference internal" href="#coldp.COLDP.params.classification_from_parents">¶</a> – If true, insert names for higher ranks into relevant elements in each taxon record based on the parent and higher ancestry for the taxon.</p></li>
+<li><p><span class="target" id="coldp.COLDP.params.allow_repeated_binomials"></span><strong>allow_repeated_binomials</strong><a class="paramlink headerlink reference internal" href="#coldp.COLDP.params.allow_repeated_binomials">¶</a> – If true, omit checks rejecting the addition of the same binomial more than once to the COLDP name dataframe.</p></li>
+<li><p><span class="target" id="coldp.COLDP.params.create_taxa_for_not_established"></span><strong>create_taxa_for_not_established</strong><a class="paramlink headerlink reference internal" href="#coldp.COLDP.params.create_taxa_for_not_established">¶</a> – If true, generate taxon records even if the associated name is flagged as not established (i.e. not satisfying the relevant nomenclatural code)</p></li>
+<li><p><span class="target" id="coldp.COLDP.params.issues_to_stdout"></span><strong>issues_to_stdout</strong><a class="paramlink headerlink reference internal" href="#coldp.COLDP.params.issues_to_stdout">¶</a> – If true, print any issue messages (see <code class="xref py py-func docutils literal notranslate"><span class="pre">issue()</span></code>) to stdout as well as inserting then in the issue dataframe.</p></li>
+<li><p><span class="target" id="coldp.COLDP.params.context"></span><strong>context</strong><a class="paramlink headerlink reference internal" href="#coldp.COLDP.params.context">¶</a> – Value to be used in labeling issue records (see <code class="xref py py-func docutils literal notranslate"><span class="pre">issue()</span></code>). This value is more normally set using <a class="reference internal" href="#coldp.COLDP.set_context" title="coldp.COLDP.set_context"><code class="xref py py-func docutils literal notranslate"><span class="pre">set_context()</span></code></a>.</p></li>
+</ul>
+</dd>
+</dl>
+<p>A COLDP object is initalised with a source/destination folder, COLDP package
+name and other options.</p>
+<p>If a subfolder exists with the supplied name in the supplied folder, it
 will be initialised with data from any CSV/TSV files it contains with any
 of the following base names: name, taxon, synonym, reference,
 distribution, speciesinteraction, namerelation, typematerial or nameusage,
-and with any of the following extensions: .csv, .tsv, .txt. File names
-are case insensitive.</p>
+and with a file extension recognised via <code class="xref py py-data docutils literal notranslate"><span class="pre">csv_extensions</span></code>.
+File names are case insensitive.</p>
 <p>Files with the base name nameusage are loaded only if the name, taxon or
 synonym file is absent, in which case the contents of the nameusage file
-are mapped internally to the more normalised name + taxon + synonym
-format.</p>
+are mapped internally to the more normalised COLDP format with separate
+name + taxon + synonym tables.</p>
 <p>If no folder exists with the supplied name, an empty instance is created.
 Pandas dataframes are created as required for the COLDP data types as
 data are inserted into the instance.</p>
@@ -67,69 +85,40 @@ objects.</p>
 <code class="xref py py-func docutils literal notranslate"><span class="pre">add_typematerial()</span></code>, <a class="reference internal" href="#coldp.COLDP.add_distribution" title="coldp.COLDP.add_distribution"><code class="xref py py-func docutils literal notranslate"><span class="pre">add_distribution()</span></code></a>, <a class="reference internal" href="#coldp.COLDP.add_species_interaction" title="coldp.COLDP.add_species_interaction"><code class="xref py py-func docutils literal notranslate"><span class="pre">add_species_interaction()</span></code></a> and
 <a class="reference internal" href="#coldp.COLDP.modify_taxon" title="coldp.COLDP.modify_taxon"><code class="xref py py-func docutils literal notranslate"><span class="pre">modify_taxon()</span></code></a> methods.</p>
 <p>The <code class="xref py py-func docutils literal notranslate"><span class="pre">save()</span></code> method writes the data back to the same or another folder.</p>
-<p class="rubric">Constructor</p>
-<dl class="py method">
-<dt class="sig sig-object py" id="coldp.COLDP.__init__">
-<span class="sig-name descname"><span class="pre">__init__</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">folder</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">name</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">dict</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#coldp.COLDP.__init__" title="Link to this definition">¶</a></dt>
-<dd><p>Load or initialise a COLDP instance</p>
-<dl class="field-list simple">
-<dt class="field-odd">Parameters<span class="colon">:</span></dt>
-<dd class="field-odd"><ul class="simple">
-<li><p><span class="target" id="coldp.COLDP.params.folder"></span><strong>folder</strong><a class="paramlink headerlink reference internal" href="#coldp.COLDP.params.folder">¶</a> – Name of folder that may contain the named COLDP source folder from which source files should be read (name specified via the name parameter) and that is the default folder in which a COLDP folder will be written when the COLDP instance is saved. This is not the folder in which the CSV files are written. It is the folder which will contain the subfolder holding CSV files.</p></li>
-<li><p><span class="target" id="coldp.COLDP.params.name"></span><strong>name</strong><a class="paramlink headerlink reference internal" href="#coldp.COLDP.params.name">¶</a> – The name for the COLDP package. If a folder of this name exists inside the folder specied by the folder parameter, this COLDP instance will be initialised with the contents of any COLDP-compliant CSV or TSV files in the named folder.</p></li>
-<li><p><span class="target" id="coldp.COLDP.params.kwargs"></span><strong>kwargs</strong><a class="paramlink headerlink reference internal" href="#coldp.COLDP.params.kwargs">¶</a> – Options for controlling the behaviour of the COLDP package - see set_options().</p></li>
-</ul>
-</dd>
-</dl>
 </dd></dl>
 
-<p class="rubric">Methods</p>
+</section>
+<section id="methods">
+<h2>Methods<a class="headerlink" href="#methods" title="Link to this heading">¶</a></h2>
+<section id="control-behaviour">
+<h3>Control behaviour<a class="headerlink" href="#control-behaviour" title="Link to this heading">¶</a></h3>
 <dl class="py method">
 <dt class="sig sig-object py" id="coldp.COLDP.set_options">
-<span class="sig-name descname"><span class="pre">set_options</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">options</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">dict</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">None</span></span></span><a class="headerlink" href="#coldp.COLDP.set_options" title="Link to this definition">¶</a></dt>
-<dd><p>Set options controlling COLDP instance from a dictionary</p>
+<span class="sig-prename descclassname"><span class="pre">COLDP.</span></span><span class="sig-name descname"><span class="pre">set_options</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">options</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#coldp.COLDP.set_options" title="Link to this definition">¶</a></dt>
+<dd><p>Set options controlling COLDP instance from keyword arguments</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
-<dd class="field-odd"><p><span class="target" id="coldp.COLDP.set_options.params.options"></span><strong>options</strong><a class="paramlink headerlink reference internal" href="#coldp.COLDP.set_options.params.options">¶</a> – Dictionary containing options to control the behaviour of the COLDP instance. Any combination of the supported options may be specified.</p>
+<dd class="field-odd"><p><span class="target" id="coldp.COLDP.set_options.params.options"></span><strong>options</strong><a class="paramlink headerlink reference internal" href="#coldp.COLDP.set_options.params.options">¶</a> – Set of boolean options for controlling the behaviour of the COLDP package - see <code class="xref py py-class docutils literal notranslate"><span class="pre">COLDP</span></code> for boolean options that can be set.</p>
 </dd>
 </dl>
-<p>Option values may be dictionaries, booleans or string values. All boolean options default to False.</p>
-<ul class="simple">
-<li><dl class="simple">
-<dt>Dictionary options</dt><dd><ul>
-<li><p><strong>default_taxon_record</strong>: Any values in the dictionary are automatically used as default values in taxon records added to the COLDP instance. In other words, the dictionary becomes the base into which other taxon record properties are then inserted.</p></li>
-</ul>
+<p>Convenience method for setting options via keyword arguments after the COLDP instance has been created.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="coldp.COLDP.set_default_taxon_record">
+<span class="sig-prename descclassname"><span class="pre">COLDP.</span></span><span class="sig-name descname"><span class="pre">set_default_taxon_record</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">default_taxon_record</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#coldp.COLDP.set_default_taxon_record" title="Link to this definition">¶</a></dt>
+<dd><p>Set default values for properties in taxon records created by this COLDP instance</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><span class="target" id="coldp.COLDP.set_default_taxon_record.params.default_taxon_record"></span><strong>default_taxon_record</strong><a class="paramlink headerlink reference internal" href="#coldp.COLDP.set_default_taxon_record.params.default_taxon_record">¶</a> – Any values in the dictionary are automatically used as default values in taxon records added to the COLDP instance. In other words, the dictionary becomes the base into which other taxon record properties are then inserted.</p>
 </dd>
 </dl>
-</li>
-<li><dl class="simple">
-<dt>Boolean options</dt><dd><ul>
-<li><p><strong>insert_species_for_trinomials</strong>:  If true, insert species (taxon and name) if trinomials are provided without the associated species. This can be convenient when mapping source data that only lists infraspecific taxa for species with subspecies, varieties or forms.</p></li>
-<li><p><strong>create_subspecies_for_infrasubspecifics</strong>:  If true, automatically add a trinomial at subspecific rank as a synonym whenever an infrasubspecific name is added. This may be useful if the resulting dataset is intended to provide easy mapping of strings to taxon concepts, since versions of the trinomial lacking the rank marker will often be found in source data.</p></li>
-<li><p><strong>create_synonyms_without_subgenus</strong>:  If true, automatically add a binomial or trinomial without an included subgenus name as a synonym whenever a name including a subgenus is added. This may be useful if the resulting dataset is intended to provide easy mapping of strings to taxon concepts, since versions of lacking the subgeneric component will often be found in source data.</p></li>
-<li><p><strong>basionyms_from_synonyms</strong>:  If true, basionym associations are automatically created from synonyms within a loaded COLDP dataset. If an accepted name includes parentheses around the authorship, and if a name with the same epithet and authorship but no parentheses is included in the synonyms, the ID value for the synonym will be used for the basionymID element in the accepted name. This is normally a housekeeping step when first loading a new COLDP dataset. This option is only used when the dataset is first loaded. Addition of basionym relationships is automatic for names added as part of the same NameBundle.</p></li>
-<li><p><strong>classification_from_parents</strong>:  If true, insert names for higher ranks into relevant elements in each taxon record based on the parent and higher ancestry for the taxon.</p></li>
-<li><p><strong>allow_repeated_binomials</strong>:  If true, omit checks rejecting the addition of the same binomial more than once to the COLDP name dataframe.</p></li>
-<li><p><strong>create_taxa_for_not_established</strong>:  If true, generate taxon records even if the associated name is flagged as not established (i.e. not satisfying the relevant nomenclatural code)</p></li>
-<li><p><strong>issues_to_stdout</strong>:  If true, print any issue messages (see issue()) to stdout as well as inserting then in the issue dataframe.</p></li>
-</ul>
-</dd>
-</dl>
-</li>
-<li><dl class="simple">
-<dt>String options</dt><dd><ul>
-<li><p><strong>code</strong>:  ICZN or ICBN to indicate the nomenclatural code for name formatting. ICZN is the default.</p></li>
-<li><p><strong>context</strong>:  Value to be used in labeling issue records (see issue()). This value is more normally set using set_context().</p></li>
-</ul>
-</dd>
-</dl>
-</li>
-</ul>
+<p>Convenience method for setting default taxon record after the COLDP instance has been created.</p>
 </dd></dl>
 
 <dl class="py method">
 <dt class="sig sig-object py" id="coldp.COLDP.set_context">
-<span class="sig-name descname"><span class="pre">set_context</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">context</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">None</span></span></span><a class="headerlink" href="#coldp.COLDP.set_context" title="Link to this definition">¶</a></dt>
+<span class="sig-prename descclassname"><span class="pre">COLDP.</span></span><span class="sig-name descname"><span class="pre">set_context</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">context</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#coldp.COLDP.set_context" title="Link to this definition">¶</a></dt>
 <dd><p>Set a string label for annotating issues in the COLDP issue table</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
@@ -147,30 +136,60 @@ with a string identifying the row from the source spreadsheet. This
 value will be included in the context column in the issue.csv output.</p>
 </dd></dl>
 
+</section>
+<section id="add-or-modify-records">
+<h3>Add or modify records<a class="headerlink" href="#add-or-modify-records" title="Link to this heading">¶</a></h3>
 <dl class="py method">
 <dt class="sig sig-object py" id="coldp.COLDP.add_names">
-<span class="sig-name descname"><span class="pre">add_names</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">bundle</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="name-bundle.html#coldp.NameBundle" title="coldp.NameBundle"><span class="pre">NameBundle</span></a></span></em>, <em class="sig-param"><span class="n"><span class="pre">parent</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">None</span></span></span><a class="headerlink" href="#coldp.COLDP.add_names" title="Link to this definition">¶</a></dt>
+<span class="sig-prename descclassname"><span class="pre">COLDP.</span></span><span class="sig-name descname"><span class="pre">add_names</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">bundle</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">parent</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#coldp.COLDP.add_names" title="Link to this definition">¶</a></dt>
 <dd><p>Ensure one or more names are included in names dataframe and update
 taxa and synonyms dataframes as necessary</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><ul class="simple">
-<li><p><span class="target" id="coldp.COLDP.add_names.params.bundle"></span><strong>bundle</strong><a class="paramlink headerlink reference internal" href="#coldp.COLDP.add_names.params.bundle">¶</a> – <a class="reference internal" href="name-bundle.html#coldp.NameBundle" title="coldp.NameBundle"><code class="xref py py-class docutils literal notranslate"><span class="pre">NameBundle</span></code></a> object with set of associated taxon names</p></li>
+<li><p><span class="target" id="coldp.COLDP.add_names.params.bundle"></span><strong>bundle</strong><a class="paramlink headerlink reference internal" href="#coldp.COLDP.add_names.params.bundle">¶</a> – <code class="xref py py-class docutils literal notranslate"><span class="pre">NameBundle</span></code> object with set of associated taxon names</p></li>
 <li><p><span class="target" id="coldp.COLDP.add_names.params.parent"></span><strong>parent</strong><a class="paramlink headerlink reference internal" href="#coldp.COLDP.add_names.params.parent">¶</a> – ID for taxon record for which the accepted taxon in this bundle is to be added as a child</p></li>
 </ul>
 </dd>
 </dl>
-<p>Add names, taxon and synonyms to package and update bundle records with id values</p>
+<p>The supplied <code class="xref py py-class docutils literal notranslate"><span class="pre">NameBundle</span></code> object includes an accepted
+name record (as a dictionary of COLDP name properties) and a list, which
+may be empty, of synonym name records in the same format. <a class="reference internal" href="#coldp.COLDP.add_names" title="coldp.COLDP.add_names"><code class="xref py py-func docutils literal notranslate"><span class="pre">add_names()</span></code></a>
+ensures that name records exist for all these names in the names dataframe,
+that a taxon record exists for the accepted taxon name, and that synonym
+records exist for this taxon record for all supplied synonyms.</p>
+<p>Depending on the options supplied for the <code class="xref py py-class docutils literal notranslate"><span class="pre">COLDP</span></code> object,
+additional synonyms may be created to represent subspecies-rank versions
+of infrasubspecific trinomials and subgenus-free versions of combinations
+including a subgenus name.</p>
+<p>If a matching name already exists in the COLDP instance, no new name will
+normally be added. Instead, the name record in the bundle will be updated
+with the ID (and basionymID where applicable) from the existing name. This
+allows for additional synonyms to be added to an existing taxon. The
+behaviour can be over-ridden with the <code class="xref py py-paramref docutils literal notranslate"><span class="pre">allow_repeated_binomials</span></code>
+option, in which case any number of matching names can be added.</p>
+<p>If the <code class="xref py py-paramref docutils literal notranslate"><span class="pre">insert_species_for_trinomials</span></code> option is
+set, a new species will be created if required before adding the
+trinomial as its child. In this case the bundle will contain the id
+for the species taxon as a species_taxon_id property.</p>
+<p>Name records in the bundle are all updated with existing or new IDs and
+basionymIDs, which are inferred automatically for zoological names by
+associating combinations with and without parentheses around the
+authorship.</p>
+<p>Upon completion, the bundle also contains an accepted_taxon_id property
+which includes the string ID for the taxon.</p>
+<p>If <a class="reference internal" href="#coldp.COLDP.add_names.params.parent" title="coldp.COLDP.add_names"><code class="xref py py-paramref docutils literal notranslate"><span class="pre">parent</span></code></a> is None, the new taxon record
+is created without a parent, i.e. becomes a root node in the classification.</p>
 </dd></dl>
 
 <dl class="py method">
 <dt class="sig sig-object py" id="coldp.COLDP.modify_taxon">
-<span class="sig-name descname"><span class="pre">modify_taxon</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">taxon_id</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">properties</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#coldp.COLDP.modify_taxon" title="Link to this definition">¶</a></dt>
+<span class="sig-prename descclassname"><span class="pre">COLDP.</span></span><span class="sig-name descname"><span class="pre">modify_taxon</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">taxon_id</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">properties</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#coldp.COLDP.modify_taxon" title="Link to this definition">¶</a></dt>
 <dd></dd></dl>
 
 <dl class="py method">
 <dt class="sig sig-object py" id="coldp.COLDP.add_references">
-<span class="sig-name descname"><span class="pre">add_references</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="pre">reference_list:</span> <span class="pre">list[dict[slice(&lt;class</span> <span class="pre">'str'&gt;,</span> <span class="pre">&lt;class</span> <span class="pre">'str'&gt;,</span> <span class="pre">None)]]</span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">list[dict[slice(&lt;class</span> <span class="pre">'str'&gt;,</span> <span class="pre">&lt;class</span> <span class="pre">'str'&gt;,</span> <span class="pre">None)]]</span></span></span><a class="headerlink" href="#coldp.COLDP.add_references" title="Link to this definition">¶</a></dt>
+<span class="sig-prename descclassname"><span class="pre">COLDP.</span></span><span class="sig-name descname"><span class="pre">add_references</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">reference_list</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#coldp.COLDP.add_references" title="Link to this definition">¶</a></dt>
 <dd><p>Ensure one or more references are included in references dataframe</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
@@ -181,7 +200,7 @@ taxa and synonyms dataframes as necessary</p>
 </dd>
 </dl>
 <p>Find existing ID values for each supplied reference, based on identity
-of: author, title, issued, containerTitle, volume, issue and page. Add
+of: author, title, issued, containerTitle, volume, issue, page and citation. Add
 ID to the appropriate reference dictionary in references. If none
 found, set ID to next unused index and add to references.</p>
 <p>The list is returned updated with current ID values so these can be used for referenceID values in other classes.</p>
@@ -189,27 +208,49 @@ found, set ID to next unused index and add to references.</p>
 
 <dl class="py method">
 <dt class="sig sig-object py" id="coldp.COLDP.add_type_material">
-<span class="sig-name descname"><span class="pre">add_type_material</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">type_material</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#coldp.COLDP.add_type_material" title="Link to this definition">¶</a></dt>
+<span class="sig-prename descclassname"><span class="pre">COLDP.</span></span><span class="sig-name descname"><span class="pre">add_type_material</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">type_material</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#coldp.COLDP.add_type_material" title="Link to this definition">¶</a></dt>
 <dd></dd></dl>
 
 <dl class="py method">
 <dt class="sig sig-object py" id="coldp.COLDP.add_distribution">
-<span class="sig-name descname"><span class="pre">add_distribution</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">distribution</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#coldp.COLDP.add_distribution" title="Link to this definition">¶</a></dt>
+<span class="sig-prename descclassname"><span class="pre">COLDP.</span></span><span class="sig-name descname"><span class="pre">add_distribution</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">distribution</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#coldp.COLDP.add_distribution" title="Link to this definition">¶</a></dt>
 <dd></dd></dl>
 
 <dl class="py method">
 <dt class="sig sig-object py" id="coldp.COLDP.add_species_interaction">
-<span class="sig-name descname"><span class="pre">add_species_interaction</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">interaction</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#coldp.COLDP.add_species_interaction" title="Link to this definition">¶</a></dt>
+<span class="sig-prename descclassname"><span class="pre">COLDP.</span></span><span class="sig-name descname"><span class="pre">add_species_interaction</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">interaction</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#coldp.COLDP.add_species_interaction" title="Link to this definition">¶</a></dt>
 <dd></dd></dl>
 
 <dl class="py method">
 <dt class="sig sig-object py" id="coldp.COLDP.add_name_relation">
-<span class="sig-name descname"><span class="pre">add_name_relation</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">name_relation</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#coldp.COLDP.add_name_relation" title="Link to this definition">¶</a></dt>
+<span class="sig-prename descclassname"><span class="pre">COLDP.</span></span><span class="sig-name descname"><span class="pre">add_name_relation</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">name_relation</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#coldp.COLDP.add_name_relation" title="Link to this definition">¶</a></dt>
 <dd></dd></dl>
 
+</section>
+<section id="find-or-get-records">
+<h3>Find or get records<a class="headerlink" href="#find-or-get-records" title="Link to this heading">¶</a></h3>
+<dl class="py method">
+<dt class="sig sig-object py" id="coldp.COLDP.get_reference">
+<span class="sig-prename descclassname"><span class="pre">COLDP.</span></span><span class="sig-name descname"><span class="pre">get_reference</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">id</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#coldp.COLDP.get_reference" title="Link to this definition">¶</a></dt>
+<dd><p>Get reference record as dictionary from ID string</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><span class="target" id="coldp.COLDP.get_reference.params.id"></span><strong>id</strong><a class="paramlink headerlink reference internal" href="#coldp.COLDP.get_reference.params.id">¶</a> – ID string for requested COLDP reference record</p>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>Dictionary of COLDP reference properties for requested ID</p>
+</dd>
+</dl>
+<p>Returns None if no matching reference. If multiple records exist with
+the given id, a warning is logged and the first match is returned.</p>
+</dd></dl>
+
+</section>
+<section id="tidy-package">
+<h3>Tidy package<a class="headerlink" href="#tidy-package" title="Link to this heading">¶</a></h3>
 <dl class="py method">
 <dt class="sig sig-object py" id="coldp.COLDP.fix_basionyms">
-<span class="sig-name descname"><span class="pre">fix_basionyms</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">names</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">DataFrame</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">synonyms</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">DataFrame</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">None</span></span></span><a class="headerlink" href="#coldp.COLDP.fix_basionyms" title="Link to this definition">¶</a></dt>
+<span class="sig-prename descclassname"><span class="pre">COLDP.</span></span><span class="sig-name descname"><span class="pre">fix_basionyms</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">names</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">synonyms</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#coldp.COLDP.fix_basionyms" title="Link to this definition">¶</a></dt>
 <dd><p>Update dataframe of name records so that subsequent combination names refer to the original basionym record where present</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
@@ -233,14 +274,14 @@ possible record is found.</p>
 
 <dl class="py method">
 <dt class="sig sig-object py" id="coldp.COLDP.fix_classification">
-<span class="sig-name descname"><span class="pre">fix_classification</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">None</span></span></span><a class="headerlink" href="#coldp.COLDP.fix_classification" title="Link to this definition">¶</a></dt>
+<span class="sig-prename descclassname"><span class="pre">COLDP.</span></span><span class="sig-name descname"><span class="pre">fix_classification</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#coldp.COLDP.fix_classification" title="Link to this definition">¶</a></dt>
 <dd><p>Tidy and fill in higher classification for taxon records based on hierarchy</p>
 <p>Recursively fixes classification elements for whole taxa dataframe</p>
 </dd></dl>
 
 <dl class="py method">
 <dt class="sig sig-object py" id="coldp.COLDP.sort_taxa">
-<span class="sig-name descname"><span class="pre">sort_taxa</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">None</span></span></span><a class="headerlink" href="#coldp.COLDP.sort_taxa" title="Link to this definition">¶</a></dt>
+<span class="sig-prename descclassname"><span class="pre">COLDP.</span></span><span class="sig-name descname"><span class="pre">sort_taxa</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#coldp.COLDP.sort_taxa" title="Link to this definition">¶</a></dt>
 <dd><p>Sort taxa dataframe so that all taxon records are sequenced
 hierarchically and alphabetically.</p>
 <p>Following this method, the taxon table is sorted so that any taxa
@@ -256,7 +297,7 @@ a database since there are no forward references to parent taxa.</p>
 
 <dl class="py method">
 <dt class="sig sig-object py" id="coldp.COLDP.sort_names">
-<span class="sig-name descname"><span class="pre">sort_names</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">None</span></span></span><a class="headerlink" href="#coldp.COLDP.sort_names" title="Link to this definition">¶</a></dt>
+<span class="sig-prename descclassname"><span class="pre">COLDP.</span></span><span class="sig-name descname"><span class="pre">sort_names</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#coldp.COLDP.sort_names" title="Link to this definition">¶</a></dt>
 <dd><p>Sort name records to match order of records in taxa dataframe and with
 accepted names and synonyms sorted alphabetically</p>
 <p>Records are sorted first in the current order of the taxon table and
@@ -267,7 +308,7 @@ then alphabetically within the set of names for each taxon.</p>
 
 <dl class="py method">
 <dt class="sig sig-object py" id="coldp.COLDP.reset_ids">
-<span class="sig-name descname"><span class="pre">reset_ids</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">name</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">prefix</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">None</span></span></span><a class="headerlink" href="#coldp.COLDP.reset_ids" title="Link to this definition">¶</a></dt>
+<span class="sig-prename descclassname"><span class="pre">COLDP.</span></span><span class="sig-name descname"><span class="pre">reset_ids</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">name</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">prefix</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#coldp.COLDP.reset_ids" title="Link to this definition">¶</a></dt>
 <dd><p>Reset all IDs for one or more COLDP data tables to consecutive values in the order of the table records</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
@@ -278,16 +319,46 @@ then alphabetically within the set of names for each taxon.</p>
 </dd>
 </dl>
 <p>Resets all ids for one or all of the four supported classes to consecutive
-id values, with an optional string prefix which defaults to “s” and an underscore in the
+id values, with an optional string prefix which defaults to <code class="docutils literal notranslate"><span class="pre">&quot;s_&quot;</span></code> in the
 case of synonym records and is otherwise empty.</p>
 <p>Also modifies corresponding foreign ID references in other tables so they
-continue to resolve correctly.</p>
+continue to resolve correctly using the <code class="xref py py-data docutils literal notranslate"><span class="pre">id_mappings</span></code>
+dictionary.</p>
 <p>If no table name is specified, all four are processed.</p>
 </dd></dl>
 
+</section>
+<section id="utilities">
+<h3>Utilities<a class="headerlink" href="#utilities" title="Link to this heading">¶</a></h3>
+<dl class="py method">
+<dt class="sig sig-object py" id="coldp.COLDP.get_text_tree">
+<span class="sig-prename descclassname"><span class="pre">COLDP.</span></span><span class="sig-name descname"><span class="pre">get_text_tree</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">taxonID</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">indent</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'</span>&#160; <span class="pre">'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">initial_prefix</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">''</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">synonym_prefix</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'</span> <span class="pre">=</span> <span class="pre">'</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#coldp.COLDP.get_text_tree" title="Link to this definition">¶</a></dt>
+<dd><p>Generate formatted text tree for specified taxon and its descendents</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><span class="target" id="coldp.COLDP.get_text_tree.params.taxonID"></span><strong>taxonID</strong><a class="paramlink headerlink reference internal" href="#coldp.COLDP.get_text_tree.params.taxonID">¶</a> – String ID for taxon to be formatted</p></li>
+<li><p><span class="target" id="coldp.COLDP.get_text_tree.params.indent"></span><strong>indent</strong><a class="paramlink headerlink reference internal" href="#coldp.COLDP.get_text_tree.params.indent">¶</a> – Indent string to be added one or more times before each nested row, defaults to two spaces</p></li>
+<li><p><span class="target" id="coldp.COLDP.get_text_tree.params.initial_prefix"></span><strong>initial_prefix</strong><a class="paramlink headerlink reference internal" href="#coldp.COLDP.get_text_tree.params.initial_prefix">¶</a> – Optional prefix string for all rows (preceeds indentation), defaults to empty string</p></li>
+<li><p><span class="target" id="coldp.COLDP.get_text_tree.params.synonym_prefix"></span><strong>synonym_prefix</strong><a class="paramlink headerlink reference internal" href="#coldp.COLDP.get_text_tree.params.synonym_prefix">¶</a> – Prefix to appear before synonymised names, defaults to an equal sign with spaces on either side</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>Multiline string representation of taxonomic hierarchy</p>
+</dd>
+</dl>
+<p>The tree view shows the name, authorship and rank for the selected taxon.
+Synonyms follow, one to a row at the same indent level but preceded by a
+space and an asterisk. Then each child follows, indented two more spaces per level,
+with its own synonyms and children following.</p>
+</dd></dl>
+
+</section>
+<section id="access-to-dataframes">
+<h3>Access to DataFrames<a class="headerlink" href="#access-to-dataframes" title="Link to this heading">¶</a></h3>
 <dl class="py method">
 <dt class="sig sig-object py" id="coldp.COLDP.table_by_name">
-<span class="sig-name descname"><span class="pre">table_by_name</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">name</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">DataFrame</span></span></span><a class="headerlink" href="#coldp.COLDP.table_by_name" title="Link to this definition">¶</a></dt>
+<span class="sig-prename descclassname"><span class="pre">COLDP.</span></span><span class="sig-name descname"><span class="pre">table_by_name</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">name</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#coldp.COLDP.table_by_name" title="Link to this definition">¶</a></dt>
 <dd><p>Return dataframe for named COLDP data class</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
@@ -297,13 +368,57 @@ continue to resolve correctly.</p>
 <dd class="field-even"><p>Requested dataframe or None if no such table exists</p>
 </dd>
 </dl>
-<p>Returns dataframe if one exists for supplied name</p>
+<p>Returns dataframe if one exists for supplied name.</p>
 </dd></dl>
 
-<p class="rubric">Internals</p>
+</section>
+</section>
+<section id="constants">
+<h2>Constants<a class="headerlink" href="#constants" title="Link to this heading">¶</a></h2>
+<dl class="py data">
+<dt class="sig sig-object py" id="coldp.csv_extensions">
+<span class="sig-prename descclassname"><span class="pre">coldp.</span></span><span class="sig-name descname"><span class="pre">csv_extensions</span></span><a class="headerlink" href="#coldp.csv_extensions" title="Link to this definition">¶</a></dt>
+<dd><p>Dictionary mapping supported CSV/TSV file extensions to the expected delimiter.</p>
+<p>Supported extensions are .csv for comma-separated data files and .tsv or .txt for tab-delimited data files.</p>
+</dd></dl>
+
+<dl class="py data">
+<dt class="sig sig-object py" id="coldp.id_mappings">
+<span class="sig-prename descclassname"><span class="pre">coldp.</span></span><span class="sig-name descname"><span class="pre">id_mappings</span></span><a class="headerlink" href="#coldp.id_mappings" title="Link to this definition">¶</a></dt>
+<dd><p>Dictionary mapping table names (name, taxon, reference or synonym) to a
+dictionary that maps another table name to the properties in the second table
+that reference ID values from the first table.</p>
+<p>For example, <code class="xref py py-data docutils literal notranslate"><span class="pre">id_mappings</span></code> maps the key “name” to a 
+dictionary that includes the key “namerelation” with a list containing 
+“nameID” and “relatedNameID” as its value.</p>
+<p>This is a map of the foreign-key relationships that need to be validated 
+and preserved between the COLDP data tables.</p>
+</dd></dl>
+
+<dl class="py data">
+<dt class="sig sig-object py" id="coldp.name_from_nameusage">
+<span class="sig-prename descclassname"><span class="pre">coldp.</span></span><span class="sig-name descname"><span class="pre">name_from_nameusage</span></span><a class="headerlink" href="#coldp.name_from_nameusage" title="Link to this definition">¶</a></dt>
+<dd><p>Dictionary mapping names of columns in COLDP Name records to the corresponding column names in COLDP NameUsage records</p>
+</dd></dl>
+
+<dl class="py data">
+<dt class="sig sig-object py" id="coldp.taxon_from_nameusage">
+<span class="sig-prename descclassname"><span class="pre">coldp.</span></span><span class="sig-name descname"><span class="pre">taxon_from_nameusage</span></span><a class="headerlink" href="#coldp.taxon_from_nameusage" title="Link to this definition">¶</a></dt>
+<dd><p>Dictionary mapping names of columns in COLDP Taxon records to the corresponding column names in COLDP NameUsage records</p>
+</dd></dl>
+
+<dl class="py data">
+<dt class="sig sig-object py" id="coldp.synonym_from_nameusage">
+<span class="sig-prename descclassname"><span class="pre">coldp.</span></span><span class="sig-name descname"><span class="pre">synonym_from_nameusage</span></span><a class="headerlink" href="#coldp.synonym_from_nameusage" title="Link to this definition">¶</a></dt>
+<dd><p>Dictionary mapping names of columns in COLDP Synonym records to the corresponding column names in COLDP NameUsage records</p>
+</dd></dl>
+
+</section>
+<section id="internal-methods">
+<h2>Internal methods<a class="headerlink" href="#internal-methods" title="Link to this heading">¶</a></h2>
 <dl class="py method">
 <dt class="sig sig-object py" id="coldp.COLDP.initialise_dataframe">
-<span class="sig-name descname"><span class="pre">initialise_dataframe</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">foldername</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">name</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">default_headings</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">list</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">]</span></span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">DataFrame</span></span></span><a class="headerlink" href="#coldp.COLDP.initialise_dataframe" title="Link to this definition">¶</a></dt>
+<span class="sig-prename descclassname"><span class="pre">COLDP.</span></span><span class="sig-name descname"><span class="pre">initialise_dataframe</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">foldername</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">name</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">default_headings</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#coldp.COLDP.initialise_dataframe" title="Link to this definition">¶</a></dt>
 <dd><p>Load or create a dataframe for one of the COLDP record types</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
@@ -329,15 +444,15 @@ loaded from the nameusage file.</p>
 
 <dl class="py method">
 <dt class="sig sig-object py" id="coldp.COLDP.extract_table">
-<span class="sig-name descname"><span class="pre">extract_table</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="pre">df:</span> <span class="pre">~pandas.core.frame.DataFrame,</span> <span class="pre">headings:</span> <span class="pre">list[str],</span> <span class="pre">mappings:</span> <span class="pre">dict[slice(&lt;class</span> <span class="pre">'str'&gt;,</span> <span class="pre">&lt;class</span> <span class="pre">'str'&gt;,</span> <span class="pre">None)]</span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">DataFrame</span></span></span><a class="headerlink" href="#coldp.COLDP.extract_table" title="Link to this definition">¶</a></dt>
+<span class="sig-prename descclassname"><span class="pre">COLDP.</span></span><span class="sig-name descname"><span class="pre">extract_table</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">df</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">headings</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">mappings</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#coldp.COLDP.extract_table" title="Link to this definition">¶</a></dt>
 <dd><p>Extract a set of columns from a dataframe using a dictionary that maps
 source columns names to target column names</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><ul class="simple">
 <li><p><span class="target" id="coldp.COLDP.extract_table.params.df"></span><strong>df</strong><a class="paramlink headerlink reference internal" href="#coldp.COLDP.extract_table.params.df">¶</a> – Dataframe from which columns are to be extracted/mapped</p></li>
-<li><p><span class="target" id="coldp.COLDP.extract_table.params.headings"></span><strong>headings</strong><a class="paramlink headerlink reference internal" href="#coldp.COLDP.extract_table.params.headings">¶</a> – Dist of column headings for destinaton dataframe</p></li>
-<li><p><span class="target" id="coldp.COLDP.extract_table.params.mappings"></span><strong>mappings</strong><a class="paramlink headerlink reference internal" href="#coldp.COLDP.extract_table.params.mappings">¶</a> – Dictionary mappimg desination column names to source column names</p></li>
+<li><p><span class="target" id="coldp.COLDP.extract_table.params.headings"></span><strong>headings</strong><a class="paramlink headerlink reference internal" href="#coldp.COLDP.extract_table.params.headings">¶</a> – List of column headings for destination dataframe</p></li>
+<li><p><span class="target" id="coldp.COLDP.extract_table.params.mappings"></span><strong>mappings</strong><a class="paramlink headerlink reference internal" href="#coldp.COLDP.extract_table.params.mappings">¶</a> – Dictionary mapping destination column names to source column names</p></li>
 </ul>
 </dd>
 <dt class="field-even">Returns<span class="colon">:</span></dt>
@@ -349,28 +464,34 @@ COLDP NameUsage table.</p>
 </dd></dl>
 
 <dl class="py method">
-<dt class="sig sig-object py" id="coldp.COLDP.set">
-<span class="sig-name descname"><span class="pre">set</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#coldp.COLDP.set" title="Link to this definition">¶</a></dt>
-<dd><p>Set options controlling COLDP instance from keyword arguments</p>
+<dt class="sig sig-object py" id="coldp.COLDP.find_reference">
+<span class="sig-prename descclassname"><span class="pre">COLDP.</span></span><span class="sig-name descname"><span class="pre">find_reference</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">reference</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#coldp.COLDP.find_reference" title="Link to this definition">¶</a></dt>
+<dd><p>Locate existing COLDP reference record exactly matching all major
+fields in <a class="reference internal" href="#coldp.COLDP.find_reference.params.reference" title="coldp.COLDP.find_reference"><code class="xref py py-paramref docutils literal notranslate"><span class="pre">reference</span></code></a></p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
-<dd class="field-odd"><p><span class="target" id="coldp.COLDP.set.params.kwargs"></span><strong>kwargs</strong><a class="paramlink headerlink reference internal" href="#coldp.COLDP.set.params.kwargs">¶</a> – Set of options for controlling the behaviour of the COLDP package - see set_options().</p>
+<dd class="field-odd"><p><span class="target" id="coldp.COLDP.find_reference.params.reference"></span><strong>reference</strong><a class="paramlink headerlink reference internal" href="#coldp.COLDP.find_reference.params.reference">¶</a> – Dictionary of COLDP reference properties representing a record to be found</p>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>DataFrame with one COLDP reference record if found, else None</p>
 </dd>
 </dl>
-<p>Convenience method for setting options via keyword arguments after the COLDP instance has been created.</p>
+<p>Only returns a record that exactly matches the values supplied in
+<a class="reference internal" href="#coldp.COLDP.find_reference.params.reference" title="coldp.COLDP.find_reference"><code class="xref py py-paramref docutils literal notranslate"><span class="pre">reference</span></code></a> for all of
+author, title, issued, containerTitle, volume, issue, page and citation.</p>
 </dd></dl>
 
 <dl class="py method">
 <dt class="sig sig-object py" id="coldp.COLDP.fix_classification_recursive">
-<span class="sig-name descname"><span class="pre">fix_classification_recursive</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">taxa:</span> <span class="pre">~pandas.core.frame.DataFrame</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">ranks:</span> <span class="pre">~pandas.core.frame.DataFrame</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">parent:</span> <span class="pre">dict[slice(&lt;class</span> <span class="pre">'str'&gt;</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">&lt;class</span> <span class="pre">'str'&gt;</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">None)]</span> <span class="pre">=</span> <span class="pre">None</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">None</span></span></span><a class="headerlink" href="#coldp.COLDP.fix_classification_recursive" title="Link to this definition">¶</a></dt>
+<span class="sig-prename descclassname"><span class="pre">COLDP.</span></span><span class="sig-name descname"><span class="pre">fix_classification_recursive</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">taxa</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">ranks</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">parent</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#coldp.COLDP.fix_classification_recursive" title="Link to this definition">¶</a></dt>
 <dd><p>Recursively complete classification elements (higher taxon IDs) in
 taxon records descended from a given parent or for all taxon records
 in the COLDP instance at the highest included rank</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><ul class="simple">
-<li><p><span class="target" id="coldp.COLDP.fix_classification_recursive.params.taxa"></span><strong>taxa</strong><a class="paramlink headerlink reference internal" href="#coldp.COLDP.fix_classification_recursive.params.taxa">¶</a> – Dataframe containing COLDP taxa records</p></li>
-<li><p><span class="target" id="coldp.COLDP.fix_classification_recursive.params.ranks"></span><strong>ranks</strong><a class="paramlink headerlink reference internal" href="#coldp.COLDP.fix_classification_recursive.params.ranks">¶</a> – DataFrame with nameID, rank and scientificName for all names in COLDP instance</p></li>
+<li><p><span class="target" id="coldp.COLDP.fix_classification_recursive.params.taxa"></span><strong>taxa</strong><a class="paramlink headerlink reference internal" href="#coldp.COLDP.fix_classification_recursive.params.taxa">¶</a> – Dataframe containing COLDP taxon records</p></li>
+<li><p><span class="target" id="coldp.COLDP.fix_classification_recursive.params.ranks"></span><strong>ranks</strong><a class="paramlink headerlink reference internal" href="#coldp.COLDP.fix_classification_recursive.params.ranks">¶</a> – DataFrame containing at least nameID, rank and scientificName for all names in COLDP instance (can be the complete table of COLDP names)</p></li>
 <li><p><span class="target" id="coldp.COLDP.fix_classification_recursive.params.parent"></span><strong>parent</strong><a class="paramlink headerlink reference internal" href="#coldp.COLDP.fix_classification_recursive.params.parent">¶</a> – Taxon record for which children should be updated, or None if all top-level taxa should be updated</p></li>
 </ul>
 </dd>
@@ -388,7 +509,7 @@ this parent. Then call this method recursively for all children.</p>
 
 <dl class="py method">
 <dt class="sig sig-object py" id="coldp.COLDP.sort_taxa_recursive">
-<span class="sig-name descname"><span class="pre">sort_taxa_recursive</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">df</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">DataFrame</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">ids</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">list</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">]</span></span></span></em>, <em class="sig-param"><span class="n"><span class="pre">id</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">list</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">]</span></span></span></span><a class="headerlink" href="#coldp.COLDP.sort_taxa_recursive" title="Link to this definition">¶</a></dt>
+<span class="sig-prename descclassname"><span class="pre">COLDP.</span></span><span class="sig-name descname"><span class="pre">sort_taxa_recursive</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">df</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">ids</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">id</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#coldp.COLDP.sort_taxa_recursive" title="Link to this definition">¶</a></dt>
 <dd><p>Internal method for recursive sorting of taxon records by parent and
 name</p>
 <dl class="field-list simple">
@@ -409,13 +530,13 @@ Recursively add IDs for children.</p>
 </dd></dl>
 
 </section>
-</dd></dl>
-
-<p class="rubric">Indices and tables</p>
+<section id="index-and-search">
+<h2>Index and search<a class="headerlink" href="#index-and-search" title="Link to this heading">¶</a></h2>
 <ul class="simple">
 <li><p><a class="reference internal" href="genindex.html"><span class="std std-ref">Index</span></a></p></li>
 <li><p><a class="reference internal" href="search.html"><span class="std std-ref">Search Page</span></a></p></li>
 </ul>
+</section>
 </section>
 
 
@@ -438,7 +559,11 @@ Recursively add IDs for children.</p>
 <p class="caption" role="heading"><span class="caption-text">Contents:</span></p>
 <ul class="current">
 <li class="toctree-l1 current"><a class="current reference internal" href="#">coldp.COLDP</a><ul>
-<li class="toctree-l2"><a class="reference internal" href="#coldp.COLDP"><code class="docutils literal notranslate"><span class="pre">COLDP</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="#class">Class</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#methods">Methods</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#constants">Constants</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#internal-methods">Internal methods</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#index-and-search">Index and search</a></li>
 </ul>
 </li>
 <li class="toctree-l1"><a class="reference internal" href="name-bundle.html">coldp.NameBundle</a></li>

@@ -3,48 +3,78 @@
 
 .. currentmodule:: coldp
 
+Class
+~~~~~
+
 .. autoclass:: COLDP
+    :no-index:
 
-    .. rubric:: Constructor   
+Methods
+~~~~~~~
 
-    .. automethod:: __init__
+Control behaviour
+^^^^^^^^^^^^^^^^^
+.. automethod:: coldp.COLDP.set_options
+.. automethod:: coldp.COLDP.set_default_taxon_record
+.. automethod:: coldp.COLDP.set_context
 
-    .. rubric:: Methods
+Add or modify records
+^^^^^^^^^^^^^^^^^^^^^
+.. automethod:: coldp.COLDP.add_names
+.. automethod:: coldp.COLDP.modify_taxon
+.. automethod:: coldp.COLDP.add_references
+.. automethod:: coldp.COLDP.add_type_material
+.. automethod:: coldp.COLDP.add_distribution
+.. automethod:: coldp.COLDP.add_species_interaction
+.. automethod:: coldp.COLDP.add_name_relation
 
-    .. automethod:: set_options
-    .. automethod:: set_context
+Find or get records
+^^^^^^^^^^^^^^^^^^^
+.. automethod:: coldp.COLDP.get_reference
 
-    .. automethod:: add_names
-    .. automethod:: modify_taxon
-    .. automethod:: add_references
-    .. automethod:: add_type_material
-    .. automethod:: add_distribution
-    .. automethod:: add_species_interaction
-    .. automethod:: add_name_relation
+Tidy package
+^^^^^^^^^^^^
+.. automethod:: coldp.COLDP.fix_basionyms
+.. automethod:: coldp.COLDP.fix_classification
+.. automethod:: coldp.COLDP.sort_taxa
+.. automethod:: coldp.COLDP.sort_names
+.. automethod:: coldp.COLDP.reset_ids
 
+Utilities
+^^^^^^^^^
+.. automethod:: coldp.COLDP.get_text_tree
 
-    .. automethod:: fix_basionyms
-    .. automethod:: fix_classification
-    .. automethod:: sort_taxa
-    .. automethod:: sort_names
-    .. automethod:: reset_ids
+Access to DataFrames
+^^^^^^^^^^^^^^^^^^^^
+.. automethod:: coldp.COLDP.table_by_name
 
+Constants
+~~~~~~~~~
 
-    .. automethod:: table_by_name
+.. autodata:: csv_extensions
+    :no-value:
+.. autodata:: id_mappings
+    :no-value:
+.. autodata:: name_from_nameusage
+    :no-value:
+.. autodata:: taxon_from_nameusage
+    :no-value:
+.. autodata:: synonym_from_nameusage
+    :no-value:
 
+Internal methods
+~~~~~~~~~~~~~~~~
 
+.. automethod:: coldp.COLDP.initialise_dataframe
+.. automethod:: coldp.COLDP.extract_table
 
-    .. rubric:: Internals
+.. automethod:: coldp.COLDP.find_reference
 
-    .. automethod:: initialise_dataframe
-    .. automethod:: extract_table
+.. automethod:: coldp.COLDP.fix_classification_recursive
+.. automethod:: coldp.COLDP.sort_taxa_recursive
 
-    .. automethod:: set
-
-    .. automethod:: fix_classification_recursive
-    .. automethod:: sort_taxa_recursive
-
-.. rubric:: Indices and tables
+Index and search 
+~~~~~~~~~~~~~~~~
 
 * :ref:`genindex`
 * :ref:`search`
