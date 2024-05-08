@@ -20,3 +20,11 @@ At minimum a NameBundle is initialised with a dictionary holding a set of COLDP 
 Once all names are included, the NameBundle can be added to the COLDP object via the COLDP.**add_names()** method. This adds name, taxon and synonym records for the set of names supplied. COLDP options may expand the set of added synonyms to include variant formats or may trigger the addition of one or taxa that are implicit in the accepted name. 
 
 The COLDP object will automatically manage record identifiers and the basionymID for any name records that are combinations of another name in the set.
+
+# Installation
+```console
+pip install py-coldp
+```
+
+# Documentation
+[Browsable documentation for COLDP version: 2024.5.2](https://html-preview.github.io/?url=https://github.com/dhobern/py-coldp/blob/main/docs/build/html/index.html)

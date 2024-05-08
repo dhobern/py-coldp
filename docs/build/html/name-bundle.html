@@ -5,11 +5,11 @@
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="viewport" content="width=device-width, initial-scale=1" />
 
-    <title>coldp.NameBundle &#8212; COLDP 2024.0.2 documentation</title>
+    <title>coldp.NameBundle &#8212; COLDP 2024.5.2 documentation</title>
     <link rel="stylesheet" type="text/css" href="_static/pygments.css?v=d1102ebc" />
     <link rel="stylesheet" type="text/css" href="_static/alabaster.css?v=12dfc556" />
-    <link rel="stylesheet" type="text/css" href="_static/sphinx_paramlinks.css?v=dd72e65a" />
-    <script src="_static/documentation_options.js?v=7ad2aca8"></script>
+    <link rel="stylesheet" type="text/css" href="_static/sphinx_paramlinks.css" />
+    <script src="_static/documentation_options.js?v=1723c9d4"></script>
     <script src="_static/doctools.js?v=9a2dae69"></script>
     <script src="_static/sphinx_highlight.js?v=dc90522c"></script>
     <link rel="index" title="Index" href="genindex.html" />
@@ -36,9 +36,9 @@
 <h1>coldp.NameBundle<a class="headerlink" href="#coldp-namebundle" title="Link to this heading">¶</a></h1>
 <section id="class">
 <h2>Class<a class="headerlink" href="#class" title="Link to this heading">¶</a></h2>
-<dl class="py class">
-<dt class="sig sig-object py">
-<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">coldp.</span></span><span class="sig-name descname"><span class="pre">NameBundle</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">coldp</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">accepted</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">incertae_sedis</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">sic</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em><span class="sig-paren">)</span></dt>
+<dl class="py method">
+<dt class="sig sig-object py" id="coldp.NameBundle.__init__">
+<span class="sig-prename descclassname"><span class="pre">NameBundle.</span></span><span class="sig-name descname"><span class="pre">__init__</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">coldp</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">accepted</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">incertae_sedis</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">sic</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#coldp.NameBundle.__init__" title="Link to this definition">¶</a></dt>
 <dd><p>Wrapper class to manage set of associated names, normally an accepted name
 and one or more synonyms. The bundle handles the logic of associated name
 variations.</p>
@@ -56,7 +56,7 @@ variations.</p>
 or more synonyms can also be supplied using the <a class="reference internal" href="#coldp.NameBundle.add_synonym" title="coldp.NameBundle.add_synonym"><code class="xref py py-func docutils literal notranslate"><span class="pre">add_synonym()</span></code></a> method.
 The bundle is then submitted to the <a class="reference internal" href="coldp.html#coldp.COLDP.add_names" title="coldp.COLDP.add_names"><code class="xref py py-func docutils literal notranslate"><span class="pre">coldp.COLDP.add_names()</span></code></a> method for
 processing.</p>
-<p>NameBundle objects should not be created directly. Use the :py:punc`coldp.COLDP.start_name_bundle` method instead.</p>
+<p>NameBundle objects should not be created directly. Use the <a class="reference internal" href="coldp.html#coldp.COLDP.start_name_bundle" title="coldp.COLDP.start_name_bundle"><code class="xref py py-func docutils literal notranslate"><span class="pre">coldp.COLDP.start_name_bundle()</span></code></a> method instead.</p>
 <p>accepted should contain a dictionary with keys that match property names from the <a class="reference external" href="https://github.com/CatalogueOfLife/coldp?tab=readme-ov-file#name">COLDP Name class</a></p>
 </dd></dl>
 
@@ -139,7 +139,6 @@ processing.</p>
 
 
 <h3>Navigation</h3>
-<p class="caption" role="heading"><span class="caption-text">Contents:</span></p>
 <ul class="current">
 <li class="toctree-l1"><a class="reference internal" href="coldp.html">coldp.COLDP</a></li>
 <li class="toctree-l1 current"><a class="current reference internal" href="#">coldp.NameBundle</a><ul>

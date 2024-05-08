@@ -5,11 +5,11 @@
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="viewport" content="width=device-width, initial-scale=1" />
 
-    <title>COLDP &#8212; COLDP 2024.0.2 documentation</title>
+    <title>coldp &#8212; COLDP 2024.5.2 documentation</title>
     <link rel="stylesheet" type="text/css" href="_static/pygments.css?v=d1102ebc" />
     <link rel="stylesheet" type="text/css" href="_static/alabaster.css?v=12dfc556" />
     <link rel="stylesheet" type="text/css" href="_static/sphinx_paramlinks.css?v=dd72e65a" />
-    <script src="_static/documentation_options.js?v=7ad2aca8"></script>
+    <script src="_static/documentation_options.js?v=1723c9d4"></script>
     <script src="_static/doctools.js?v=9a2dae69"></script>
     <script src="_static/sphinx_highlight.js?v=dc90522c"></script>
     <link rel="index" title="Index" href="genindex.html" />
@@ -33,9 +33,31 @@
           <div class="body" role="main">
             
   <section id="coldp">
-<h1>COLDP<a class="headerlink" href="#coldp" title="Link to this heading">¶</a></h1>
+<h1>coldp<a class="headerlink" href="#coldp" title="Link to this heading">¶</a></h1>
+<p>Python tools for working with taxonomic checklists organised as Catalogue of Life Data Package (COLDP) format</p>
+<section id="overview">
+<h2>Overview<a class="headerlink" href="#overview" title="Link to this heading">¶</a></h2>
+<p>coldp is a Python package to facilitate creation, manipulation, editing and serialisation of taxonomic checklists in the <a class="reference external" href="https://github.com/CatalogueOfLife/coldp">COL Data Package (COLDP)</a> format.</p>
+<p>The package includes two classes:</p>
+<ul class="simple">
+<li><p><strong>coldp.COLDP</strong> - A COLDP package loaded as a set of Pandas dataframes</p></li>
+<li><p><strong>coldp.NameBundle</strong> - A helper class to simplify addition of taxon names with sets of associated synonyms to a COLDP instance</p></li>
+</ul>
+<p>The main <strong>COLDP</strong> class instantiates a COLDP package in memory as a set of Pandas dataframes. An instance may be initialised from the contents of a folder containing a set of COLDP-compliant CSV or tab-delimited data files or alternatively can be initialised as an empty instance in memory. The class includes many methods for inserting new data, editing existing records and querying the contents of the package. The instance can then be saved as a set of CSV files in a named folder .</p>
+<p>The <strong>NameBundle</strong> class brings together a scientific name and its synonyms so that these can be added together and the COLDP package can automatically manage their relationships NameBundle objects are normally created using the <a class="reference internal" href="coldp.html#coldp.COLDP.start_name_bundle" title="coldp.COLDP.start_name_bundle"><code class="xref py py-func docutils literal notranslate"><span class="pre">coldp.COLDP.start_name_bundle()</span></code></a> method.</p>
+<p>At minimum a NameBundle is initialised with a dictionary holding a set of COLDP name record values. The scientific name represented by this dictionary should be the accepted name for a species or other taxon. Synonyms may then be added to the NameBundle.</p>
+<p>Once all names are included, the NameBundle can be added to the COLDP object via the <a class="reference internal" href="coldp.html#coldp.COLDP.add_names" title="coldp.COLDP.add_names"><code class="xref py py-func docutils literal notranslate"><span class="pre">coldp.COLDP.add_names()</span></code></a> method. This adds name, taxon and synonym records for the set of names supplied. COLDP options may expand the set of added synonyms to include variant formats or may trigger the addition of one or taxa that are implicit in the accepted name.</p>
+<p>The COLDP object will automatically manage record identifiers and the basionymID for any name records that are combinations of another name in the set.</p>
+</section>
+<section id="installation">
+<h2>Installation<a class="headerlink" href="#installation" title="Link to this heading">¶</a></h2>
+<div class="highlight-console notranslate"><div class="highlight"><pre><span></span><span class="go">pip install py-coldp</span>
+</pre></div>
+</div>
+</section>
+<section id="classes">
+<h2>Classes<a class="headerlink" href="#classes" title="Link to this heading">¶</a></h2>
 <div class="toctree-wrapper compound">
-<p class="caption" role="heading"><span class="caption-text">Contents:</span></p>
 <ul>
 <li class="toctree-l1"><a class="reference internal" href="coldp.html">coldp.COLDP</a><ul>
 <li class="toctree-l2"><a class="reference internal" href="coldp.html#class">Class</a></li>
@@ -54,11 +76,12 @@
 </ul>
 </div>
 <section id="index-and-search">
-<h2>Index and search<a class="headerlink" href="#index-and-search" title="Link to this heading">¶</a></h2>
+<h3>Index and search<a class="headerlink" href="#index-and-search" title="Link to this heading">¶</a></h3>
 <ul class="simple">
 <li><p><a class="reference internal" href="genindex.html"><span class="std std-ref">Index</span></a></p></li>
 <li><p><a class="reference internal" href="search.html"><span class="std std-ref">Search Page</span></a></p></li>
 </ul>
+</section>
 </section>
 </section>
 
@@ -79,7 +102,6 @@
 
 
 <h3>Navigation</h3>
-<p class="caption" role="heading"><span class="caption-text">Contents:</span></p>
 <ul>
 <li class="toctree-l1"><a class="reference internal" href="coldp.html">coldp.COLDP</a></li>
 <li class="toctree-l1"><a class="reference internal" href="name-bundle.html">coldp.NameBundle</a></li>

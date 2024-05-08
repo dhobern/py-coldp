@@ -6,8 +6,7 @@
 Class
 ~~~~~
 
-.. autoclass:: NameBundle
-    :no-index:
+.. automethod:: coldp.NameBundle.__init__
 
 Methods
 ~~~~~~~
