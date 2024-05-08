@@ -26,6 +26,7 @@ extensions = [
     "sphinx.ext.intersphinx",
     "sphinx.ext.autosummary",
     "sphinx_paramlinks",
+    "sphinx_simplepdf",
 ]
 
 

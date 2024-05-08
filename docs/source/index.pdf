@@ -1,0 +1,352 @@
+%PDF-1.4
+%“Œ‹ž ReportLab Generated PDF document http://www.reportlab.com
+1 0 obj
+<<
+/F1 2 0 R /F2 3 0 R /F3 5 0 R /F4 6 0 R
+>>
+endobj
+2 0 obj
+<<
+/BaseFont /Helvetica /Encoding /WinAnsiEncoding /Name /F1 /Subtype /Type1 /Type /Font
+>>
+endobj
+3 0 obj
+<<
+/BaseFont /Times-Roman /Encoding /WinAnsiEncoding /Name /F2 /Subtype /Type1 /Type /Font
+>>
+endobj
+4 0 obj
+<<
+/A <<
+/S /URI /Type /Action /URI (https://github.com/CatalogueOfLife/coldp)
+>> /Border [ 0 0 0 ] /Rect [ 130.3836 618.0236 260.4236 630.0236 ] /Subtype /Link /Type /Annot
+>>
+endobj
+5 0 obj
+<<
+/BaseFont /Courier /Encoding /WinAnsiEncoding /Name /F3 /Subtype /Type1 /Type /Font
+>>
+endobj
+6 0 obj
+<<
+/BaseFont /Helvetica-Bold /Encoding /WinAnsiEncoding /Name /F4 /Subtype /Type1 /Type /Font
+>>
+endobj
+7 0 obj
+<<
+/Annots [ 4 0 R ] /Contents 16 0 R /MediaBox [ 0 0 595.2756 841.8898 ] /Parent 15 0 R /Resources <<
+/Font 1 0 R /ProcSet [ /PDF /Text /ImageB /ImageC /ImageI ]
+>> /Rotate 0 
+  /Trans <<
+
+>> /Type /Page
+>>
+endobj
+8 0 obj
+<<
+/Outlines 10 0 R /PageLabels 17 0 R /PageMode /UseNone /Pages 15 0 R /Type /Catalog
+>>
+endobj
+9 0 obj
+<<
+/Author () /CreationDate (D:20240508220252-10'00') /Creator (\(unspecified\)) /Keywords () /ModDate (D:20240508220252-10'00') /Producer (ReportLab PDF Library - www.reportlab.com) 
+  /Subject (\(unspecified\)) /Title (coldp) /Trapped /False
+>>
+endobj
+10 0 obj
+<<
+/Count 5 /First 11 0 R /Last 13 0 R /Type /Outlines
+>>
+endobj
+11 0 obj
+<<
+/Dest [ 7 0 R /XYZ 57.02362 669.0236 0 ] /Next 12 0 R /Parent 10 0 R /Title (Overview)
+>>
+endobj
+12 0 obj
+<<
+/Dest [ 7 0 R /XYZ 57.02362 306.0236 0 ] /Next 13 0 R /Parent 10 0 R /Prev 11 0 R /Title (Installation)
+>>
+endobj
+13 0 obj
+<<
+/Count 1 /Dest [ 7 0 R /XYZ 57.02362 227.8236 0 ] /First 14 0 R /Last 14 0 R /Parent 10 0 R /Prev 12 0 R 
+  /Title (Classes)
+>>
+endobj
+14 0 obj
+<<
+/Dest [ 7 0 R /XYZ 57.02362 194.8236 0 ] /Parent 13 0 R /Title (Index and search)
+>>
+endobj
+15 0 obj
+<<
+/Count 1 /Kids [ 7 0 R ] /Type /Pages
+>>
+endobj
+16 0 obj
+<<
+/Length 5538
+>>
+stream
+1 0 0 1 0 0 cm  BT /F1 12 Tf 14.4 TL ET
+q
+1 0 0 1 57.02362 741.0236 cm
+q
+BT 1 0 0 1 0 4 Tm 218.3942 0 Td 24 TL /F2 20 Tf .133333 .133333 .133333 rg (coldp) Tj T* -218.3942 0 Td ET
+Q
+Q
+q
+1 0 0 1 57.02362 681.0236 cm
+q
+BT 1 0 0 1 0 14 Tm .828453 Tw 12 TL /F1 10 Tf 0 0 0 rg (Python tools for working with taxonomic checklists organised as Catalogue of Life Data Package \(COLDP\)) Tj T* 0 Tw (format) Tj T* ET
+Q
+Q
+q
+1 0 0 1 57.02362 648.0236 cm
+q
+BT 1 0 0 1 0 3.5 Tm 21 TL /F2 17.5 Tf .133333 .133333 .133333 rg (Overview) Tj T* ET
+Q
+Q
+q
+1 0 0 1 57.02362 618.0236 cm
+q
+BT 1 0 0 1 0 14 Tm 3.369104 Tw 12 TL /F1 10 Tf 0 0 0 rg (coldp is a Python package to facilitate creation, manipulation, editing and serialisation of taxonomic) Tj T* 0 Tw (checklists in the ) Tj 0 .4 .6 rg (COL Data Package \(COLDP\)) Tj 0 0 0 rg ( format.) Tj T* ET
+Q
+Q
+q
+1 0 0 1 57.02362 600.0236 cm
+q
+0 0 0 rg
+BT 1 0 0 1 0 2 Tm /F1 10 Tf 12 TL (The package includes two classes:) Tj T* ET
+Q
+Q
+q
+1 0 0 1 57.02362 594.0236 cm
+Q
+q
+1 0 0 1 57.02362 594.0236 cm
+Q
+q
+1 0 0 1 57.02362 582.0236 cm
+q
+0 0 0 rg
+BT /F1 10 Tf 12 TL ET
+q
+1 0 0 1 6 -3 cm
+q
+0 0 0 rg
+BT 1 0 0 1 0 2 Tm /F3 10 Tf 12 TL 8 0 Td (\177) Tj T* -8 0 Td ET
+Q
+Q
+q
+1 0 0 1 23 -3 cm
+q
+BT 1 0 0 1 0 2 Tm 12 TL /F4 10 Tf 0 0 0 rg (coldp.COLDP) Tj /F1 10 Tf ( - A COLDP package loaded as a set of Pandas dataframes) Tj T* ET
+Q
+Q
+q
+Q
+Q
+Q
+q
+1 0 0 1 57.02362 576.0236 cm
+Q
+q
+1 0 0 1 57.02362 552.0236 cm
+q
+0 0 0 rg
+BT /F1 10 Tf 12 TL ET
+q
+1 0 0 1 6 9 cm
+q
+0 0 0 rg
+BT 1 0 0 1 0 2 Tm /F3 10 Tf 12 TL 8 0 Td (\177) Tj T* -8 0 Td ET
+Q
+Q
+q
+1 0 0 1 23 -3 cm
+q
+BT 1 0 0 1 0 14 Tm 2.600596 Tw 12 TL /F4 10 Tf 0 0 0 rg (coldp.NameBundle) Tj /F1 10 Tf ( - A helper class to simplify addition of taxon names with sets of associated) Tj T* 0 Tw (synonyms to a COLDP instance) Tj T* ET
+Q
+Q
+q
+Q
+Q
+Q
+q
+1 0 0 1 57.02362 552.0236 cm
+Q
+q
+1 0 0 1 57.02362 486.0236 cm
+q
+BT 1 0 0 1 0 50 Tm 1.940522 Tw 12 TL /F1 10 Tf 0 0 0 rg (The main ) Tj /F4 10 Tf (COLDP) Tj /F1 10 Tf ( class instantiates a COLDP package in memory as a set of Pandas dataframes. An) Tj T* 0 Tw 2.183022 Tw (instance may be initialised from the contents of a folder containing a set of COLDP-compliant CSV or) Tj T* 0 Tw .134897 Tw (tab-delimited data files or alternatively can be initialised as an empty instance in memory. The class includes) Tj T* 0 Tw .026772 Tw (many methods for inserting new data, editing existing records and querying the contents of the package. The) Tj T* 0 Tw (instance can then be saved as a set of CSV files in a named folder .) Tj T* ET
+Q
+Q
+q
+1 0 0 1 57.02362 444.0236 cm
+q
+BT 1 0 0 1 0 26 Tm 1.522397 Tw 12 TL /F1 10 Tf 0 0 0 rg (The ) Tj /F4 10 Tf (NameBundle) Tj /F1 10 Tf ( class brings together a scientific name and its synonyms so that these can be added) Tj T* 0 Tw 1.519862 Tw (together and the COLDP package can automatically manage their relationships NameBundle objects are) Tj T* 0 Tw (normally created using the ) Tj 1 0 0 rg (:py:func:`coldp.COLDP.start_name_bundle`) Tj 0 0 0 rg ( method.) Tj T* ET
+Q
+Q
+q
+1 0 0 1 57.02362 402.0236 cm
+q
+BT 1 0 0 1 0 26 Tm .585197 Tw 12 TL /F1 10 Tf 0 0 0 rg (At minimum a NameBundle is initialised with a dictionary holding a set of COLDP name record values. The) Tj T* 0 Tw 1.313022 Tw (scientific name represented by this dictionary should be the accepted name for a species or other taxon.) Tj T* 0 Tw (Synonyms may then be added to the NameBundle.) Tj T* ET
+Q
+Q
+q
+1 0 0 1 57.02362 348.0236 cm
+q
+BT 1 0 0 1 0 38 Tm 5.62389 Tw 12 TL /F1 10 Tf 0 0 0 rg (Once all names are included, the NameBundle can be added to the COLDP object via the) Tj T* 0 Tw 1.751529 Tw 1 0 0 rg (:py:func:`coldp.COLDP.add_names`) Tj 0 0 0 rg ( method. This adds name, taxon and synonym records for the set of) Tj T* 0 Tw .549897 Tw (names supplied. COLDP options may expand the set of added synonyms to include variant formats or may) Tj T* 0 Tw (trigger the addition of one or taxa that are implicit in the accepted name.) Tj T* ET
+Q
+Q
+q
+1 0 0 1 57.02362 318.0236 cm
+q
+BT 1 0 0 1 0 14 Tm 1.067739 Tw 12 TL /F1 10 Tf 0 0 0 rg (The COLDP object will automatically manage record identifiers and the basionymID for any name records) Tj T* 0 Tw (that are combinations of another name in the set.) Tj T* ET
+Q
+Q
+q
+1 0 0 1 57.02362 285.0236 cm
+q
+BT 1 0 0 1 0 3.5 Tm 21 TL /F2 17.5 Tf .133333 .133333 .133333 rg (Installation) Tj T* ET
+Q
+Q
+q
+1 0 0 1 57.02362 239.8236 cm
+q
+q
+1 0 0 1 0 0 cm
+q
+1 0 0 1 6.6 6.6 cm
+q
+.662745 .662745 .662745 RG
+.5 w
+.941176 .972549 1 rg
+n -6 -6 480.0283 36 re B*
+Q
+q
+.533333 .533333 .533333 rg
+BT 1 0 0 1 0 14 Tm /F3 10 Tf 12 TL (pip install py-coldp) Tj T*  T* ET
+Q
+Q
+Q
+Q
+Q
+q
+1 0 0 1 57.02362 206.8236 cm
+q
+BT 1 0 0 1 0 3.5 Tm 21 TL /F2 17.5 Tf .133333 .133333 .133333 rg (Classes) Tj T* ET
+Q
+Q
+q
+1 0 0 1 57.02362 176.8236 cm
+q
+BT 1 0 0 1 0 3 Tm 18 TL /F2 15 Tf .133333 .133333 .133333 rg (Index and search) Tj T* ET
+Q
+Q
+q
+1 0 0 1 57.02362 164.8236 cm
+Q
+q
+1 0 0 1 57.02362 164.8236 cm
+Q
+q
+1 0 0 1 57.02362 152.8236 cm
+q
+0 0 0 rg
+BT /F1 10 Tf 12 TL ET
+q
+1 0 0 1 6 -3 cm
+q
+0 0 0 rg
+BT 1 0 0 1 0 2 Tm /F3 10 Tf 12 TL 8 0 Td (\177) Tj T* -8 0 Td ET
+Q
+Q
+q
+1 0 0 1 23 -3 cm
+q
+1 0 0 rg
+BT 1 0 0 1 0 2 Tm /F1 10 Tf 12 TL (:ref:`genindex`) Tj T* ET
+Q
+Q
+q
+Q
+Q
+Q
+q
+1 0 0 1 57.02362 146.8236 cm
+Q
+q
+1 0 0 1 57.02362 134.8236 cm
+q
+0 0 0 rg
+BT /F1 10 Tf 12 TL ET
+q
+1 0 0 1 6 -3 cm
+q
+0 0 0 rg
+BT 1 0 0 1 0 2 Tm /F3 10 Tf 12 TL 8 0 Td (\177) Tj T* -8 0 Td ET
+Q
+Q
+q
+1 0 0 1 23 -3 cm
+q
+BT 1 0 0 1 0 2 Tm 12 TL /F1 10 Tf 1 0 0 rg (:ref:`search`) Tj T* ET
+Q
+Q
+q
+Q
+Q
+Q
+q
+1 0 0 1 57.02362 134.8236 cm
+Q
+ 
+endstream
+endobj
+17 0 obj
+<<
+/Nums [ 0 18 0 R ]
+>>
+endobj
+18 0 obj
+<<
+/S /D /St 1
+>>
+endobj
+xref
+0 19
+0000000000 65535 f 
+0000000073 00000 n 
+0000000134 00000 n 
+0000000241 00000 n 
+0000000350 00000 n 
+0000000542 00000 n 
+0000000647 00000 n 
+0000000759 00000 n 
+0000000982 00000 n 
+0000001087 00000 n 
+0000001349 00000 n 
+0000001423 00000 n 
+0000001532 00000 n 
+0000001658 00000 n 
+0000001805 00000 n 
+0000001909 00000 n 
+0000001969 00000 n 
+0000007559 00000 n 
+0000007600 00000 n 
+trailer
+<<
+/ID 
+[<2381b1f951e79b8714f03638f09ca0d0><2381b1f951e79b8714f03638f09ca0d0>]
+% ReportLab generated PDF document -- digest (http://www.reportlab.com)
+
+/Info 9 0 R
+/Root 8 0 R
+/Size 19
+>>
+startxref
+7634
+%%EOF

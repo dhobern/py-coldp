@@ -4,7 +4,7 @@ reversion:
 doc : 
 	python version.py update docs/source/conf.py '^release = .*' 'release = "{version}"'
 	python version.py update README.md 'documentation for COLDP version: [0-9\.]+' 'documentation for COLDP version: {version}'
-	cd docs; ./make.bat html
+	cd docs; ./make.bat html; ./make.bat simplepdf
 
 package :
 	python version.py update pyproject.toml 'version = .*' 'version = "{version}"'
