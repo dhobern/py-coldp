@@ -5,8 +5,8 @@
 py-coldp is a Python package to facilitate creation, manipulation, editing and serialisation of taxonomic checklists in the [Catalogue of Life Data Package](https://github.com/CatalogueOfLife/coldp ) format.
 
 The package includes two classes:
-* **[COLDP](#class-coldp)** - A COLDP package loaded as a set of Pandas dataframes
-* **[NameBundle](#class-namebundle)** - A helper class to simplify addition of taxon names with sets of associated synonyms to a COLDP instance
+* **COLDP** - A COLDP package loaded as a set of Pandas dataframes
+* **NameBundle** - A helper class to simplify addition of taxon names with sets of associated synonyms to a COLDP instance
 
 # Class: COLDP
 The main **COLDP** class instantiates a COLDP package in memory as a set of Pandas dataframes. An instance may be initialised from the contents of a folder containing a set of COLDP-compliant CSV or tab-delimited data files or alternatively can be initialised as an empty instance in memory. The class includes many methods for inserting new data, editing existing records and querying the contents of the package. The instance can then be saved as a set of CSV files in a named folder .
