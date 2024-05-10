@@ -7,14 +7,14 @@
   <title>
    COLDP 2024.5.2 documentation
   </title>
-  <link href="_static/pygments.css" rel="stylesheet" type="text/css"/>
+  <link href="_static/pygments.css?v=649a27d8" rel="stylesheet" type="text/css"/>
   <link href="_static/main.css?v=0eace31b" rel="stylesheet" type="text/css"/>
   <link href="_static/sphinx_paramlinks.css" rel="stylesheet" type="text/css"/>
-  <script src="_static/documentation_options.js">
+  <script src="_static/documentation_options.js?v=aa6a5cb5">
   </script>
-  <script src="_static/doctools.js">
+  <script src="_static/doctools.js?v=9a2dae69">
   </script>
-  <script src="_static/sphinx_highlight.js">
+  <script src="_static/sphinx_highlight.js?v=dc90522c">
   </script>
   <link href="genindex.html" rel="index" title="Index"/>
   <link href="search.html" rel="search" title="Search"/>
@@ -116,6 +116,13 @@
        </ul>
       </li>
      </ul>
+     <ul>
+      <li class="toctree-l1">
+       <a class="reference internal" href="#usage">
+        Usage
+       </a>
+      </li>
+     </ul>
     </div>
    </div>
   </div>
@@ -215,6 +222,9 @@
           &para;
          </a>
         </h2>
+        <p>
+         Install the latest version from PyPI.
+        </p>
         <div class="highlight-console notranslate">
          <div class="highlight">
           <pre><span></span><span class="go">pip install py-coldp</span>
@@ -6556,6 +6566,205 @@ processing.
             </li>
            </ul>
           </section>
+         </section>
+        </div>
+       </section>
+       <section id="usage">
+        <h2>
+         Usage
+         <a class="headerlink" href="#usage" title="Link to this heading">
+          &para;
+         </a>
+        </h2>
+        <div class="toctree-wrapper compound">
+         <span id="document-usage">
+         </span>
+         <section id="usage">
+          <h3>
+           Usage
+           <a class="headerlink" href="#usage" title="Link to this heading">
+            &para;
+           </a>
+          </h3>
+          <p>
+           The following example illustrates basic usage. It creates a new COLDP
+instance for the monotypic Lepidoptera family Tridentaformidae, including
+name and taxon records for the family, genus and species, the original
+combination for the species, three distribution records for the species, and
+references for all elements.
+          </p>
+          <p>
+           Running the same code a second time leaves the data unchanged since it
+locates and validates the existing records.
+          </p>
+          <p>
+           In this example, each reference is associated with an ID string provided
+when the records are created, but all name and taxon ID strings are
+generated and managed by the COLDP instance.
+          </p>
+          <p>
+           Adding the synonym to the NameBundle for the species enables the COLDP instance
+to create the relevant basionymID reference to the current combination.
+          </p>
+          <p>
+           The example names include a mixture with parsed name elements or a single
+scientificName element. The final names table includes both formats for all
+names.
+          </p>
+          <p>
+           The addition of the distribution records shows the pattern for adding other
+COLDP classes that reference name (namerelation, typematerial) and taxon
+(distribution, speciesinteraction) records.
+          </p>
+          <div class="highlight-python notranslate">
+           <div class="highlight">
+            <pre><span></span><span class="c1"># Import COLDP class</span>
+<span class="kn">from</span> <span class="nn">coldp</span> <span class="kn">import</span> <span class="n">COLDP</span>
+
+<span class="c1"># Default properties for all COLDP Taxon records created by COLDP instance</span>
+<span class="n">taxon_defaults</span> <span class="o">=</span> <span class="p">{</span>
+    <span class="s2">"kingdom"</span><span class="p">:</span> <span class="s2">"Animalia"</span><span class="p">,</span>
+    <span class="s2">"phylum"</span><span class="p">:</span> <span class="s2">"Arthropoda"</span><span class="p">,</span>
+    <span class="s2">"class"</span><span class="p">:</span> <span class="s2">"Insecta"</span><span class="p">,</span>
+    <span class="s2">"order"</span><span class="p">:</span> <span class="s2">"Lepidoptera"</span><span class="p">,</span>
+    <span class="s2">"status"</span><span class="p">:</span> <span class="s2">"established"</span><span class="p">,</span>
+<span class="p">}</span>
+
+<span class="c1"># Create new COLDP instance with name Tridentaformidae</span>
+<span class="c1">#</span>
+<span class="c1"># This would load an existing COLDP instance from a folder named</span>
+<span class="c1"># Tridentaformidae in the current folder if it already exists</span>
+<span class="n">coldp</span> <span class="o">=</span> <span class="n">COLDP</span><span class="p">(</span><span class="s2">"Tridentaformidae"</span><span class="p">,</span> <span class="n">default_taxon_record</span> <span class="o">=</span> <span class="n">taxon_defaults</span><span class="p">)</span>
+
+<span class="c1"># Add four COLDP Reference objects</span>
+<span class="n">references</span> <span class="o">=</span> <span class="n">coldp</span><span class="o">.</span><span class="n">add_references</span><span class="p">([</span>
+    <span class="p">{</span>
+        <span class="s2">"ID"</span><span class="p">:</span> <span class="s2">"Braun_1923"</span><span class="p">,</span>
+        <span class="s2">"author"</span><span class="p">:</span> <span class="s2">"Braun, A.F."</span><span class="p">,</span>
+        <span class="s2">"issued"</span><span class="p">:</span> <span class="s2">"1923"</span><span class="p">,</span>
+        <span class="s2">"title"</span><span class="p">:</span> <span class="s2">"Microlepidoptera: Notes and New Species"</span><span class="p">,</span>
+        <span class="s2">"containerTitle"</span><span class="p">:</span> <span class="s2">"Transactions of the American Entomological Society"</span><span class="p">,</span>
+        <span class="s2">"volume"</span><span class="p">:</span> <span class="s2">"49"</span><span class="p">,</span>
+        <span class="s2">"issue"</span><span class="p">:</span> <span class="s2">"2"</span><span class="p">,</span>
+        <span class="s2">"page"</span><span class="p">:</span> <span class="s2">"115-127"</span><span class="p">,</span>
+        <span class="s2">"link"</span><span class="p">:</span> <span class="s2">"https://www.jstor.org/stable/25077087"</span><span class="p">,</span>
+    <span class="p">},</span>
+    <span class="p">{</span>
+        <span class="s2">"ID"</span><span class="p">:</span> <span class="s2">"Davis_1978"</span><span class="p">,</span>
+        <span class="s2">"author"</span><span class="p">:</span> <span class="s2">"Davis, D.R."</span><span class="p">,</span>
+        <span class="s2">"issued"</span><span class="p">:</span> <span class="s2">"1978"</span><span class="p">,</span>
+        <span class="s2">"title"</span><span class="p">:</span> <span class="s2">"Two new genera of North American incurvariine moths (Lepidoptera: Incurvariidae)"</span><span class="p">,</span>
+        <span class="s2">"containerTitle"</span><span class="p">:</span> <span class="s2">"The Pan-Pacific entomologist"</span><span class="p">,</span>
+        <span class="s2">"volume"</span><span class="p">:</span> <span class="s2">"54"</span><span class="p">,</span>
+        <span class="s2">"issue"</span><span class="p">:</span> <span class="s2">"2"</span><span class="p">,</span>
+        <span class="s2">"page"</span><span class="p">:</span> <span class="s2">"147-153"</span><span class="p">,</span>
+        <span class="s2">"link"</span><span class="p">:</span> <span class="s2">"https://www.biodiversitylibrary.org/page/56100973"</span><span class="p">,</span>
+    <span class="p">},</span>
+    <span class="p">{</span>
+        <span class="s2">"ID"</span><span class="p">:</span> <span class="s2">"Pohl_et_al_2019"</span><span class="p">,</span>
+        <span class="s2">"author"</span><span class="p">:</span> <span class="s2">"Pohl, G.R., Landry, J.-F., Schmidt, B.C. &amp; deWaard, J.R."</span><span class="p">,</span>
+        <span class="s2">"issued"</span><span class="p">:</span> <span class="s2">"2019"</span><span class="p">,</span>
+        <span class="s2">"title"</span><span class="p">:</span> <span class="s2">"Lepidoptera of Canada"</span><span class="p">,</span>
+        <span class="s2">"containerTitle"</span><span class="p">:</span> <span class="s2">"ZooKeys"</span><span class="p">,</span>
+        <span class="s2">"volume"</span><span class="p">:</span> <span class="s2">"819"</span><span class="p">,</span>
+        <span class="s2">"page"</span><span class="p">:</span> <span class="s2">"463-505"</span><span class="p">,</span>
+        <span class="s2">"link"</span><span class="p">:</span> <span class="s2">"https://doi.org/10.3897/zookeys.819.27259"</span><span class="p">,</span>
+    <span class="p">},</span>
+    <span class="p">{</span>
+        <span class="s2">"ID"</span><span class="p">:</span> <span class="s2">"Regier_et_al_2014"</span><span class="p">,</span>
+        <span class="s2">"author"</span><span class="p">:</span> <span class="s2">"Regier, J.C., Mitter, C., Davis, D.R., Harrison, T.L., Sohn, J.-C., Cummings, M.P., Zwick, A. &amp; Mitter, K.T."</span><span class="p">,</span>
+        <span class="s2">"issued"</span><span class="p">:</span> <span class="s2">"2015"</span><span class="p">,</span>
+        <span class="s2">"title"</span><span class="p">:</span> <span class="s2">"A molecular phylogeny for the oldest (nonditrysian) lineages of extant Lepidoptera, with implications for classification, comparative morphology and life-history evolution"</span><span class="p">,</span>
+        <span class="s2">"containerTitle"</span><span class="p">:</span> <span class="s2">"Systematic Entomology"</span><span class="p">,</span>
+        <span class="s2">"volume"</span><span class="p">:</span> <span class="s2">"40"</span><span class="p">,</span>
+        <span class="s2">"issue"</span><span class="p">:</span> <span class="s2">"4"</span><span class="p">,</span>
+        <span class="s2">"page"</span><span class="p">:</span> <span class="s2">"671&ndash;704"</span><span class="p">,</span>
+        <span class="s2">"link"</span><span class="p">:</span> <span class="s2">"https://doi.org/10.1111/syen.12129"</span><span class="p">,</span>
+    <span class="p">},</span>
+<span class="p">])</span>
+
+<span class="c1"># Add COLDP Name and Taxon records for family and get the ID string for the</span>
+<span class="c1"># family Taxon record</span>
+<span class="c1">#</span>
+<span class="c1"># Name provided as a uninomial</span>
+<span class="n">bundle</span> <span class="o">=</span> <span class="n">coldp</span><span class="o">.</span><span class="n">start_name_bundle</span><span class="p">({</span>
+    <span class="s2">"rank"</span><span class="p">:</span> <span class="s2">"family"</span><span class="p">,</span>
+    <span class="s2">"uninomial"</span><span class="p">:</span> <span class="s2">"Tridentaformidae"</span><span class="p">,</span>
+    <span class="s2">"authorship"</span><span class="p">:</span> <span class="s2">"Davis, 2014"</span><span class="p">,</span>
+    <span class="s2">"referenceID"</span><span class="p">:</span> <span class="s2">"Regier_et_al_2014"</span><span class="p">,</span>
+    <span class="s2">"publishedInPage"</span><span class="p">:</span> <span class="s2">"697"</span><span class="p">,</span>
+<span class="p">})</span>
+<span class="n">coldp</span><span class="o">.</span><span class="n">add_names</span><span class="p">(</span><span class="n">bundle</span><span class="p">)</span>
+<span class="n">family_id</span> <span class="o">=</span> <span class="n">bundle</span><span class="o">.</span><span class="n">accepted_taxon_id</span>
+
+<span class="c1"># Add COLDP Name and Taxon records for genus as child of the family and get</span>
+<span class="c1"># the ID string for the genus Taxon record</span>
+<span class="c1">#</span>
+<span class="c1"># Name provided as a scientificName</span>
+<span class="n">bundle</span> <span class="o">=</span> <span class="n">coldp</span><span class="o">.</span><span class="n">start_name_bundle</span><span class="p">({</span>
+    <span class="s2">"rank"</span><span class="p">:</span> <span class="s2">"genus"</span><span class="p">,</span>
+    <span class="s2">"scientificName"</span><span class="p">:</span> <span class="s2">"Tridentaforma"</span><span class="p">,</span>
+    <span class="s2">"authorship"</span><span class="p">:</span> <span class="s2">"Davis, 1978"</span><span class="p">,</span>
+    <span class="s2">"referenceID"</span><span class="p">:</span> <span class="s2">"Davis_1978"</span><span class="p">,</span>
+    <span class="s2">"publishedInPage"</span><span class="p">:</span> <span class="s2">"150"</span><span class="p">,</span>
+<span class="p">})</span>
+<span class="n">coldp</span><span class="o">.</span><span class="n">add_names</span><span class="p">(</span><span class="n">bundle</span><span class="p">,</span> <span class="n">family_id</span><span class="p">)</span>
+<span class="n">genus_id</span> <span class="o">=</span> <span class="n">bundle</span><span class="o">.</span><span class="n">accepted_taxon_id</span>
+
+<span class="c1"># Add COLDP Name and Taxon records for species as child of the genus</span>
+<span class="c1"># with original combination as a synonym and get the ID string for the</span>
+<span class="c1"># species Taxon record</span>
+<span class="c1">#</span>
+<span class="c1"># Accepted name provided as parsed elements. Synonym provided only as</span>
+<span class="c1"># scientificName.</span>
+<span class="n">bundle</span> <span class="o">=</span> <span class="n">coldp</span><span class="o">.</span><span class="n">start_name_bundle</span><span class="p">({</span>
+    <span class="s2">"rank"</span><span class="p">:</span> <span class="s2">"species"</span><span class="p">,</span>
+    <span class="s2">"genus"</span><span class="p">:</span> <span class="s2">"Tridentaforma"</span><span class="p">,</span>
+    <span class="s2">"specificEpithet"</span><span class="p">:</span> <span class="s2">"fuscoleuca"</span><span class="p">,</span>
+    <span class="s2">"authorship"</span><span class="p">:</span> <span class="s2">"(Braun, 1923)"</span><span class="p">,</span>
+    <span class="s2">"referenceID"</span><span class="p">:</span> <span class="s2">"Davis_1978"</span><span class="p">,</span>
+    <span class="s2">"publishedInPage"</span><span class="p">:</span> <span class="s2">"150"</span><span class="p">,</span>
+    <span class="s2">"publishedInYear"</span><span class="p">:</span> <span class="s2">"1978"</span><span class="p">,</span>
+<span class="p">})</span>
+<span class="n">bundle</span><span class="o">.</span><span class="n">add_synonym</span><span class="p">({</span>
+    <span class="s2">"rank"</span><span class="p">:</span> <span class="s2">"species"</span><span class="p">,</span>
+    <span class="s2">"scientificName"</span><span class="p">:</span> <span class="s2">"Lampronia fuscoleuca"</span><span class="p">,</span>
+    <span class="s2">"authorship"</span><span class="p">:</span> <span class="s2">"Braun, 1923"</span><span class="p">,</span>
+    <span class="s2">"referenceID"</span><span class="p">:</span> <span class="s2">"Braun_1923"</span><span class="p">,</span>
+    <span class="s2">"publishedInPage"</span><span class="p">:</span> <span class="s2">"127"</span><span class="p">,</span>
+<span class="p">})</span>
+<span class="n">coldp</span><span class="o">.</span><span class="n">add_names</span><span class="p">(</span><span class="n">bundle</span><span class="p">,</span> <span class="n">genus_id</span><span class="p">)</span>
+<span class="n">species_id</span> <span class="o">=</span> <span class="n">bundle</span><span class="o">.</span><span class="n">accepted_taxon_id</span>
+
+<span class="c1"># Add three distribution records for the species, each with a reference</span>
+<span class="k">for</span> <span class="n">area</span><span class="p">,</span> <span class="n">referenceID</span> <span class="ow">in</span> <span class="p">{</span><span class="s2">"US-CA"</span><span class="p">:</span> <span class="s2">"Braun_1923"</span><span class="p">,</span> <span class="s2">"CA-AB"</span><span class="p">:</span> <span class="s2">"Pohl_et_al_2019"</span><span class="p">,</span> <span class="s2">"CA-BC"</span><span class="p">:</span> <span class="s2">"Pohl_et_al_2019"</span><span class="p">}</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
+    <span class="n">distribution</span> <span class="o">=</span> <span class="n">coldp</span><span class="o">.</span><span class="n">add_distribution</span><span class="p">({</span>
+        <span class="s2">"taxonID"</span><span class="p">:</span> <span class="n">species_id</span><span class="p">,</span>
+        <span class="s2">"area"</span><span class="p">:</span> <span class="n">area</span><span class="p">,</span>
+        <span class="s2">"gazetteer"</span><span class="p">:</span> <span class="s2">"iso"</span><span class="p">,</span>
+        <span class="s2">"status"</span><span class="p">:</span> <span class="s2">"native"</span><span class="p">,</span>
+        <span class="s2">"referenceID"</span><span class="p">:</span> <span class="n">referenceID</span><span class="p">,</span>
+    <span class="p">})</span>
+
+<span class="c1"># Save the COLDP instance to a Tridentaformidae subfolder in the current</span>
+<span class="c1"># folder</span>
+<span class="n">coldp</span><span class="o">.</span><span class="n">save</span><span class="p">()</span>
+
+<span class="c1"># Load the COLDP instance from the curent folder</span>
+<span class="n">coldp</span> <span class="o">=</span> <span class="n">COLDP</span><span class="p">(</span><span class="s2">"Tridentaformidae"</span><span class="p">)</span>
+
+<span class="c1"># Display the classification as a text tee</span>
+<span class="nb">print</span><span class="p">(</span><span class="n">coldp</span><span class="o">.</span><span class="n">get_text_tree</span><span class="p">(</span><span class="n">family_id</span><span class="p">))</span>
+
+<span class="c1"># Show content of dataframes</span>
+<span class="nb">print</span><span class="p">(</span><span class="n">coldp</span><span class="o">.</span><span class="n">references</span><span class="p">)</span>
+<span class="nb">print</span><span class="p">(</span><span class="n">coldp</span><span class="o">.</span><span class="n">names</span><span class="p">)</span>
+<span class="nb">print</span><span class="p">(</span><span class="n">coldp</span><span class="o">.</span><span class="n">taxa</span><span class="p">)</span>
+<span class="nb">print</span><span class="p">(</span><span class="n">coldp</span><span class="o">.</span><span class="n">synonyms</span><span class="p">)</span>
+<span class="nb">print</span><span class="p">(</span><span class="n">coldp</span><span class="o">.</span><span class="n">distributions</span><span class="p">)</span>
+</pre>
+           </div>
+          </div>
          </section>
         </div>
         <section id="index-and-search">

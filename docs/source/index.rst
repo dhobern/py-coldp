@@ -1,7 +1,4 @@
-.. COLDP documentation master file, created by
-   sphinx-quickstart on Sat May  4 16:13:15 2024.
-   You can adapt this file completely to your liking, but it should at least
-   contain the root `toctree` directive.
+.. Root for documentation for the coldp package
 
 coldp
 =====
@@ -28,6 +25,7 @@ The COLDP object will automatically manage record identifiers and the basionymID
 
 Installation
 ------------
+Install the latest version from PyPI.
 
 .. code-block:: console
     
@@ -40,6 +38,13 @@ Classes
 
    coldp
    name-bundle
+
+Usage
+-----
+.. toctree::
+   :maxdepth: 2
+
+   usage
 
 Index and search 
 ~~~~~~~~~~~~~~~~

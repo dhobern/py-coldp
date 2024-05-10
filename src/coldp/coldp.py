@@ -310,9 +310,56 @@ This is a map of the foreign-key relationships that need to be validated
 and preserved between the COLDP data tables.
 """
 
-# ---------------------------------------------------------------------------
+# -----------------------------------------------------------------------------
+# Required properties for tables
+#
+# Properties expected by COLDP methods when processing or finding records in
+# each table
+# -----------------------------------------------------------------------------
+required_properties = {
+    "reference": [
+        "ID",
+        "author",
+        "title",
+        "issued",
+        "containerTitle",
+        "volume",
+        "issue",
+        "page",
+        "citation",
+    ],
+    "name": [
+        "uninomial",
+        "genus",
+        "infragenericEpithet",
+        "specificEpithet",
+        "infraspecificEpithet",
+        "authorship",
+        "rank",
+        "basionymID",
+        "scientificName",
+        "code",
+        "status",
+    ],
+    "distribution": [
+        "taxonID",
+        "area",
+        "gazetteer",
+        "status",
+        "referenceID",
+    ],
+}
+"""
+Dictionary mapping table names to list of properties (columns) required by
+COLDP in a loaded dataframe.
+
+:py:func:`~coldp.COLDP.initialise_dataframe` will ensure that all listed columns
+are present.
+"""
+
+# ----------------------------------------------------------------------------
 # Recognised file extensions and their associated separator characters
-# ---------------------------------------------------------------------------
+# ----------------------------------------------------------------------------
 csv_extensions = {"csv": ",", "tsv": "\t", "txt": "\t"}
 """
 Dictionary mapping supported CSV/TSV file extensions to the expected delimiter.
@@ -327,6 +374,9 @@ Supported extensions are .csv for comma-separated data files and .tsv or .txt fo
 uninomial_pattern = re.compile("^[A-Z][a-z]+$")
 epithet_pattern = re.compile("^[a-z]-?[a-z]+$")
 name_pattern = re.compile("^[A-Za-z]-?[a-z]+$")
+scientific_name_pattern = re.compile(
+    r"^([A-Z][a-z]+)( ([A-Z][a-z]+))?( ([a-z]-?[a-z]+))?( [abfrpsuv]+\.)?( ([a-z]-?[a-z]+))?$"
+)
 
 
 class NameBundle:
@@ -396,7 +446,7 @@ class NameBundle:
                         present = True
                         break
         if not present:
-            self.synonyms.append(self.normalise_name(synonym, sic))
+            self.synonyms.append(normalised)
 
     def normalise_name(self, name: dict[str:str], sic: bool = False) -> dict:
         """
@@ -408,19 +458,13 @@ class NameBundle:
         """
 
         # Ensure main elements are present in dictionary
-        for k in [
-            "uninomial",
-            "genus",
-            "infragenericEpithet",
-            "specificEpithet",
-            "infraspecificEpithet",
-            "authorship",
-            "rank",
-            "basionymID",
-            "scientificName",
-        ]:
+        for k in required_properties["name"]:
             if k not in name:
                 name[k] = ""
+
+        # If code is missing, use value from COLDP
+        if "code" not in name or name["code"] == "":
+            name["code"] = self.coldp.code
 
         # Skip processing if sic
         if not sic:
@@ -450,8 +494,33 @@ class NameBundle:
                         )
                         name[k] = name[k][0].lower() + name[k][1:]
 
+        # If scientificName is present, make sure all parts are
+        # also completed.
+        if name["scientificName"]:
+            match = scientific_name_pattern.match(name["scientificName"])
+            if match is not None:
+                # Handle any name with a specificEpithet
+                if match.group(5):
+                    if not name["genus"]:
+                        name["genus"] = match.group(1)
+                    if not name["infragenericEpithet"] and match.group(3):
+                        name["infragenericEpithet"] = match.group(3)
+                    if not name["specificEpithet"] and match.group(5):
+                        name["specificEpithet"] = match.group(5)
+                    if not name["infraspecificEpithet"] and match.group(8):
+                        name["infraspecificEpithet"] = match.group(8)
+                elif name["rank"] == "subgenus":
+                    if not name["genus"]:
+                        name["genus"] = match.group(1)
+                    if not name["uninomial"] and match.group(3):
+                        name["uninomial"] = match.group(3)
+                else:
+                    if not name["uninomial"]:
+                        name["uninomial"] = match.group(1)
+
+        # Generate properly formatted scientific name unless sic is True.
+        # If sic is True but scientificName is empty, generate anyway.
         if not sic or not name["scientificName"]:
-            # Generate properly formatted scientific name
             if self.coldp.is_species_group(name):
                 (
                     name["scientificName"],
@@ -488,18 +557,7 @@ class NameBundle:
             if "genus" in values or "specificEpithet" in values:
                 values["authorship"] = "(" + name["authorship"] + ")"
 
-        for k in [
-            "basionymID",
-            "authorship",
-            "rank",
-            "uninomial",
-            "genus",
-            "infragenericEpithet",
-            "specificEpithet",
-            "infraspecificEpithet",
-            "code",
-            "status",
-        ]:
+        for k in required_properties["name"]:
             if k in name and k not in values:
                 values[k] = name[k]
         return self.normalise_name(values, sic)
@@ -576,7 +634,8 @@ class COLDP:
             "extinct": "false",
             "temporalRangeEnd": "Holocene",
         }
-        self.default_taxon_record = default_taxon_record
+        if default_taxon_record is not None:
+            self.default_taxon.update(default_taxon_record)
         self.code = code
         self.species_from_trinomials = insert_species_for_trinomials
         self.subspecies_from_trinomials = create_subspecies_for_infrasubspecifics
@@ -772,6 +831,12 @@ class COLDP:
         # Empty dataframe by default
         if df is None and default_headings is not None:
             df = pd.DataFrame(columns=default_headings)
+
+        # Ensure essential columns are present
+        if name in required_properties:
+            for column in required_properties[name]:
+                if column not in df.columns:
+                    df[column] = ""
 
         return df
 
@@ -1214,17 +1279,7 @@ class COLDP:
         author, title, issued, containerTitle, volume, issue, page and citation.
         """
 
-        for k in [
-            "ID",
-            "author",
-            "title",
-            "issued",
-            "containerTitle",
-            "volume",
-            "issue",
-            "page",
-            "citation",
-        ]:
+        for k in required_properties["reference"]:
             if k not in reference:
                 reference[k] = ""
 
@@ -1358,7 +1413,7 @@ class COLDP:
             ] = bundle.accepted["basionymID"]
 
         if (
-            "status" not in bundle.accepted
+            not bundle.accepted["status"]
             or bundle.accepted["status"] == "established"
             or self.create_taxa_for_not_established
         ):
@@ -1499,11 +1554,45 @@ class COLDP:
             )
             return None
 
+        dist = self.find_distribution(distribution)
+        if dist is not None:
+            logging.debug("Matched distribution")
+            return dist.to_dict()
+
         self.distributions = pd.concat(
             (self.distributions, pd.DataFrame.from_records([distribution])),
             ignore_index=True,
         )
         return distribution
+
+    def find_distribution(self, distribution: dict[str:str]) -> pd.DataFrame:
+        """
+        Locate existing COLDP distribution record exactly matching all major
+        fields in :py:paramref:`~coldp.COLDP.find_distribution.distribution`
+
+        :param distribution: Dictionary of COLDP distribution properties representing a record to be found
+        :return: DataFrame with one COLDP distribution record if found, else None
+
+        Only returns a record that exactly matches the values supplied in
+        :py:paramref:`~coldp.COLDP.find_distribution.distribution` for all of
+        taxonID, area, gazetteer, status, referenceID.
+        """
+
+        for k in required_properties["distribution"]:
+            if k not in distribution:
+                distribution[k] = ""
+
+        match = self.distributions[
+            (self.distributions["taxonID"] == distribution["taxonID"])
+            & (self.distributions["area"] == distribution["area"])
+            & (self.distributions["gazetteer"] == distribution["gazetteer"])
+            & (self.distributions["status"] == distribution["status"])
+            & (self.distributions["referenceID"] == distribution["referenceID"])
+        ]
+
+        if len(match) == 0:
+            return None
+        return match.iloc[0]
 
     def add_species_interaction(self, interaction: dict[str:str]) -> dict[str:str]:
         """
@@ -1737,7 +1826,7 @@ class COLDP:
                     + " "
                     + parentB["authorship"]
                 )
-            return match.to_dict("records")[0]
+            return match.to_dict()
         else:
             parent_rank = ""
             parent_name = ""
@@ -1987,7 +2076,7 @@ class COLDP:
         record = self.find_name(
             name["scientificName"], name["authorship"], name["rank"]
         )
-        return None if record is None else record.to_dict("records")
+        return None if record is None else record.to_dict()
 
     def get_name(self, id: str) -> pd.DataFrame:
         """

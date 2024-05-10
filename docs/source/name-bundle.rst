@@ -20,9 +20,3 @@ Index and search
 
 * :ref:`genindex`
 * :ref:`search`
-   
-   
-
-   
-   
-   

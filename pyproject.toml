@@ -32,6 +32,9 @@ Issues = "https://github.com/dhobern/py-coldp/issues"
 doc = [
     "sphinx", "sphinx-paramlinks"
 ]
+test = [
+    "pytest"
+]
 
 [tool.hatch.build.targets.wheel]
 packages = ["src/coldp"]
