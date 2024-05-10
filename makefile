@@ -13,7 +13,7 @@ package :
 
 build: doc package
 
-publish : reversion build
+publish : reversion clean build
 	py -m twine upload --repository pypi dist/*`cat VERSION`*.*
 
 clean :

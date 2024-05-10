@@ -39,6 +39,7 @@ Find or get records
 ^^^^^^^^^^^^^^^^^^^
 .. automethod:: coldp.COLDP.find_name_record
 .. automethod:: coldp.COLDP.find_names
+.. automethod:: coldp.COLDP.find_distribution
 .. automethod:: coldp.COLDP.get_name
 .. automethod:: coldp.COLDP.get_reference
 .. automethod:: coldp.COLDP.get_taxon

@@ -5,16 +5,16 @@
   <meta content="width=device-width, initial-scale=1.0" name="viewport"/>
   <meta content="width=device-width, initial-scale=1" name="viewport"/>
   <title>
-   COLDP 2024.5.2 documentation
+   COLDP 2024.5.3 documentation
   </title>
-  <link href="_static/pygments.css?v=649a27d8" rel="stylesheet" type="text/css"/>
+  <link href="_static/pygments.css" rel="stylesheet" type="text/css"/>
   <link href="_static/main.css?v=0eace31b" rel="stylesheet" type="text/css"/>
   <link href="_static/sphinx_paramlinks.css" rel="stylesheet" type="text/css"/>
-  <script src="_static/documentation_options.js?v=aa6a5cb5">
+  <script src="_static/documentation_options.js">
   </script>
-  <script src="_static/doctools.js?v=9a2dae69">
+  <script src="_static/doctools.js">
   </script>
-  <script src="_static/sphinx_highlight.js?v=dc90522c">
+  <script src="_static/sphinx_highlight.js">
   </script>
   <link href="genindex.html" rel="index" title="Index"/>
   <link href="search.html" rel="search" title="Search"/>
@@ -2307,6 +2307,93 @@ COLDP Name properties dictionary, or None if no match is found.
               </dl>
               <p>
                Returns all matching records as Pandas DataFrame or list of dictionaries. If no matches, None is returned.
+              </p>
+             </dd>
+            </dl>
+            <dl class="py method">
+             <dt class="sig sig-object py" id="coldp.COLDP.find_distribution">
+              <span class="sig-prename descclassname">
+               <span class="pre">
+                COLDP.
+               </span>
+              </span>
+              <span class="sig-name descname">
+               <span class="pre">
+                find_distribution
+               </span>
+              </span>
+              <span class="sig-paren">
+               (
+              </span>
+              <em class="sig-param">
+               <span class="n">
+                <span class="pre">
+                 distribution
+                </span>
+               </span>
+              </em>
+              <span class="sig-paren">
+               )
+              </span>
+              <a class="headerlink" href="#coldp.COLDP.find_distribution" title="Link to this definition">
+               &para;
+              </a>
+             </dt>
+             <dd>
+              <p>
+               Locate existing COLDP distribution record exactly matching all major
+fields in
+               <a class="reference internal" href="#coldp.COLDP.find_distribution.params.distribution" title="coldp.COLDP.find_distribution">
+                <code class="xref py py-paramref docutils literal notranslate">
+                 <span class="pre">
+                  distribution
+                 </span>
+                </code>
+               </a>
+              </p>
+              <dl class="field-list simple">
+               <dt class="field-odd">
+                Parameters
+                <span class="colon">
+                 :
+                </span>
+               </dt>
+               <dd class="field-odd">
+                <p>
+                 <span class="target" id="coldp.COLDP.find_distribution.params.distribution">
+                 </span>
+                 <strong>
+                  distribution
+                 </strong>
+                 <a class="paramlink headerlink reference internal" href="#coldp.COLDP.find_distribution.params.distribution">
+                  &para;
+                 </a>
+                 &ndash; Dictionary of COLDP distribution properties representing a record to be found
+                </p>
+               </dd>
+               <dt class="field-even">
+                Returns
+                <span class="colon">
+                 :
+                </span>
+               </dt>
+               <dd class="field-even">
+                <p>
+                 DataFrame with one COLDP distribution record if found, else None
+                </p>
+               </dd>
+              </dl>
+              <p>
+               Only returns a record that exactly matches the values supplied in
+               <a class="reference internal" href="#coldp.COLDP.find_distribution.params.distribution" title="coldp.COLDP.find_distribution">
+                <code class="xref py py-paramref docutils literal notranslate">
+                 <span class="pre">
+                  distribution
+                 </span>
+                </code>
+               </a>
+               for all of
+taxonID, area, gazetteer, status, referenceID.
               </p>
              </dd>
             </dl>
