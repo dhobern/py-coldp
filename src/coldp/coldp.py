@@ -361,6 +361,28 @@ required_properties = {
         "status",
         "referenceID",
     ],
+    "speciesinteraction": [
+        "taxonID",
+        "relatedTaxonID",
+        "relatedTaxonScientificName",
+        "type",
+        "referenceID",
+    ],
+    "typematerial": [
+        "nameID",
+        "citation",
+        "status",
+        "referenceID",
+        "locality",
+        "country",
+        "latitude",
+        "longitude",
+        "elevation",
+        "date",
+        "collector",
+        "institutionCode",
+        "sex",
+    ],
 }
 """
 Dictionary mapping table names to list of properties (columns) required by
@@ -1379,11 +1401,57 @@ class COLDP:
             self.issue("Type material must be associated with a valid name ID")
             return None
 
+        material = self.find_type_material(type_material)
+        if material is not None:
+            logging.debug("Matched typematerial")
+            return material.to_dict()
+
         self.type_materials = pd.concat(
             (self.type_materials, pd.DataFrame.from_records([type_material])),
             ignore_index=True,
         )
         return type_material
+
+    def find_type_material(self, type_material: dict[str:str]) -> pd.DataFrame:
+        """
+        Locate existing COLDP typematerial record exactly matching all major
+        fields in :py:paramref:`~coldp.COLDP.find_type_material.type_material`
+
+        :param type_material: Dictionary of COLDP typematerial properties representing a record to be found
+        :return: DataFrame with one COLDP typematerial record if found, else None
+
+        Only returns a record that exactly matches the values supplied in
+        :py:paramref:`~coldp.COLDP.find_type_material.type_material` for all of
+        nameID, citation, status, locality, country, latitude, longitude,
+        elevation, date, collector, institutionCode, sex and referenceID, .
+        """
+
+        for k in required_properties["typematerial"]:
+            if k not in type_material:
+                type_material[k] = ""
+
+        match = self.type_materials[
+            (self.type_materials["nameID"] == type_material["nameID"])
+            & (self.type_materials["citation"] == type_material["citation"])
+            & (self.type_materials["status"] == type_material["status"])
+            & (self.type_materials["locality"] == type_material["locality"])
+            & (self.type_materials["country"] == type_material["country"])
+            & (self.type_materials["latitude"] == type_material["latitude"])
+            & (self.type_materials["longitude"] == type_material["longitude"])
+            & (self.type_materials["elevation"] == type_material["elevation"])
+            & (self.type_materials["date"] == type_material["date"])
+            & (self.type_materials["collector"] == type_material["collector"])
+            & (
+                self.type_materials["institutionCode"]
+                == type_material["institutionCode"]
+            )
+            & (self.type_materials["sex"] == type_material["sex"])
+            & (self.type_materials["referenceID"] == type_material["referenceID"])
+        ]
+
+        if len(match) == 0:
+            return None
+        return match.iloc[0]
 
     def add_distribution(self, distribution: dict[str:str]) -> dict[str:str]:
         """
@@ -1475,11 +1543,52 @@ class COLDP:
             self.issue("Species interaction must be associated with a valid taxon ID")
             return None
 
+        si = self.find_species_interaction(interaction)
+        if si is not None:
+            logging.debug("Matched speciesinteraction")
+            return si.to_dict()
+
         self.species_interactions = pd.concat(
             (self.species_interactions, pd.DataFrame.from_records([interaction])),
             ignore_index=True,
         )
         return interaction
+
+    def find_species_interaction(self, interaction: dict[str:str]) -> pd.DataFrame:
+        """
+        Locate existing COLDP speciesinteraction record exactly matching all major
+        fields in :py:paramref:`~coldp.COLDP.find_species_interaction.interaction`
+
+        :param interaction: Dictionary of COLDP speciesinteraction properties representing a record to be found
+        :return: DataFrame with one COLDP speciesinteraction record if found, else None
+
+        Only returns a record that exactly matches the values supplied in
+        :py:paramref:`~coldp.COLDP.find_species_interaction.interaction` for all of
+        taxonID, relatedTaxonID, relatedTaxonScientificName, type, and
+        referenceID.
+        """
+
+        for k in required_properties["speciesinteraction"]:
+            if k not in interaction:
+                interaction[k] = ""
+
+        match = self.species_interactions[
+            (self.species_interactions["taxonID"] == interaction["taxonID"])
+            & (
+                self.species_interactions["relatedTaxonID"]
+                == interaction["relatedTaxonID"]
+            )
+            & (
+                self.species_interactions["relatedTaxonScientificName"]
+                == interaction["relatedTaxonScientificName"]
+            )
+            & (self.species_interactions["type"] == interaction["type"])
+            & (self.species_interactions["referenceID"] == interaction["referenceID"])
+        ]
+
+        if len(match) == 0:
+            return None
+        return match.iloc[0]
 
     def prepare_bundle(self, bundle):
         """

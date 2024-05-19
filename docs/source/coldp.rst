@@ -41,7 +41,10 @@ Find or get records
 .. automethod:: coldp.COLDP.find_name_record
 .. automethod:: coldp.COLDP.find_names
 .. automethod:: coldp.COLDP.find_name
+.. automethod:: coldp.COLDP.find_reference
 .. automethod:: coldp.COLDP.find_distribution
+.. automethod:: coldp.COLDP.find_species_interaction
+.. automethod:: coldp.COLDP.find_type_material
 .. automethod:: coldp.COLDP.get_name
 .. automethod:: coldp.COLDP.get_reference
 .. automethod:: coldp.COLDP.get_taxon
@@ -90,11 +93,8 @@ Internal methods
 .. automethod:: coldp.COLDP.insert_taxon
 .. automethod:: coldp.COLDP.insert_synonym
 
-.. automethod:: coldp.COLDP.find_reference
-
 .. automethod:: coldp.COLDP.fix_classification_recursive
 .. automethod:: coldp.COLDP.sort_taxa_recursive
-
 
 .. automethod:: coldp.COLDP.prepare_bundle
 .. automethod:: coldp.COLDP.validate_record

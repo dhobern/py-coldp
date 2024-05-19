@@ -5,7 +5,7 @@
   <meta content="width=device-width, initial-scale=1.0" name="viewport"/>
   <meta content="width=device-width, initial-scale=1" name="viewport"/>
   <title>
-   COLDP 2024.5.4 documentation
+   COLDP 2024.5.5 documentation
   </title>
   <link href="_static/pygments.css" rel="stylesheet" type="text/css"/>
   <link href="_static/main.css?v=0eace31b" rel="stylesheet" type="text/css"/>
@@ -2588,6 +2588,93 @@ name based only on scientificName and rank.
              </dd>
             </dl>
             <dl class="py method">
+             <dt class="sig sig-object py" id="coldp.COLDP.find_reference">
+              <span class="sig-prename descclassname">
+               <span class="pre">
+                COLDP.
+               </span>
+              </span>
+              <span class="sig-name descname">
+               <span class="pre">
+                find_reference
+               </span>
+              </span>
+              <span class="sig-paren">
+               (
+              </span>
+              <em class="sig-param">
+               <span class="n">
+                <span class="pre">
+                 reference
+                </span>
+               </span>
+              </em>
+              <span class="sig-paren">
+               )
+              </span>
+              <a class="headerlink" href="#coldp.COLDP.find_reference" title="Link to this definition">
+               &para;
+              </a>
+             </dt>
+             <dd>
+              <p>
+               Locate existing COLDP reference record exactly matching all major
+fields in
+               <a class="reference internal" href="#coldp.COLDP.find_reference.params.reference" title="coldp.COLDP.find_reference">
+                <code class="xref py py-paramref docutils literal notranslate">
+                 <span class="pre">
+                  reference
+                 </span>
+                </code>
+               </a>
+              </p>
+              <dl class="field-list simple">
+               <dt class="field-odd">
+                Parameters
+                <span class="colon">
+                 :
+                </span>
+               </dt>
+               <dd class="field-odd">
+                <p>
+                 <span class="target" id="coldp.COLDP.find_reference.params.reference">
+                 </span>
+                 <strong>
+                  reference
+                 </strong>
+                 <a class="paramlink headerlink reference internal" href="#coldp.COLDP.find_reference.params.reference">
+                  &para;
+                 </a>
+                 &ndash; Dictionary of COLDP reference properties representing a record to be found
+                </p>
+               </dd>
+               <dt class="field-even">
+                Returns
+                <span class="colon">
+                 :
+                </span>
+               </dt>
+               <dd class="field-even">
+                <p>
+                 DataFrame with one COLDP reference record if found, else None
+                </p>
+               </dd>
+              </dl>
+              <p>
+               Only returns a record that exactly matches the values supplied in
+               <a class="reference internal" href="#coldp.COLDP.find_reference.params.reference" title="coldp.COLDP.find_reference">
+                <code class="xref py py-paramref docutils literal notranslate">
+                 <span class="pre">
+                  reference
+                 </span>
+                </code>
+               </a>
+               for all of
+author, title, issued, containerTitle, volume, issue, page and citation.
+              </p>
+             </dd>
+            </dl>
+            <dl class="py method">
              <dt class="sig sig-object py" id="coldp.COLDP.find_distribution">
               <span class="sig-prename descclassname">
                <span class="pre">
@@ -2671,6 +2758,182 @@ fields in
                </a>
                for all of
 taxonID, area, gazetteer, status, referenceID.
+              </p>
+             </dd>
+            </dl>
+            <dl class="py method">
+             <dt class="sig sig-object py" id="coldp.COLDP.find_species_interaction">
+              <span class="sig-prename descclassname">
+               <span class="pre">
+                COLDP.
+               </span>
+              </span>
+              <span class="sig-name descname">
+               <span class="pre">
+                find_species_interaction
+               </span>
+              </span>
+              <span class="sig-paren">
+               (
+              </span>
+              <em class="sig-param">
+               <span class="n">
+                <span class="pre">
+                 interaction
+                </span>
+               </span>
+              </em>
+              <span class="sig-paren">
+               )
+              </span>
+              <a class="headerlink" href="#coldp.COLDP.find_species_interaction" title="Link to this definition">
+               &para;
+              </a>
+             </dt>
+             <dd>
+              <p>
+               Locate existing COLDP speciesinteraction record exactly matching all major
+fields in
+               <a class="reference internal" href="#coldp.COLDP.find_species_interaction.params.interaction" title="coldp.COLDP.find_species_interaction">
+                <code class="xref py py-paramref docutils literal notranslate">
+                 <span class="pre">
+                  interaction
+                 </span>
+                </code>
+               </a>
+              </p>
+              <dl class="field-list simple">
+               <dt class="field-odd">
+                Parameters
+                <span class="colon">
+                 :
+                </span>
+               </dt>
+               <dd class="field-odd">
+                <p>
+                 <span class="target" id="coldp.COLDP.find_species_interaction.params.interaction">
+                 </span>
+                 <strong>
+                  interaction
+                 </strong>
+                 <a class="paramlink headerlink reference internal" href="#coldp.COLDP.find_species_interaction.params.interaction">
+                  &para;
+                 </a>
+                 &ndash; Dictionary of COLDP speciesinteraction properties representing a record to be found
+                </p>
+               </dd>
+               <dt class="field-even">
+                Returns
+                <span class="colon">
+                 :
+                </span>
+               </dt>
+               <dd class="field-even">
+                <p>
+                 DataFrame with one COLDP speciesinteraction record if found, else None
+                </p>
+               </dd>
+              </dl>
+              <p>
+               Only returns a record that exactly matches the values supplied in
+               <a class="reference internal" href="#coldp.COLDP.find_species_interaction.params.interaction" title="coldp.COLDP.find_species_interaction">
+                <code class="xref py py-paramref docutils literal notranslate">
+                 <span class="pre">
+                  interaction
+                 </span>
+                </code>
+               </a>
+               for all of
+taxonID, relatedTaxonID, relatedTaxonScientificName, type, and
+referenceID.
+              </p>
+             </dd>
+            </dl>
+            <dl class="py method">
+             <dt class="sig sig-object py" id="coldp.COLDP.find_type_material">
+              <span class="sig-prename descclassname">
+               <span class="pre">
+                COLDP.
+               </span>
+              </span>
+              <span class="sig-name descname">
+               <span class="pre">
+                find_type_material
+               </span>
+              </span>
+              <span class="sig-paren">
+               (
+              </span>
+              <em class="sig-param">
+               <span class="n">
+                <span class="pre">
+                 type_material
+                </span>
+               </span>
+              </em>
+              <span class="sig-paren">
+               )
+              </span>
+              <a class="headerlink" href="#coldp.COLDP.find_type_material" title="Link to this definition">
+               &para;
+              </a>
+             </dt>
+             <dd>
+              <p>
+               Locate existing COLDP typematerial record exactly matching all major
+fields in
+               <a class="reference internal" href="#coldp.COLDP.find_type_material.params.type_material" title="coldp.COLDP.find_type_material">
+                <code class="xref py py-paramref docutils literal notranslate">
+                 <span class="pre">
+                  type_material
+                 </span>
+                </code>
+               </a>
+              </p>
+              <dl class="field-list simple">
+               <dt class="field-odd">
+                Parameters
+                <span class="colon">
+                 :
+                </span>
+               </dt>
+               <dd class="field-odd">
+                <p>
+                 <span class="target" id="coldp.COLDP.find_type_material.params.type_material">
+                 </span>
+                 <strong>
+                  type_material
+                 </strong>
+                 <a class="paramlink headerlink reference internal" href="#coldp.COLDP.find_type_material.params.type_material">
+                  &para;
+                 </a>
+                 &ndash; Dictionary of COLDP typematerial properties representing a record to be found
+                </p>
+               </dd>
+               <dt class="field-even">
+                Returns
+                <span class="colon">
+                 :
+                </span>
+               </dt>
+               <dd class="field-even">
+                <p>
+                 DataFrame with one COLDP typematerial record if found, else None
+                </p>
+               </dd>
+              </dl>
+              <p>
+               Only returns a record that exactly matches the values supplied in
+               <a class="reference internal" href="#coldp.COLDP.find_type_material.params.type_material" title="coldp.COLDP.find_type_material">
+                <code class="xref py py-paramref docutils literal notranslate">
+                 <span class="pre">
+                  type_material
+                 </span>
+                </code>
+               </a>
+               for all of
+nameID, citation, status, locality, country, latitude, longitude,
+elevation, date, collector, institutionCode, sex and referenceID, .
               </p>
              </dd>
             </dl>
@@ -4679,93 +4942,6 @@ a new record is created and returned. Default values are taken from the
              </dl>
              <p>
               Ensures that a synonym record exists in the COLDP instance for the given taxon and name.
-             </p>
-            </dd>
-           </dl>
-           <dl class="py method">
-            <dt class="sig sig-object py" id="coldp.COLDP.find_reference">
-             <span class="sig-prename descclassname">
-              <span class="pre">
-               COLDP.
-              </span>
-             </span>
-             <span class="sig-name descname">
-              <span class="pre">
-               find_reference
-              </span>
-             </span>
-             <span class="sig-paren">
-              (
-             </span>
-             <em class="sig-param">
-              <span class="n">
-               <span class="pre">
-                reference
-               </span>
-              </span>
-             </em>
-             <span class="sig-paren">
-              )
-             </span>
-             <a class="headerlink" href="#coldp.COLDP.find_reference" title="Link to this definition">
-              &para;
-             </a>
-            </dt>
-            <dd>
-             <p>
-              Locate existing COLDP reference record exactly matching all major
-fields in
-              <a class="reference internal" href="#coldp.COLDP.find_reference.params.reference" title="coldp.COLDP.find_reference">
-               <code class="xref py py-paramref docutils literal notranslate">
-                <span class="pre">
-                 reference
-                </span>
-               </code>
-              </a>
-             </p>
-             <dl class="field-list simple">
-              <dt class="field-odd">
-               Parameters
-               <span class="colon">
-                :
-               </span>
-              </dt>
-              <dd class="field-odd">
-               <p>
-                <span class="target" id="coldp.COLDP.find_reference.params.reference">
-                </span>
-                <strong>
-                 reference
-                </strong>
-                <a class="paramlink headerlink reference internal" href="#coldp.COLDP.find_reference.params.reference">
-                 &para;
-                </a>
-                &ndash; Dictionary of COLDP reference properties representing a record to be found
-               </p>
-              </dd>
-              <dt class="field-even">
-               Returns
-               <span class="colon">
-                :
-               </span>
-              </dt>
-              <dd class="field-even">
-               <p>
-                DataFrame with one COLDP reference record if found, else None
-               </p>
-              </dd>
-             </dl>
-             <p>
-              Only returns a record that exactly matches the values supplied in
-              <a class="reference internal" href="#coldp.COLDP.find_reference.params.reference" title="coldp.COLDP.find_reference">
-               <code class="xref py py-paramref docutils literal notranslate">
-                <span class="pre">
-                 reference
-                </span>
-               </code>
-              </a>
-              for all of
-author, title, issued, containerTitle, volume, issue, page and citation.
              </p>
             </dd>
            </dl>
