@@ -5,11 +5,11 @@
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="viewport" content="width=device-width, initial-scale=1" />
 
-    <title>coldp.COLDP &#8212; COLDP 2024.5.3 documentation</title>
+    <title>coldp.COLDP &#8212; COLDP 2024.5.4 documentation</title>
     <link rel="stylesheet" type="text/css" href="_static/pygments.css?v=d1102ebc" />
     <link rel="stylesheet" type="text/css" href="_static/alabaster.css?v=12dfc556" />
     <link rel="stylesheet" type="text/css" href="_static/sphinx_paramlinks.css" />
-    <script src="_static/documentation_options.js?v=b35b4dcd"></script>
+    <script src="_static/documentation_options.js?v=78d2dd00"></script>
     <script src="_static/doctools.js?v=9a2dae69"></script>
     <script src="_static/sphinx_highlight.js?v=dc90522c"></script>
     <link rel="index" title="Index" href="genindex.html" />
@@ -61,7 +61,7 @@ of Life Data Package.</p>
 </ul>
 </dd>
 </dl>
-<p>A COLDP object is initalised with a source/destination folder, COLDP package
+<p>A COLDP object is initialised with a source/destination folder, COLDP package
 name and other options.</p>
 <p>If a subfolder exists with the supplied name in the supplied folder, it
 will be initialised with data from any CSV/TSV files it contains with any
@@ -214,7 +214,7 @@ is created without a parent, i.e. becomes a root node in the classification.</p>
 </dl>
 <p>Find existing ID values for each supplied reference, based on identity
 of: author, title, issued, containerTitle, volume, issue, page and citation. Add
-ID to the appropriate reference dictionary in references. If none
+ID from the appropriate reference dictionary in references. If none
 found, set ID to next unused index and add to references.</p>
 <p>The list is returned updated with current ID values so these can be used for referenceID values in other classes.</p>
 </dd></dl>
@@ -361,6 +361,25 @@ Any numpy NAN elements are replaced with an empty string.</p>
 <section id="find-or-get-records">
 <h3>Find or get records<a class="headerlink" href="#find-or-get-records" title="Link to this heading">¶</a></h3>
 <dl class="py method">
+<dt class="sig sig-object py" id="coldp.COLDP.find_taxon">
+<span class="sig-prename descclassname"><span class="pre">COLDP.</span></span><span class="sig-name descname"><span class="pre">find_taxon</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">scientificName</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">authorship</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">rank</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#coldp.COLDP.find_taxon" title="Link to this definition">¶</a></dt>
+<dd><p>Get COLDP Taxon record (as Pandas dataframe) with accepted name matching supplied scientificName, authorship and rank values</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><span class="target" id="coldp.COLDP.find_taxon.params.scientificName"></span><strong>scientificName</strong><a class="paramlink headerlink reference internal" href="#coldp.COLDP.find_taxon.params.scientificName">¶</a> – Scientific name in canonical format</p></li>
+<li><p><span class="target" id="coldp.COLDP.find_taxon.params.authorship"></span><strong>authorship</strong><a class="paramlink headerlink reference internal" href="#coldp.COLDP.find_taxon.params.authorship">¶</a> – Authorship string</p></li>
+<li><p><span class="target" id="coldp.COLDP.find_taxon.params.rank"></span><strong>rank</strong><a class="paramlink headerlink reference internal" href="#coldp.COLDP.find_taxon.params.rank">¶</a> – Rank name string</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>COLDP Taxon record matching supplied parameters</p>
+</dd>
+</dl>
+<p>Logs a warning issue if multiple taxon records exist for a matching name and returns the first such match. Returns None if no match.</p>
+</dd></dl>
+
+<dl class="py method">
 <dt class="sig sig-object py" id="coldp.COLDP.find_name_record">
 <span class="sig-prename descclassname"><span class="pre">COLDP.</span></span><span class="sig-name descname"><span class="pre">find_name_record</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">name</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#coldp.COLDP.find_name_record" title="Link to this definition">¶</a></dt>
 <dd><p>Return record from names DataFrame matching key fields (scientificName,
@@ -394,6 +413,30 @@ COLDP Name properties dictionary, or None if no match is found.</p>
 </dd>
 </dl>
 <p>Returns all matching records as Pandas DataFrame or list of dictionaries. If no matches, None is returned.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="coldp.COLDP.find_name">
+<span class="sig-prename descclassname"><span class="pre">COLDP.</span></span><span class="sig-name descname"><span class="pre">find_name</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">scientificName</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">authorship</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">rank</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#coldp.COLDP.find_name" title="Link to this definition">¶</a></dt>
+<dd><p>Return record from names DataFrame matching supplied scientificName,
+authorship and rank</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><span class="target" id="coldp.COLDP.find_name.params.scientificName"></span><strong>scientificName</strong><a class="paramlink headerlink reference internal" href="#coldp.COLDP.find_name.params.scientificName">¶</a> – Scientific name in canonical format</p></li>
+<li><p><span class="target" id="coldp.COLDP.find_name.params.authorship"></span><strong>authorship</strong><a class="paramlink headerlink reference internal" href="#coldp.COLDP.find_name.params.authorship">¶</a> – Authorship string</p></li>
+<li><p><span class="target" id="coldp.COLDP.find_name.params.rank"></span><strong>rank</strong><a class="paramlink headerlink reference internal" href="#coldp.COLDP.find_name.params.rank">¶</a> – Rank name string</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>Dictionary containing matching record if found</p>
+</dd>
+</dl>
+<p>Locates any existing record in the names DataFrame that matches the
+supplied scientificName, authorship and rank and returns it as a
+COLDP Name properties dictionary, or None if no match is found.</p>
+<p>If <a class="reference internal" href="#coldp.COLDP.find_name.params.authorship" title="coldp.COLDP.find_name"><code class="xref py py-paramref docutils literal notranslate"><span class="pre">authorship</span></code></a> is None, returns a
+name based only on scientificName and rank.</p>
 </dd></dl>
 
 <dl class="py method">
@@ -624,6 +667,38 @@ dictionary.</p>
 Synonyms follow, one to a row at the same indent level but preceded by a
 space and an asterisk. Then each child follows, indented two more spaces per level,
 with its own synonyms and children following.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="coldp.COLDP.get_available_column_headings">
+<span class="sig-prename descclassname"><span class="pre">COLDP.</span></span><span class="sig-name descname"><span class="pre">get_available_column_headings</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#coldp.COLDP.get_available_column_headings" title="Link to this definition">¶</a></dt>
+<dd><p>Return dictionary mapping table names to lists of supported columns</p>
+<dl class="field-list simple">
+<dt class="field-odd">Returns<span class="colon">:</span></dt>
+<dd class="field-odd"><p>Dictionary containing copies of internal heading lists</p>
+</dd>
+</dl>
+<p>Returns copies to avoid corrupting the lists used in this class</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="coldp.COLDP.get_identifier_policy">
+<span class="sig-prename descclassname"><span class="pre">COLDP.</span></span><span class="sig-name descname"><span class="pre">get_identifier_policy</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">table_name</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">default_prefix</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">required</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">True</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">volatile</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#coldp.COLDP.get_identifier_policy" title="Link to this definition">¶</a></dt>
+<dd><p>Find or create <code class="xref py py-class docutils literal notranslate"><span class="pre">IdentifierPolicy</span></code> associated with named table</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><span class="target" id="coldp.COLDP.get_identifier_policy.params.table_name"></span><strong>table_name</strong><a class="paramlink headerlink reference internal" href="#coldp.COLDP.get_identifier_policy.params.table_name">¶</a> – Name of COLDP dataframe for which policy is required</p></li>
+<li><p><span class="target" id="coldp.COLDP.get_identifier_policy.params.default_prefix"></span><strong>default_prefix</strong><a class="paramlink headerlink reference internal" href="#coldp.COLDP.get_identifier_policy.params.default_prefix">¶</a> – String prefix to use before numeric ID values if existing ID values are not consistently positive integer values</p></li>
+<li><p><span class="target" id="coldp.COLDP.get_identifier_policy.params.required"></span><strong>required</strong><a class="paramlink headerlink reference internal" href="#coldp.COLDP.get_identifier_policy.params.required">¶</a> – Flag to indicate whether the table must have ID values - if False, the <code class="xref py py-class docutils literal notranslate"><span class="pre">IdentifierPolicy</span></code> will return None unless <a class="reference internal" href="identifier-policy.html#coldp.IdentifierPolicy.__init__.params.existing" title="coldp.IdentifierPolicy.__init__"><code class="xref py py-paramref docutils literal notranslate"><span class="pre">existing</span></code></a> already contains ID values</p></li>
+<li><p><span class="target" id="coldp.COLDP.get_identifier_policy.params.volatile"></span><strong>volatile</strong><a class="paramlink headerlink reference internal" href="#coldp.COLDP.get_identifier_policy.params.volatile">¶</a> – Flag to indicate if external code may modify ID values while the current COLDP instance is active - if False, the policy and future values will be determined on initialisation, otherwise the policy will be reviewed for each new ID value</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p><code class="xref py py-class docutils literal notranslate"><span class="pre">IdentifierPolicy</span></code> object or None if no policy is required for the table</p>
+</dd>
+</dl>
+<p>Creates new <code class="xref py py-class docutils literal notranslate"><span class="pre">IdentifierPolicy</span></code> instance if this is the first invocation for the given table. Policies take into account any existing ID values for the table.</p>
 </dd></dl>
 
 </section>
@@ -981,49 +1056,6 @@ value and return the record with the ID.</p>
 </dd></dl>
 
 <dl class="py method">
-<dt class="sig sig-object py" id="coldp.COLDP.find_name">
-<span class="sig-prename descclassname"><span class="pre">COLDP.</span></span><span class="sig-name descname"><span class="pre">find_name</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">scientificName</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">authorship</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">rank</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#coldp.COLDP.find_name" title="Link to this definition">¶</a></dt>
-<dd><p>Return record from names DataFrame matching supplied scientificName,
-authorship and rank</p>
-<dl class="field-list simple">
-<dt class="field-odd">Parameters<span class="colon">:</span></dt>
-<dd class="field-odd"><ul class="simple">
-<li><p><span class="target" id="coldp.COLDP.find_name.params.scientificName"></span><strong>scientificName</strong><a class="paramlink headerlink reference internal" href="#coldp.COLDP.find_name.params.scientificName">¶</a> – Scientific name in canonical format</p></li>
-<li><p><span class="target" id="coldp.COLDP.find_name.params.authorship"></span><strong>authorship</strong><a class="paramlink headerlink reference internal" href="#coldp.COLDP.find_name.params.authorship">¶</a> – Authorship string</p></li>
-<li><p><span class="target" id="coldp.COLDP.find_name.params.rank"></span><strong>rank</strong><a class="paramlink headerlink reference internal" href="#coldp.COLDP.find_name.params.rank">¶</a> – Rank name string</p></li>
-</ul>
-</dd>
-<dt class="field-even">Returns<span class="colon">:</span></dt>
-<dd class="field-even"><p>Dictionary containing matching record if found</p>
-</dd>
-</dl>
-<p>Locates any existing record in the names DataFrame that matches the
-supplied scientificName, authorship and rank and returns it as a
-COLDP Name properties dictionary, or None if no match is found.</p>
-<p>If <a class="reference internal" href="#coldp.COLDP.find_name.params.authorship" title="coldp.COLDP.find_name"><code class="xref py py-paramref docutils literal notranslate"><span class="pre">authorship</span></code></a> is None, returns a
-name based only on scientificName and rank.</p>
-</dd></dl>
-
-<dl class="py method">
-<dt class="sig sig-object py" id="coldp.COLDP.find_taxon">
-<span class="sig-prename descclassname"><span class="pre">COLDP.</span></span><span class="sig-name descname"><span class="pre">find_taxon</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">scientificName</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">authorship</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">rank</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#coldp.COLDP.find_taxon" title="Link to this definition">¶</a></dt>
-<dd><p>Get COLDP Taxon record (as Pandas dataframe) with accepted name matching supplied scientificName, authorship and rank values</p>
-<dl class="field-list simple">
-<dt class="field-odd">Parameters<span class="colon">:</span></dt>
-<dd class="field-odd"><ul class="simple">
-<li><p><span class="target" id="coldp.COLDP.find_taxon.params.scientificName"></span><strong>scientificName</strong><a class="paramlink headerlink reference internal" href="#coldp.COLDP.find_taxon.params.scientificName">¶</a> – Scientific name in canonical format</p></li>
-<li><p><span class="target" id="coldp.COLDP.find_taxon.params.authorship"></span><strong>authorship</strong><a class="paramlink headerlink reference internal" href="#coldp.COLDP.find_taxon.params.authorship">¶</a> – Authorship string</p></li>
-<li><p><span class="target" id="coldp.COLDP.find_taxon.params.rank"></span><strong>rank</strong><a class="paramlink headerlink reference internal" href="#coldp.COLDP.find_taxon.params.rank">¶</a> – Rank name string</p></li>
-</ul>
-</dd>
-<dt class="field-even">Returns<span class="colon">:</span></dt>
-<dd class="field-even"><p>COLDP Taxon record matching supplied parameters</p>
-</dd>
-</dl>
-<p>Logs a warning issue if multiple taxon records exist for a matching name and returns the first such match. Returns None if no match.</p>
-</dd></dl>
-
-<dl class="py method">
 <dt class="sig sig-object py" id="coldp.COLDP.construct_species_rank_name">
 <span class="sig-prename descclassname"><span class="pre">COLDP.</span></span><span class="sig-name descname"><span class="pre">construct_species_rank_name</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">g</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">sg</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">s</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">ss</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">marker</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#coldp.COLDP.construct_species_rank_name" title="Link to this definition">¶</a></dt>
 <dd><p>Consistently construct a species or infraspecific name from the included epithets and optional rank marker</p>
@@ -1156,6 +1188,7 @@ are also output as an error via logging.</p>
 </ul>
 </li>
 <li class="toctree-l1"><a class="reference internal" href="name-bundle.html">coldp.NameBundle</a></li>
+<li class="toctree-l1"><a class="reference internal" href="identifier-policy.html">coldp.IdentifierPolicy</a></li>
 </ul>
 <ul>
 <li class="toctree-l1"><a class="reference internal" href="usage.html">Usage</a></li>

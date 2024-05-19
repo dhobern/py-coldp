@@ -37,8 +37,10 @@ Save
 
 Find or get records
 ^^^^^^^^^^^^^^^^^^^
+.. automethod:: coldp.COLDP.find_taxon
 .. automethod:: coldp.COLDP.find_name_record
 .. automethod:: coldp.COLDP.find_names
+.. automethod:: coldp.COLDP.find_name
 .. automethod:: coldp.COLDP.find_distribution
 .. automethod:: coldp.COLDP.get_name
 .. automethod:: coldp.COLDP.get_reference
@@ -58,6 +60,8 @@ Tidy package
 Utilities
 ^^^^^^^^^
 .. automethod:: coldp.COLDP.get_text_tree
+.. automethod:: coldp.COLDP.get_available_column_headings
+.. automethod:: coldp.COLDP.get_identifier_policy
 
 Access to DataFrames
 ^^^^^^^^^^^^^^^^^^^^
@@ -101,8 +105,6 @@ Internal methods
 .. automethod:: coldp.COLDP.epithet_and_authorship_match
 .. automethod:: coldp.COLDP.set_basionymid
 .. automethod:: coldp.COLDP.fix_basionymid
-.. automethod:: coldp.COLDP.find_name
-.. automethod:: coldp.COLDP.find_taxon
 .. automethod:: coldp.COLDP.construct_species_rank_name
 .. automethod:: coldp.COLDP.construct_authorship
 .. automethod:: coldp.COLDP.is_species_group

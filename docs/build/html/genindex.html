@@ -4,11 +4,11 @@
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Index &#8212; COLDP 2024.5.3 documentation</title>
+    <title>Index &#8212; COLDP 2024.5.4 documentation</title>
     <link rel="stylesheet" type="text/css" href="_static/pygments.css?v=d1102ebc" />
     <link rel="stylesheet" type="text/css" href="_static/alabaster.css?v=12dfc556" />
     <link rel="stylesheet" type="text/css" href="_static/sphinx_paramlinks.css" />
-    <script src="_static/documentation_options.js?v=b35b4dcd"></script>
+    <script src="_static/documentation_options.js?v=78d2dd00"></script>
     <script src="_static/doctools.js?v=9a2dae69"></script>
     <script src="_static/sphinx_highlight.js?v=dc90522c"></script>
     <link rel="index" title="Index" href="#" />
@@ -61,6 +61,8 @@
       <li><a href="coldp.html#coldp.COLDP.__init__">__init__() (coldp.COLDP method)</a>
 
       <ul>
+        <li><a href="identifier-policy.html#coldp.IdentifierPolicy.__init__">(coldp.IdentifierPolicy method)</a>
+</li>
         <li><a href="name-bundle.html#coldp.NameBundle.__init__">(coldp.NameBundle method)</a>
 </li>
       </ul></li>
@@ -174,16 +176,22 @@
   <td style="width: 33%; vertical-align: top;"><ul>
       <li><a href="coldp.html#coldp.COLDP.initialise_dataframe.params.default_headings">default_headings (coldp.COLDP.initialise_dataframe parameter)</a>
 </li>
+      <li><a href="coldp.html#coldp.COLDP.get_identifier_policy.params.default_prefix">default_prefix (coldp.COLDP.get_identifier_policy parameter)</a>
+
+      <ul>
+        <li><a href="identifier-policy.html#coldp.IdentifierPolicy.params.default_prefix">(coldp.IdentifierPolicy parameter)</a>
+</li>
+      </ul></li>
       <li><a href="coldp.html#coldp.COLDP.params.default_taxon_record">default_taxon_record (coldp.COLDP parameter)</a>
 
       <ul>
         <li><a href="coldp.html#coldp.COLDP.set_default_taxon_record.params.default_taxon_record">(coldp.COLDP.set_default_taxon_record parameter)</a>
 </li>
       </ul></li>
-      <li><a href="name-bundle.html#coldp.NameBundle.derive_name">derive_name() (coldp.NameBundle method)</a>
-</li>
   </ul></td>
   <td style="width: 33%; vertical-align: top;"><ul>
+      <li><a href="name-bundle.html#coldp.NameBundle.derive_name">derive_name() (coldp.NameBundle method)</a>
+</li>
       <li><a href="coldp.html#coldp.COLDP.save.params.destination">destination (coldp.COLDP.save parameter)</a>
 </li>
       <li><a href="coldp.html#coldp.COLDP.extract_table.params.df">df (coldp.COLDP.extract_table parameter)</a>
@@ -210,10 +218,18 @@
         <li><a href="coldp.html#coldp.COLDP.remove_gender.params.epithet">(coldp.COLDP.remove_gender parameter)</a>
 </li>
       </ul></li>
-  </ul></td>
-  <td style="width: 33%; vertical-align: top;"><ul>
       <li><a href="coldp.html#coldp.COLDP.epithet_and_authorship_match">epithet_and_authorship_match() (coldp.COLDP method)</a>
 </li>
+  </ul></td>
+  <td style="width: 33%; vertical-align: top;"><ul>
+      <li><a href="identifier-policy.html#coldp.IdentifierPolicy.params.existing">existing (coldp.IdentifierPolicy parameter)</a>
+
+      <ul>
+        <li><a href="identifier-policy.html#coldp.IdentifierPolicy.initialise.params.existing">(coldp.IdentifierPolicy.initialise parameter)</a>
+</li>
+        <li><a href="identifier-policy.html#coldp.IdentifierPolicy.next.params.existing">(coldp.IdentifierPolicy.next parameter)</a>
+</li>
+      </ul></li>
       <li><a href="coldp.html#coldp.COLDP.extract_table">extract_table() (coldp.COLDP method)</a>
 </li>
   </ul></td>
@@ -256,14 +272,18 @@
   <td style="width: 33%; vertical-align: top;"><ul>
       <li><a href="coldp.html#coldp.COLDP.construct_species_rank_name.params.g">g (coldp.COLDP.construct_species_rank_name parameter)</a>
 </li>
+      <li><a href="coldp.html#coldp.COLDP.get_available_column_headings">get_available_column_headings() (coldp.COLDP method)</a>
+</li>
       <li><a href="coldp.html#coldp.COLDP.get_children">get_children() (coldp.COLDP method)</a>
+</li>
+      <li><a href="coldp.html#coldp.COLDP.get_identifier_policy">get_identifier_policy() (coldp.COLDP method)</a>
 </li>
       <li><a href="coldp.html#coldp.COLDP.get_name">get_name() (coldp.COLDP method)</a>
 </li>
-      <li><a href="coldp.html#coldp.COLDP.get_original_authorship">get_original_authorship() (coldp.COLDP method)</a>
-</li>
   </ul></td>
   <td style="width: 33%; vertical-align: top;"><ul>
+      <li><a href="coldp.html#coldp.COLDP.get_original_authorship">get_original_authorship() (coldp.COLDP method)</a>
+</li>
       <li><a href="coldp.html#coldp.COLDP.get_reference">get_reference() (coldp.COLDP method)</a>
 </li>
       <li><a href="coldp.html#coldp.COLDP.get_synonyms">get_synonyms() (coldp.COLDP method)</a>
@@ -312,9 +332,11 @@
       </ul></li>
       <li><a href="coldp.html#coldp.COLDP.get_text_tree.params.indent">indent (coldp.COLDP.get_text_tree parameter)</a>
 </li>
+      <li><a href="coldp.html#coldp.COLDP.get_text_tree.params.initial_prefix">initial_prefix (coldp.COLDP.get_text_tree parameter)</a>
+</li>
   </ul></td>
   <td style="width: 33%; vertical-align: top;"><ul>
-      <li><a href="coldp.html#coldp.COLDP.get_text_tree.params.initial_prefix">initial_prefix (coldp.COLDP.get_text_tree parameter)</a>
+      <li><a href="identifier-policy.html#coldp.IdentifierPolicy.initialise">initialise() (coldp.IdentifierPolicy method)</a>
 </li>
       <li><a href="coldp.html#coldp.COLDP.initialise_dataframe">initialise_dataframe() (coldp.COLDP method)</a>
 </li>
@@ -402,6 +424,8 @@
 </li>
       <li><a href="coldp.html#coldp.COLDP.fix_basionyms.params.names">names (coldp.COLDP.fix_basionyms parameter)</a>
 </li>
+      <li><a href="identifier-policy.html#coldp.IdentifierPolicy.next">next() (coldp.IdentifierPolicy method)</a>
+</li>
       <li><a href="name-bundle.html#coldp.NameBundle.normalise_name">normalise_name() (coldp.NameBundle method)</a>
 </li>
   </ul></td>
@@ -456,16 +480,22 @@
 </li>
       <li><a href="coldp.html#coldp.COLDP.validate_record.params.record">record (coldp.COLDP.validate_record parameter)</a>
 </li>
-  </ul></td>
-  <td style="width: 33%; vertical-align: top;"><ul>
       <li><a href="coldp.html#coldp.COLDP.validate_record.params.record_type">record_type (coldp.COLDP.validate_record parameter)</a>
 </li>
+  </ul></td>
+  <td style="width: 33%; vertical-align: top;"><ul>
       <li><a href="coldp.html#coldp.COLDP.find_reference.params.reference">reference (coldp.COLDP.find_reference parameter)</a>
 </li>
       <li><a href="coldp.html#coldp.COLDP.add_references.params.reference_list">reference_list (coldp.COLDP.add_references parameter)</a>
 </li>
       <li><a href="coldp.html#coldp.COLDP.remove_gender">remove_gender() (coldp.COLDP method)</a>
 </li>
+      <li><a href="coldp.html#coldp.COLDP.get_identifier_policy.params.required">required (coldp.COLDP.get_identifier_policy parameter)</a>
+
+      <ul>
+        <li><a href="identifier-policy.html#coldp.IdentifierPolicy.params.required">(coldp.IdentifierPolicy parameter)</a>
+</li>
+      </ul></li>
       <li><a href="coldp.html#coldp.COLDP.reset_ids">reset_ids() (coldp.COLDP method)</a>
 </li>
   </ul></td>
@@ -542,6 +572,8 @@
   <td style="width: 33%; vertical-align: top;"><ul>
       <li><a href="coldp.html#coldp.COLDP.table_by_name">table_by_name() (coldp.COLDP method)</a>
 </li>
+      <li><a href="coldp.html#coldp.COLDP.get_identifier_policy.params.table_name">table_name (coldp.COLDP.get_identifier_policy parameter)</a>
+</li>
       <li><a href="coldp.html#coldp.COLDP.fix_classification_recursive.params.taxa">taxa (coldp.COLDP.fix_classification_recursive parameter)</a>
 </li>
       <li><a href="coldp.html#coldp.taxon_from_nameusage">taxon_from_nameusage (in module coldp)</a>
@@ -586,10 +618,16 @@
   <td style="width: 33%; vertical-align: top;"><ul>
       <li><a href="coldp.html#coldp.COLDP.validate_record">validate_record() (coldp.COLDP method)</a>
 </li>
-  </ul></td>
-  <td style="width: 33%; vertical-align: top;"><ul>
       <li><a href="name-bundle.html#coldp.NameBundle.derive_name.params.values">values (coldp.NameBundle.derive_name parameter)</a>
 </li>
+  </ul></td>
+  <td style="width: 33%; vertical-align: top;"><ul>
+      <li><a href="coldp.html#coldp.COLDP.get_identifier_policy.params.volatile">volatile (coldp.COLDP.get_identifier_policy parameter)</a>
+
+      <ul>
+        <li><a href="identifier-policy.html#coldp.IdentifierPolicy.params.volatile">(coldp.IdentifierPolicy parameter)</a>
+</li>
+      </ul></li>
   </ul></td>
 </tr></table>
 
@@ -622,6 +660,7 @@
 <ul>
 <li class="toctree-l1"><a class="reference internal" href="coldp.html">coldp.COLDP</a></li>
 <li class="toctree-l1"><a class="reference internal" href="name-bundle.html">coldp.NameBundle</a></li>
+<li class="toctree-l1"><a class="reference internal" href="identifier-policy.html">coldp.IdentifierPolicy</a></li>
 </ul>
 <ul>
 <li class="toctree-l1"><a class="reference internal" href="usage.html">Usage</a></li>

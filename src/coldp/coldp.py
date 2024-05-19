@@ -15,12 +15,25 @@ See: `COL Data Package (ColDP) Specification <https://github.com/CatalogueOfLife
 # ---------------------------------------------------------------------------
 # Imports
 # ---------------------------------------------------------------------------
+from collections import abc
 import pandas as pd
 import numpy as np
 import logging
 import os
 import re
 import shutil
+
+
+# ---------------------------------------------------------------------------
+# Class pre-declarations
+# ---------------------------------------------------------------------------
+class NameBundle:
+    pass
+
+
+class IdentifierPolicy:
+    pass
+
 
 # ---------------------------------------------------------------------------
 # Column headings for each data class within COLDP packages
@@ -222,7 +235,7 @@ type_material_headings = [
 name_relation_headings = ["nameID", "relatedNameID", "type", "referenceID", "remarks"]
 
 distribution_headings = [
-    "taxonId",
+    "taxonID",
     "area",
     "gazetteer",
     "status",
@@ -379,190 +392,6 @@ scientific_name_pattern = re.compile(
 )
 
 
-class NameBundle:
-    def __init__(
-        self,
-        coldp,
-        accepted: dict[str:str],
-        incertae_sedis: bool = False,
-        sic: bool = False,
-    ) -> None:
-        """
-        Wrapper class to manage set of associated names, normally an accepted name
-        and one or more synonyms. The bundle handles the logic of associated name
-        variations.
-
-        :param coldp: :py:class:`~coldp.COLDP` object to handle logging of any issues and normalise name records
-        :param accepted: Dictionary mapping COLDP name elements to values for the accepted name - a name record and a taxon record will be added to the COLDP package for the accepted name
-        :param incertae_sedis: Flag to indicate if the resulting taxon record should be marked "incertae sedis"
-        :param sic: Flag to indicate if the accepted name should be processed without reporting issues for invalid format
-
-        The minimal usage is to create a new bundle with an accepted name. One
-        or more synonyms can also be supplied using the :py:func:`~coldp.NameBundle.add_synonym` method.
-        The bundle is then submitted to the :py:func:`coldp.COLDP.add_names` method for
-        processing.
-
-        NameBundle objects should not be created directly. Use the :py:func:`coldp.COLDP.start_name_bundle` method instead.
-
-        accepted should contain a dictionary with keys that match property names from the `COLDP Name class <https://github.com/CatalogueOfLife/coldp?tab=readme-ov-file#name>`_
-        """
-
-        self.coldp = coldp
-        if "rank" not in accepted:
-            self.coldp.issue(
-                "Accepted name missing rank, assume species: " + str(accepted)
-            )
-            accepted["rank"] = "species"
-        self.accepted_sic = sic
-        self.accepted = self.normalise_name(accepted.copy(), sic)
-        self.incertae_sedis = incertae_sedis
-        self.accepted_taxon_id = None
-        self.synonyms = []
-        self.species = None
-        self.species_synonym = None
-        self.accepted_species_id = None
-
-    def add_synonym(self, synonym: dict[str:str], sic: bool = False) -> None:
-        """
-        Register an additional name as a synonym for the accepted name
-
-        synonym should contain a dictionary with keys that match property names from the `COLDP Name class <https://github.com/CatalogueOfLife/coldp?tab=readme-ov-file#name>`_
-
-        :param synonym: Dictionary mapping COLDP name elements to values for the synonymous name - a name record and a synonym record will be added to the COLDP package for the synonym
-        :param sic: Flag to indicate that the name does not follow expected formatting rules for a code-compliant name and that no issues should be logged for this
-
-        """
-
-        normalised = self.normalise_name(synonym, sic)
-        present = normalised["scientificName"] == self.accepted["scientificName"]
-        if not present:
-            for s in self.synonyms:
-                if normalised["scientificName"] == s["scientificName"]:
-                    if (
-                        normalised["authorship"] is None
-                        or s["authorship"] is None
-                        or normalised["authorship"] == s["authorship"]
-                    ):
-                        present = True
-                        break
-        if not present:
-            self.synonyms.append(normalised)
-
-    def normalise_name(self, name: dict[str:str], sic: bool = False) -> dict:
-        """
-        Ensure that a name record dictionary contains all necessary/appropriate elements
-
-        :param name: Dictionary containing name to be normalised
-        :param sic: Flag to indicate that the name does not follow expected formatting rules for a code-compliant name and that no issues should be logged for this
-        :return: Name dictionary updated with extra values
-        """
-
-        # Ensure main elements are present in dictionary
-        for k in required_properties["name"]:
-            if k not in name:
-                name[k] = ""
-
-        # If code is missing, use value from COLDP
-        if "code" not in name or name["code"] == "":
-            name["code"] = self.coldp.code
-
-        # Skip processing if sic
-        if not sic:
-            # Check uninomials for formatting - log issues and fix case
-            for k in ["uninomial", "genus", "infragenericEpithet"]:
-                if len(name[k]) > 0:
-                    if not name_pattern.match(name[k]):
-                        self.coldp.issue(
-                            f'Invalid pattern for supraspecific name: "{name[k]}"'
-                        )
-                    elif name[k][0].islower():
-                        self.coldp.issue(
-                            "Lowercase initial letter "
-                            + "for supraspecific name: "
-                            + name[k]
-                        )
-                        name[k] = name[k][0].upper() + name[k][1:]
-
-            # Check epithets for formatting - log issues and fix case
-            for k in ["specificEpithet", "infraspecificEpithet"]:
-                if len(name[k]) > 0:
-                    if not name_pattern.match(name[k]):
-                        self.coldp.issue("Invalid pattern for epithet: " + name[k])
-                    elif name[k][0].isupper():
-                        self.coldp.issue(
-                            "Uppercase initial letter for epithet: " + name[k]
-                        )
-                        name[k] = name[k][0].lower() + name[k][1:]
-
-        # If scientificName is present, make sure all parts are
-        # also completed.
-        if name["scientificName"]:
-            match = scientific_name_pattern.match(name["scientificName"])
-            if match is not None:
-                # Handle any name with a specificEpithet
-                if match.group(5):
-                    if not name["genus"]:
-                        name["genus"] = match.group(1)
-                    if not name["infragenericEpithet"] and match.group(3):
-                        name["infragenericEpithet"] = match.group(3)
-                    if not name["specificEpithet"] and match.group(5):
-                        name["specificEpithet"] = match.group(5)
-                    if not name["infraspecificEpithet"] and match.group(8):
-                        name["infraspecificEpithet"] = match.group(8)
-                elif name["rank"] == "subgenus":
-                    if not name["genus"]:
-                        name["genus"] = match.group(1)
-                    if not name["uninomial"] and match.group(3):
-                        name["uninomial"] = match.group(3)
-                else:
-                    if not name["uninomial"]:
-                        name["uninomial"] = match.group(1)
-
-        # Generate properly formatted scientific name unless sic is True.
-        # If sic is True but scientificName is empty, generate anyway.
-        if not sic or not name["scientificName"]:
-            if self.coldp.is_species_group(name):
-                (
-                    name["scientificName"],
-                    name["rank"],
-                ) = self.coldp.construct_species_rank_name(
-                    name["genus"],
-                    name["infragenericEpithet"],
-                    name["specificEpithet"],
-                    name["infraspecificEpithet"],
-                    name["rank"],
-                )
-            else:
-                name["scientificName"] = name["uninomial"]
-
-        # Return normalised version of name
-        return name
-
-    def derive_name(
-        self, name: dict[str:str], values: dict[str:str], sic: bool = False
-    ) -> dict:
-        """
-        Use supplied values to create new name dictionary with missing elements copied from an existing name dictionary
-
-        :param name: Dictionary containing name on which new name is to be based
-        :param values: Dictionary of values to override values in name
-        :return: Name dictionary with supplied values supplemented from name
-        """
-
-        if (
-            "authorship" not in values
-            and "authorship" in name
-            and not name["authorship"].startswith("(")
-        ):
-            if "genus" in values or "specificEpithet" in values:
-                values["authorship"] = "(" + name["authorship"] + ")"
-
-        for k in required_properties["name"]:
-            if k in name and k not in values:
-                values[k] = name[k]
-        return self.normalise_name(values, sic)
-
-
 class COLDP:
     def __init__(
         self,
@@ -598,7 +427,7 @@ class COLDP:
         :param issues_to_stdout: If true, print any issue messages (see :py:func:`~coldp.COLDP.issue`) to stdout as well as inserting then in the issue dataframe.
         :param context: Value to be used in labeling issue records (see :py:func:`~coldp.COLDP.issue`). This value is more normally set using :py:func:`~coldp.COLDP.set_context`.
 
-        A COLDP object is initalised with a source/destination folder, COLDP package
+        A COLDP object is initialised with a source/destination folder, COLDP package
         name and other options.
 
         If a subfolder exists with the supplied name in the supplied folder, it
@@ -666,7 +495,7 @@ class COLDP:
             source_folder, "distribution", distribution_headings
         )
         self.species_interactions = self.initialise_dataframe(
-            source_folder, "speciesinteration", species_interaction_headings
+            source_folder, "speciesinteraction", species_interaction_headings
         )
         self.name_relations = self.initialise_dataframe(
             source_folder, "namerelation", name_relation_headings
@@ -679,6 +508,8 @@ class COLDP:
         if self.basionyms_from_synonyms:
             self.fix_basionyms(self.names, self.synonyms)
         self.issues = None
+
+        self.identifier_policies = {}
 
     def set_options(self, **options: bool):
         """
@@ -1219,35 +1050,54 @@ class COLDP:
 
         Find existing ID values for each supplied reference, based on identity
         of: author, title, issued, containerTitle, volume, issue, page and citation. Add
-        ID to the appropriate reference dictionary in references. If none
+        ID from the appropriate reference dictionary in references. If none
         found, set ID to next unused index and add to references.
 
         The list is returned updated with current ID values so these can be used for referenceID values in other classes.
         """
 
         for i in range(len(reference_list)):
-            has_content = False
-            for k in reference_list[i].keys():
-                if reference_list[i][k]:
-                    has_content = True
-                    break
-            if has_content:
-                r = reference_list[i]
-                reference = self.find_reference(reference_list[i])
-                if reference is not None:
-                    reference_list[i] = reference
-                    logging.debug("Matched reference ID " + reference_list[i]["ID"])
-                else:
-                    if not r["ID"]:
-                        r["ID"] = "r_" + str(len(self.references) + 1)
-                    self.references = pd.concat(
-                        (self.references, pd.DataFrame.from_records([r])),
-                        ignore_index=True,
-                    )
-                    logging.debug("Added reference " + str(r))
-            else:
-                reference_list[i]["ID"] = ""
+            reference_list[i] = self.add_reference(reference_list[i])
+
         return reference_list
+
+    def add_reference(self, reference: dict[str:str]) -> dict[str:str]:
+        """
+        Ensure a reference is included in references dataframe
+
+        :param reference: Dictionary containing values keyed by terms from reference_headings
+        :return: Updated :paramref:`~coldp.COLDP.add_references.reference` with ID for reference in this COLDP instance
+
+        Find existing ID values for supplied reference, based on identity
+        of: author, title, issued, containerTitle, volume, issue, page and citation. Add
+        ID from the appropriate reference dictionary in references. If none
+        found, set ID to next unused index and add to references.
+
+        The reference is returned updated with the current ID value so this can be used for referenceID values in other classes.
+        """
+
+        has_content = False
+        for k in reference.keys():
+            if reference[k]:
+                has_content = True
+                break
+        if has_content:
+            r = self.find_reference(reference)
+            if r is not None:
+                logging.debug("Matched reference ID " + r["ID"])
+                reference = r
+            else:
+                if not reference["ID"]:
+                    policy = self.get_identifier_policy("reference", "r_")
+                    reference["ID"] = policy.next(self.references["ID"])
+                self.references = pd.concat(
+                    (self.references, pd.DataFrame.from_records([reference])),
+                    ignore_index=True,
+                )
+                logging.debug("Added reference " + str(reference))
+        else:
+            reference["ID"] = ""
+        return reference
 
     def get_reference(self, id: str) -> dict[str:str]:
         """
@@ -1493,6 +1343,12 @@ class COLDP:
         if "nameID" not in synonym or synonym["nameID"] not in self.names["ID"].values:
             self.issue("Synonym must be associated with a valid name ID")
             return None
+
+        if "ID" in self.synonyms.columns and not synonym["ID"]:
+            policy = self.get_identifier_policy("synonym", "s_", False)
+            next_id = policy.next(self.synonyms["ID"])
+            if next_id is not None:
+                synonym["ID"] = next_id
 
         self.synonyms = pd.concat(
             (self.synonyms, pd.DataFrame.from_records([synonym])),
@@ -1837,6 +1693,7 @@ class COLDP:
                     taxon_row = self.default_taxon
                 else:
                     taxon_row = match.iloc[0].copy()
+                    taxon_row["remarks"] = ""
                     parent_name_row = self.names[
                         self.names["ID"] == taxon_row["nameID"]
                     ]
@@ -1844,7 +1701,10 @@ class COLDP:
                     parent_name = parent_name_row.iloc[0]["scientificName"]
             else:
                 taxon_row = self.default_taxon
-            taxon_row["ID"] = str(len(self.taxa) + 1)
+
+            policy = self.get_identifier_policy("taxon", "t_")
+            taxon_row["ID"] = policy.next(self.taxa["ID"])
+
             taxon_row["parentID"] = parentID if parentID else ""
             taxon_row["nameID"] = name["ID"]
             if parent_rank in [
@@ -1939,7 +1799,9 @@ class COLDP:
             return match
         else:
             if "ID" not in name or not name["ID"]:
-                name["ID"] = str(len(self.names) + 1)
+                policy = self.get_identifier_policy("name", "n_", False)
+                name["ID"] = policy.next(self.names["ID"])
+
             self.names = pd.concat(
                 (self.names, pd.DataFrame.from_records([name])), ignore_index=True
             )
@@ -2485,6 +2347,59 @@ class COLDP:
             "aberration",
         ]
 
+    def get_available_column_headings(self) -> dict[str, list[str]]:
+        """
+        Return dictionary mapping table names to lists of supported columns
+
+        :return: Dictionary containing copies of internal heading lists
+
+        Returns copies to avoid corrupting the lists used in this class
+        """
+        return {
+            "reference": reference_headings.copy(),
+            "name": name_headings.copy(),
+            "taxon": taxon_headings.copy(),
+            "synonym": synonym_headings.copy(),
+            "distribution": distribution_headings.copy(),
+            "typematerial": type_material_headings.copy(),
+            "speciesinteraction": species_interaction_headings.copy(),
+        }
+
+    def get_identifier_policy(
+        self, table_name: str, default_prefix: str = None, required=True, volatile=False
+    ) -> IdentifierPolicy:
+        """
+        Find or create :py:class:`~coldp.IdentifierPolicy` associated with named table
+
+        :param table_name: Name of COLDP dataframe for which policy is required
+        :param default_prefix: String prefix to use before numeric ID values if existing ID values are not consistently positive integer values
+        :param required: Flag to indicate whether the table must have ID values - if False, the :py:class:`~coldp.IdentifierPolicy` will return None unless :paramref:`~coldp.IdentifierPolicy.__init__.existing` already contains ID values
+        :param volatile: Flag to indicate if external code may modify ID values while the current COLDP instance is active - if False, the policy and future values will be determined on initialisation, otherwise the policy will be reviewed for each new ID value
+        :return: :py:class:`~coldp.IdentifierPolicy` object or None if no policy is required for the table
+
+        Creates new :py:class:`~coldp.IdentifierPolicy` instance if this is the first invocation for the given table. Policies take into account any existing ID values for the table.
+        """
+        if table_name not in self.identifier_policies:
+
+            table = self.table_by_name(table_name)
+            if table is None:
+                return None
+
+            headings = self.get_available_column_headings(table)
+            if headings is None or "ID" not in headings:
+                return None
+
+            if "ID" in table.columns:
+                existing = table["ID"]
+            else:
+                existing = None
+
+            self.identifier_policies[table_name] = IdentifierPolicy(
+                table["ID"], default_prefix, required, volatile
+            )
+
+        return self.identifier_policies[table_name]
+
     def save(self, destination: str = None, name: str = None) -> None:
         """
         Write dataframes as COLDP CSV files
@@ -2557,6 +2472,273 @@ class COLDP:
         self.issues = pd.concat(
             (self.issues, pd.DataFrame.from_records([issue_record])), ignore_index=True
         )
+
+
+class NameBundle:
+    def __init__(
+        self,
+        coldp,
+        accepted: dict[str:str],
+        incertae_sedis: bool = False,
+        sic: bool = False,
+    ) -> None:
+        """
+        Wrapper class to manage set of associated names, normally an accepted name
+        and one or more synonyms. The bundle handles the logic of associated name
+        variations.
+
+        :param coldp: :py:class:`~coldp.COLDP` object to handle logging of any issues and normalise name records
+        :param accepted: Dictionary mapping COLDP name elements to values for the accepted name - a name record and a taxon record will be added to the COLDP package for the accepted name
+        :param incertae_sedis: Flag to indicate if the resulting taxon record should be marked "incertae sedis"
+        :param sic: Flag to indicate if the accepted name should be processed without reporting issues for invalid format
+
+        The minimal usage is to create a new bundle with an accepted name. One
+        or more synonyms can also be supplied using the :py:func:`~coldp.NameBundle.add_synonym` method.
+        The bundle is then submitted to the :py:func:`coldp.COLDP.add_names` method for
+        processing.
+
+        NameBundle objects should not be created directly. Use the :py:func:`coldp.COLDP.start_name_bundle` method instead.
+
+        accepted should contain a dictionary with keys that match property names from the `COLDP Name class <https://github.com/CatalogueOfLife/coldp?tab=readme-ov-file#name>`_
+        """
+
+        self.coldp = coldp
+        if "rank" not in accepted:
+            self.coldp.issue(
+                "Accepted name missing rank, assume species: " + str(accepted)
+            )
+            accepted["rank"] = "species"
+        self.accepted_sic = sic
+        self.accepted = self.normalise_name(accepted.copy(), sic)
+        self.incertae_sedis = incertae_sedis
+        self.accepted_taxon_id = None
+        self.synonyms = []
+        self.species = None
+        self.species_synonym = None
+        self.accepted_species_id = None
+
+    def add_synonym(self, synonym: dict[str:str], sic: bool = False) -> None:
+        """
+        Register an additional name as a synonym for the accepted name
+
+        synonym should contain a dictionary with keys that match property names from the `COLDP Name class <https://github.com/CatalogueOfLife/coldp?tab=readme-ov-file#name>`_
+
+        :param synonym: Dictionary mapping COLDP name elements to values for the synonymous name - a name record and a synonym record will be added to the COLDP package for the synonym
+        :param sic: Flag to indicate that the name does not follow expected formatting rules for a code-compliant name and that no issues should be logged for this
+
+        """
+
+        normalised = self.normalise_name(synonym, sic)
+        present = normalised["scientificName"] == self.accepted["scientificName"]
+        if not present:
+            for s in self.synonyms:
+                if normalised["scientificName"] == s["scientificName"]:
+                    if (
+                        normalised["authorship"] is None
+                        or s["authorship"] is None
+                        or normalised["authorship"] == s["authorship"]
+                    ):
+                        present = True
+                        break
+        if not present:
+            self.synonyms.append(normalised)
+
+    def normalise_name(self, name: dict[str:str], sic: bool = False) -> dict:
+        """
+        Ensure that a name record dictionary contains all necessary/appropriate elements
+
+        :param name: Dictionary containing name to be normalised
+        :param sic: Flag to indicate that the name does not follow expected formatting rules for a code-compliant name and that no issues should be logged for this
+        :return: Name dictionary updated with extra values
+        """
+
+        # Ensure main elements are present in dictionary
+        for k in required_properties["name"]:
+            if k not in name:
+                name[k] = ""
+
+        # If code is missing, use value from COLDP
+        if "code" not in name or name["code"] == "":
+            name["code"] = self.coldp.code
+
+        # Skip processing if sic
+        if not sic:
+            # Check uninomials for formatting - log issues and fix case
+            for k in ["uninomial", "genus", "infragenericEpithet"]:
+                if len(name[k]) > 0:
+                    if not name_pattern.match(name[k]):
+                        self.coldp.issue(
+                            f'Invalid pattern for supraspecific name: "{name[k]}"'
+                        )
+                    elif name[k][0].islower():
+                        self.coldp.issue(
+                            "Lowercase initial letter "
+                            + "for supraspecific name: "
+                            + name[k]
+                        )
+                        name[k] = name[k][0].upper() + name[k][1:]
+
+            # Check epithets for formatting - log issues and fix case
+            for k in ["specificEpithet", "infraspecificEpithet"]:
+                if len(name[k]) > 0:
+                    if not name_pattern.match(name[k]):
+                        self.coldp.issue("Invalid pattern for epithet: " + name[k])
+                    elif name[k][0].isupper():
+                        self.coldp.issue(
+                            "Uppercase initial letter for epithet: " + name[k]
+                        )
+                        name[k] = name[k][0].lower() + name[k][1:]
+
+        # If scientificName is present, make sure all parts are
+        # also completed.
+        if name["scientificName"]:
+            match = scientific_name_pattern.match(name["scientificName"])
+            if match is not None:
+                # Handle any name with a specificEpithet
+                if match.group(5):
+                    if not name["genus"]:
+                        name["genus"] = match.group(1)
+                    if not name["infragenericEpithet"] and match.group(3):
+                        name["infragenericEpithet"] = match.group(3)
+                    if not name["specificEpithet"] and match.group(5):
+                        name["specificEpithet"] = match.group(5)
+                    if not name["infraspecificEpithet"] and match.group(8):
+                        name["infraspecificEpithet"] = match.group(8)
+                elif name["rank"] == "subgenus":
+                    if not name["genus"]:
+                        name["genus"] = match.group(1)
+                    if not name["uninomial"] and match.group(3):
+                        name["uninomial"] = match.group(3)
+                else:
+                    if not name["uninomial"]:
+                        name["uninomial"] = match.group(1)
+
+        # Generate properly formatted scientific name unless sic is True.
+        # If sic is True but scientificName is empty, generate anyway.
+        if not sic or not name["scientificName"]:
+            if self.coldp.is_species_group(name):
+                (
+                    name["scientificName"],
+                    name["rank"],
+                ) = self.coldp.construct_species_rank_name(
+                    name["genus"],
+                    name["infragenericEpithet"],
+                    name["specificEpithet"],
+                    name["infraspecificEpithet"],
+                    name["rank"],
+                )
+            else:
+                name["scientificName"] = name["uninomial"]
+
+        # Return normalised version of name
+        return name
+
+    def derive_name(
+        self, name: dict[str:str], values: dict[str:str], sic: bool = False
+    ) -> dict:
+        """
+        Use supplied values to create new name dictionary with missing elements copied from an existing name dictionary
+
+        :param name: Dictionary containing name on which new name is to be based
+        :param values: Dictionary of values to override values in name
+        :return: Name dictionary with supplied values supplemented from name
+        """
+
+        if (
+            "authorship" not in values
+            and "authorship" in name
+            and not name["authorship"].startswith("(")
+        ):
+            if "genus" in values or "specificEpithet" in values:
+                values["authorship"] = "(" + name["authorship"] + ")"
+
+        for k in required_properties["name"]:
+            if k in name and k not in values:
+                values[k] = name[k]
+        return self.normalise_name(values, sic)
+
+
+class IdentifierPolicy:
+
+    def __init__(
+        self,
+        existing: pd.Series,
+        default_prefix: str,
+        required: bool = True,
+        volatile: bool = False,
+    ) -> None:
+        """
+        Internal class to manage ID values in COLDP dataframes.
+
+        :param existing: Pandas series containing current ID values for table - may be empty or None
+        :param default_prefix: String prefix to use before numeric ID values if existing ID values are not consistently positive integer values
+        :param required: Flag to indicate whether the table must have ID values - if False, the :py:class:`~coldp.IdentifierPolicy` will return None unless :paramref:`~coldp.IdentifierPolicy.__init__.existing` already contains ID values
+        :param volatile: Flag to indicate if external code may modify ID values while the current COLDP instance is active - if False, the policy and future values will be determined on initialisation, otherwise the policy will be reviewed for each new ID value
+
+        Checks any existing values in the series. If none are present, the next ID value will be 1. If all values are integer strings, the next value will be the integer string with a value one higher than the current maximum value. Otherwise ID values will be the concatenation of the prefix (defaulting to the empty string) and the current length of the ID series. Subsequent values will increment by one.
+
+        If :paramref:`~coldp.IdentifierPolicy.__init__.required` is False and no current valus exist in the series, the policy will always return None.
+
+        If :paramref:`~coldp.IdentifierPolicy.__init__.volatile` is True, the policy will be revised on every invocation of next. Otherwise, the series will only be scanned on initialisation and all policy values will then be fixed.
+        """
+
+        self.required = required
+        self.volatile = volatile
+        self.default_prefix = default_prefix
+
+        if not self.volatile:
+            self.next_value, self.prefix = self.initialise(existing)
+        else:
+            self.next_value = None
+            self.prefix = None
+
+        return
+
+    def initialise(self, existing: pd.Series) -> tuple[int, str]:
+        """
+        Internal method to set or refresh policy
+
+        :param existing: Pandas series containing current ID values for table - may be empty or None
+        :return: Tuple comprising the next integer value for the policy and a prefix for use if ID values should not be plain integer strings - one or both values will be None
+
+        Provides the variables to determine the next ID value, if any
+        """
+
+        if existing is None or len(existing) == 0:
+            if self.required:
+                return 1, None
+            else:
+                return None, None
+
+        if len(existing.str.match(r"^[0-9]+$")) == len(existing):
+            return existing.astype(int).max() + 1, None
+
+        elif self.default_prefix is not None:
+            return None, self.default_prefix
+
+        return None, ""
+
+    def next(self, existing: pd.Series = None) -> str:
+        """
+        Return next ID value for series
+
+        :param existing: Pandas series containing current ID values for table - may be empty or None - only required if :paramref:`~coldp.IdentifierPolicy.__init__.volatile` is True
+        :return: Next string ID value for policy or None if no ID is required
+
+        Returns the next ID value for use in the Series associated with this IdentifierPolicy. Recalculates policy if paramref:`~coldp.IdentifierPolicy.__init__.volatile` is True.
+        """
+        if self.volatile:
+            next_value, prefix = self.initialise(existing)
+        else:
+            next_value = self.next_value
+            self.next_value = self.next_value + 1
+            prefix = self.prefix
+
+        if next_value is not None:
+            return str(next_value)
+        elif prefix is not None:
+            return f"{prefix}{len(existing) + 1}"
+        return None
 
 
 if __name__ == "__main__":
