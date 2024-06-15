@@ -1908,7 +1908,7 @@ class COLDP:
             return match
         else:
             if "ID" not in name or not name["ID"]:
-                policy = self.get_identifier_policy("name", "n_", False)
+                policy = self.get_identifier_policy("name", "n_")
                 name["ID"] = policy.next(self.names["ID"])
 
             self.names = pd.concat(
@@ -2766,6 +2766,20 @@ class NameBundle:
                 values[k] = name[k]
         return self.normalise_name(values, sic)
 
+    def __str__(self) -> str:
+        """
+        Render NameBundle as string
+
+        :return: String including name, authorship and rank for accepted name and all synonyms
+
+        Returns a string of the form "accepted_name accepted_authorship [accepted_rank] == {synonym_name synonym_authorship [synonym_rank], ...}".
+        """
+        s = f"{self.accepted['scientificName']} {self.accepted['authorship']} [{self.accepted['rank']}]"
+        if len(self.synonyms) > 0:
+            s2 = ", ".join([f"{syn['scientificName']} {syn['authorship']} [{syn['rank']}]" for syn in self.synonyms])
+            s += " == {" + s2 + "}"
+
+        return s
 
 class IdentifierPolicy:
 
@@ -2839,16 +2853,19 @@ class IdentifierPolicy:
         if self.volatile:
             next_value, prefix = self.initialise(existing)
         else:
-            next_value = self.next_value
-            self.next_value = self.next_value + 1
+            if self.next_value is None:
+                next_value = None
+            else:
+                next_value = self.next_value
+                self.next_value = self.next_value + 1
             prefix = self.prefix
 
         if next_value is not None:
             return str(next_value)
-        elif prefix is not None:
+        elif prefix is not None and existing is not None:
             return f"{prefix}{len(existing) + 1}"
         return None
-
+    
 
 if __name__ == "__main__":
     logging.basicConfig(filename="COLDP.log", level=logging.DEBUG)
@@ -2928,6 +2945,8 @@ if __name__ == "__main__":
         }
     )
 
+    print(nb)
+
     nb.add_synonym(
         {
             "genus": "Xus",
@@ -2957,6 +2976,8 @@ if __name__ == "__main__":
             "status": "established",
         }
     )
+
+    print(nb)
 
     coldp.add_names(nb, None)
 
