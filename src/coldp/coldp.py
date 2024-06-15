@@ -2494,7 +2494,7 @@ class COLDP:
             if table is None:
                 return None
 
-            headings = self.get_available_column_headings(table)
+            headings = self.get_available_column_headings()[table_name]
             if headings is None or "ID" not in headings:
                 return None
 

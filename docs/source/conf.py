@@ -15,7 +15,7 @@ sys.path.insert(0, os.path.abspath("../../src/coldp"))
 project = "COLDP"
 copyright = "2024, Donald Hobern"
 author = "Donald Hobern"
-release = "2024.5.5"
+release = "2024.6.1"
 
 # -- General configuration ---------------------------------------------------
 # https://www.sphinx-doc.org/en/master/usage/configuration.html#general-configuration
