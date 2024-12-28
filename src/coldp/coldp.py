@@ -428,6 +428,7 @@ class COLDP:
         classification_from_parents: bool = False,
         allow_repeated_binomials: bool = False,
         create_taxa_for_not_established: bool = False,
+        taxon_ids_from_accepted_name_ids: bool = False,
         issues_to_stdout: bool = False,
         context: str = None,
     ) -> None:
@@ -495,6 +496,7 @@ class COLDP:
         self.classification_from_parents = classification_from_parents
         self.allow_repeated_binomials = allow_repeated_binomials
         self.create_taxa_for_not_established = create_taxa_for_not_established
+        self.taxon_ids_from_accepted_name_ids = taxon_ids_from_accepted_name_ids
         self.issues_to_stdout = issues_to_stdout
         self.context = context
 
@@ -1290,13 +1292,13 @@ class COLDP:
             or self.create_taxa_for_not_established
         ):
             if bundle.species:
-                taxon = self.insert_taxon(bundle.species, parent)
+                taxon = self.insert_taxon(bundle.species, parent, taxon_ids_from_accepted_name_ids=self.taxon_ids_from_accepted_name_ids)
                 parent = taxon["ID"]
                 bundle.species_taxon_id = parent
                 if bundle.species_synonym:
                     self.insert_synonym(parent, bundle.species_synonym["ID"])
 
-            taxon = self.insert_taxon(bundle.accepted, parent, bundle.incertae_sedis)
+            taxon = self.insert_taxon(bundle.accepted, parent, incertae_sedis=bundle.incertae_sedis, taxon_ids_from_accepted_name_ids=self.taxon_ids_from_accepted_name_ids)
             bundle.accepted_taxon_id = taxon["ID"]
             for i in range(len(bundle.synonyms)):
                 self.insert_synonym(bundle.accepted_taxon_id, bundle.synonyms[i]["ID"])
@@ -1724,7 +1726,7 @@ class COLDP:
         return valid
 
     def insert_taxon(
-        self, name: dict[str:str], parentID: str, incertae_sedis: bool = False
+        self, name: dict[str:str], parentID: str, incertae_sedis: bool = False, taxon_ids_from_accepted_name_ids: bool = False
     ) -> dict[str:str]:
         """
         Insert COLDP Taxon record as child of identified parent - creates or moves record as necessary
@@ -1811,11 +1813,15 @@ class COLDP:
             else:
                 taxon_row = self.default_taxon
 
-            policy = self.get_identifier_policy("taxon", "t_")
-            taxon_row["ID"] = policy.next(self.taxa["ID"])
-
             taxon_row["parentID"] = parentID if parentID else ""
             taxon_row["nameID"] = name["ID"]
+
+            if taxon_ids_from_accepted_name_ids and name["ID"] not in self.taxa["ID"]:
+                taxon_row["ID"] = name["ID"]
+            else:
+                policy = self.get_identifier_policy("taxon", "t_")
+                taxon_row["ID"] = policy.next(self.taxa["ID"])
+
             if parent_rank in [
                 "kingdom",
                 "phylum",
