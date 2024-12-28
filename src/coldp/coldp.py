@@ -2833,7 +2833,7 @@ class IdentifierPolicy:
             else:
                 return None, None
 
-        if len(existing.str.match(r"^[0-9]+$")) == len(existing):
+        if all(existing.str.match(r"^[0-9]+$")):
             return existing.astype(int).max() + 1, None
 
         elif self.default_prefix is not None:
