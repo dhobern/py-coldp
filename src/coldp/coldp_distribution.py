@@ -8,7 +8,7 @@ import pathlib
 from datetime import datetime
 import warnings
 
-warnings.filterwarnings("ignore", category=numpy.VisibleDeprecationWarning)
+#warnings.filterwarnings("ignore", category=numpy.VisibleDeprecationWarning)
 
 
 # Return taxon id for taxon record or for taxon record linked via synonym record to a name record based on search_name
