@@ -1,13 +1,4 @@
-
-*.pyc
-*.log
-*.txt
-*.csv
-coldp_reshape_2.py
-test/output/
-/legacy
-/.idea
-/venv
-/dist
-/docs/build/doctrees
-docs/build/html/.buildinfo
+crake/
+dist/
+docs/build/
+src/coldp/__pycache__

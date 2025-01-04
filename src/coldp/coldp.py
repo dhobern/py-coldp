@@ -868,7 +868,7 @@ class COLDP:
         else:
             classification = parent[rank_headings]
             if parent["rank"] in rank_headings:
-                classification[rank_headings.index(parent["rank"])] = parent[
+                classification.iloc[rank_headings.index(parent["rank"])] = parent[
                     "scientificName"
                 ]
 
