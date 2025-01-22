@@ -994,15 +994,19 @@ class COLDP:
         # expanded to include values from the name record, including rank and
         # scientificName - these will be passed for the first recursion
         if parent is None:
+            ranks_to_preserve = []
             for p in range(len(rank_headings)):
                 parents = pd.merge(
                     taxa,
                     ranks[ranks["rank"] == rank_headings[p]],
                     on="nameID",
                     how="right",
-                )
+                ).fillna("")
                 if parents is not None and len(parents) > 0:
+                    taxa[[c for c in taxa.columns if c in rank_headings and c not in ranks_to_preserve]] = ""
                     break
+                else:
+                    ranks_to_preserve.append(rank_headings[p])
 
         # Otherwise, get the classification columns from the parent and set
         # any column with a name matching the parent's rank to contain the
@@ -1011,21 +1015,22 @@ class COLDP:
         # and set all their higher taxon columns to match the parent. Use these
         # as parents for the next recursion.
         else:
-            classification = parent[rank_headings]
+            classification = {k: v for k,v in parent.items() if k in rank_headings and len(v) > 0}
             if parent["rank"] in rank_headings:
-                classification[rank_headings.index(parent["rank"])] = parent[
+                classification[parent["rank"]] = parent[
                     "scientificName"
                 ]
+            parent_ranks = classification.keys()
+            parent_taxa = [classification[k] for k in parent_ranks]
 
-            taxa.loc[taxa["parentID"] == parent["ID"], rank_headings] = (
-                classification.to_numpy()
-            )
+            taxa.loc[taxa["ID"] == parent["ID"], parent_ranks] = parent_taxa
+            taxa.loc[taxa["parentID"] == parent["ID"], parent_ranks] = parent_taxa
             parents = pd.merge(
                 taxa.loc[taxa["parentID"] == parent["ID"]],
                 ranks,
                 on="nameID",
                 how="left",
-            )
+            ).fillna("")
 
         # Recurse for all identified parents at the next level
         for i in range(len(parents)):
@@ -1898,6 +1903,41 @@ class COLDP:
             properties.values()
         )
 
+    def set_parent(self, taxon_id: str, parent_id, fix_classification=True) -> bool:
+        """
+        Set parent for selected taxon
+
+        :param taxon_id: String ID for a Taxon record
+        :param parent_id: String ID for the proposed parent Taxon record
+        :param fix_classification: True if classification columns should be fixed (default True)
+        :return: True if parent successfully set
+
+        If both taxa exist and the parent is of a higher rank, set the parentID of the other taxon. If requested, force update to classification columns.
+        """
+        if taxon_id not in self.taxa["ID"].values:
+            logging.error(f"Taxon ID {taxon_id} not recognised")
+            return False
+
+        if parent_id not in self.taxa["ID"].values:
+            logging.error(f"Parent ID {parent_id} not recognised")
+            return False
+
+        taxon = self.get_taxon(taxon_id)
+        taxon_name = self.get_name(taxon["nameID"])
+        parent = self.get_taxon(parent_id)
+        parent_name = self.get_name(parent["nameID"])
+        
+        if self.compare_ranks(taxon, parent) >= 0:
+            logging.error(f"Taxon {taxon_id} not of lower rank than parent {parent_id}")
+            return False
+
+        self.taxa.loc[self.taxa["ID"] == taxon_id, ["parentID"]] = parent_id
+        
+        if fix_classification:
+            self.fix_classification()
+            
+        return True
+
     def modify_name(self, name_id: str, properties: dict[str:str]) -> None:
         """
         Add or modify properties on a COLDP Name record
@@ -2133,6 +2173,18 @@ class COLDP:
             )
         if len(match) == 1:
             return match.iloc[0]
+        elif len(match) > 1 and authorship is None:
+            candidate = None
+            for i in range(len(match)):
+                nameID = match.iloc[i]["ID"]
+                taxon_match = self.taxa[self.taxa["ID"] == nameID]
+                if len(taxon_match) > 1:
+                    return None
+                if len(taxon_match) == 1:
+                    if candidate is not None:
+                        return None
+                    candidate = match.iloc[i]
+            return candidate
         return None
 
     def find_taxon(
@@ -2484,6 +2536,49 @@ class COLDP:
             "form",
             "aberration",
         ]
+
+    def compare_ranks(self, taxon_a: dict[str:str], taxon_b: dict[str:str]) -> int:
+        """
+        Compare ranks of two taxa
+
+        :param taxon_a: First taxon for comparison
+        :param taxon_b: Second taxon for comparison
+        :return: 1 if taxon_a is of higher rank than taxon_b, -1 if taxon_b is of higher rank than taxon_a, 0 otherwise (including if either rank is unrecognised)
+
+        Returns a positive number if the first taxon is of higher rank than the second, negative if the opposite.
+        """
+        if "nameID" not in taxon_a:
+            logging.error(f"taxon_a does not include a nameID")
+            return 0
+        if "nameID" not in taxon_b:
+            logging.error(f"taxon_b does not include a nameID")
+            return 0
+
+        name_a = self.get_name(taxon_a["nameID"])
+        if name_a is None:
+            logging.error(f"name_a not found")
+            return 0
+            
+        name_b = self.get_name(taxon_b["nameID"])
+        if name_b is None:
+            logging.error(f"name_b not found")
+            return 0
+
+        if "rank" not in name_a or name_a["rank"] not in rank_headings:
+            logging.error(f"name_a does not have a recognised rank")
+            return 0
+            
+        if "rank" not in name_b or name_b["rank"] not in rank_headings:
+            logging.error(f"name_b does not have a recognised rank")
+            return 0
+
+        if name_a["rank"] == name_b["rank"]:
+            return 0
+        
+        if rank_headings.index(name_a["rank"]) < rank_headings.index(name_b["rank"]):
+            return 1
+        
+        return -1
 
     def save(self, destination: str = None, name: str = None) -> None:
         """
