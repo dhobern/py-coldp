@@ -1878,7 +1878,50 @@ class COLDP:
             properties.values()
         )
 
-    def set_parent(self, taxon_id: str, parent_id, fix_classification=True) -> bool:
+    def synonymise(self, accepted_id: str, synonymised_id: str, reference_id: str = "", fix_classification: bool = True) -> bool:
+        """
+        Change taxon to be synonym of another taxon
+
+        :param accepted_id: String ID for a Taxon record that is to remain accepted 
+        :param synonymised_id: String ID for a Taxon that is to become a synonym
+        :param fix_classification: True if classification columns should be fixed (default True)
+        :return: True if successfully synonymised
+
+        If both taxa exist set the second to be a synonym and fix other data accordingly. If requested, force update to classification columns.
+        """
+        if accepted_id not in self.taxa["ID"].values:
+            logging.error(f"Accepted ID {taxon_id} not recognised")
+            return False
+
+        if synonymised_id not in self.taxa["ID"].values:
+            logging.error(f"Synonymised ID {parent_id} not recognised")
+            return False
+
+        accepted = self.get_taxon(accepted_id)
+        synonymised = self.get_taxon(synonymised_id)
+     
+        match = self.taxa[self.taxa["parentID"] == synonymised_id]
+        if len(match) > 0: 
+            if self.compare_ranks(accepted, synonymised) != 0:
+                logging.error(f"Synonymised taxon {synonymised_id} has children and is of different rank from accepted taxon - cannot synonymise")
+                return False
+
+            self.taxa.loc[self.taxa["parentID"] == synonymised_id, ["parentID"]] = accepted_id
+
+        self.synonyms.loc[self.synonyms["taxonID"] == synonymised_id, ["taxonID"]] = accepted_id
+        self.distributions.loc[self.distributions["taxonID"] == synonymised_id, ["taxonID"]] = accepted_id
+        self.species_interactions.loc[self.species_interactions["taxonID"] == synonymised_id, ["taxonID"]] = accepted_id
+        
+        self.add_synonym({"nameID": synonymised["nameID"], "taxonID": accepted_id, "status": "synonym", "referenceID": reference_id})
+
+        self.taxa = self.taxa[self.taxa["ID"] != synonymised_id]
+            
+        if fix_classification:
+            self.fix_classification()
+            
+        return True
+
+    def set_parent(self, taxon_id: str, parent_id: str, fix_classification=True) -> bool:
         """
         Set parent for selected taxon
 
