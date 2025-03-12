@@ -1385,6 +1385,104 @@ class COLDP:
         )
         return synonym
 
+    def add_name(self, name: dict[str:str]) -> dict[str:str]:
+        """
+        Add COLDP Name record to COLDP instance
+
+        :param name: COLDP Name record represented as dictionary of properties
+        :return: Name record returned unchanged apart from possible addition of ID
+
+        If supplied, the ID value must be unused. If no ID value is supplied, 
+        a new one will be generated. If a basionymID is supplied, it must match
+        an existing name ID or that supplied for this record.
+
+        Any referenceID or sourceID value must match the ID value for an existing 
+        reference record.
+
+        This method returns the record unchanged other than any added ID value.
+        """
+        if "basionymID" in name and name["basionymID"] not in ["", name["ID"]]:
+            match = self.names[self.names["ID"] == name["basionymID"]]
+            if match is None or len(match) == 0:
+                self.issue(f"Name includes unrecognised basionymID {name['basionymID']}")
+                return None
+
+        if "referenceID" in name and name["referenceID"] != "":
+            match = self.references[self.references["ID"] == name["referenceID"]]
+            if match is None or len(match) == 0:
+                self.issue(f"Name includes unrecognised referenceID {name['referenceID']}")
+                return None
+
+        if "sourceID" in name and name["sourceID"] != "":
+            match = self.references[self.references["ID"] == name["sourceID"]]
+            if match is None or len(match) == 0:
+                self.issue(f"Name includes unrecognised sourceID {name['sourceID']}")
+                return None
+
+        if "ID" not in name or name["ID"] == "":
+            policy = self.get_identifier_policy("name", "n_")
+            next_id = policy.next(self.names["ID"])
+            if next_id is not None:
+                name["ID"] = next_id
+
+        self.names = pd.concat(
+            (self.names, pd.DataFrame.from_records([name])),
+            ignore_index=True,
+        )
+        return name
+
+    def add_taxon(self, taxon: dict[str:str]) -> dict[str:str]:
+        """
+        Add COLDP Taxon record to COLDP instance
+
+        :param name: COLDP Taxon record represented as dictionary of properties
+        :return: Taxon record returned unchanged apart from possible addition of ID
+
+        If supplied, the ID value must be unused. If no ID value is supplied, 
+        a new one will be generated. If a parentID is supplied, it must match
+        an existing taxon ID. Any nameID must match the ID of an existing name.
+
+        Any referenceID or nameReference value must match the ID value for an existing 
+        reference record.
+
+        This method returns the record unchanged other than any added ID value.
+        """
+        if "parentID" in taxon and taxon["parentID"] != "":
+            match = self.taxa[self.taxa["ID"] == taxon["parentID"]]
+            if match is None or len(match) == 0:
+                self.issue(f"Taxon includes unrecognised parentID {taxon['parentID']}")
+                return None
+
+        if "nameID" in taxon and taxon["nameID"] != "":
+            match = self.names[self.names["ID"] == taxon["nameID"]]
+            if match is None or len(match) == 0:
+                self.issue(f"Taxon includes unrecognised nameID {taxon['nameID']}")
+                return None
+
+        if "referenceID" in taxon and taxon["referenceID"] != "":
+            match = self.references[self.references["ID"] == taxon["referenceID"]]
+            if match is None or len(match) == 0:
+                self.issue(f"Taxon includes unrecognised referenceID {taxon['referenceID']}")
+                return None
+
+        if "nameReferenceID" in taxon and taxon["nameReferenceID"] != "":
+            match = self.references[self.references["ID"] == taxon["nameReferenceID"]]
+            if match is None or len(match) == 0:
+                self.issue(f"Taxon includes unrecognised nameReferenceID {taxon['nameReferenceID']}")
+                return None
+
+        if "ID" not in taxon or taxon["ID"] == "":
+            policy = self.get_identifier_policy("taxon", "t_")
+            next_id = policy.next(self.taxa["ID"])
+            if next_id is not None:
+                taxon["ID"] = next_id
+
+        self.taxa = pd.concat(
+            (self.taxa, pd.DataFrame.from_records([taxon])),
+            ignore_index=True,
+        )
+        return taxon
+
     def add_type_material(self, type_material: dict[str:str]) -> dict[str:str]:
         """
         Add COLDP TypeMaterial record to COLDP instance
@@ -2290,6 +2388,16 @@ class COLDP:
         if to_dict:
             return match.to_dict("records")
         return match
+
+    def get_roots(self) -> list[dict[str:str]]:
+        """
+        Get root nodes (taxa without a parentID)
+
+        :return: List of dictionaries containing properties for taxon records lacking a parentID
+
+        Locates all taxa without a defined parentID and returns these in a list.
+        """
+        return self.taxa[self.taxa["parentID"] == ""].to_dict("records")
 
     def get_synonymy(
         self, nameID: str, to_dict: bool = False

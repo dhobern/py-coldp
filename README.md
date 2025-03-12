@@ -27,6 +27,6 @@ pip install py-coldp
 ```
 
 # Documentation
-[Browsable documentation for COLDP version: 2024.12.3](https://html-preview.github.io/?url=https://github.com/dhobern/py-coldp/blob/main/docs/build/html/index.html)
+[Browsable documentation for COLDP version: 2025.3.2](https://html-preview.github.io/?url=https://github.com/dhobern/py-coldp/blob/main/docs/build/html/index.html)
 
-[PDF documentation for COLDP version: 2024.12.3](https://github.com/dhobern/py-coldp/blob/main/docs/build/simplepdf/COLDP.pdf)
+[PDF documentation for COLDP version: 2025.3.2](https://github.com/dhobern/py-coldp/blob/main/docs/build/simplepdf/COLDP.pdf)
